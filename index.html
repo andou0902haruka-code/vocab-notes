@@ -350,6 +350,15 @@
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .sync-line { font-size: 0.72rem; color: var(--sub); margin-top: 10px; text-align: center; }
   .sync-line a { color: var(--teal); text-decoration: underline; cursor: pointer; }
+  /* 今日の復習: つかう時間チップ・この先7日の予定 */
+  .rev-min-row { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-top:10px;
+    font-size:.78rem; color:#777; justify-content:center; }
+  .rev-min { border:1px solid #ddd; background:#fff; color:#555; border-radius:999px;
+    padding:3px 11px; font-size:.78rem; cursor:pointer; font-family:inherit; }
+  .rev-min.on { border-color:#3b82f6; background:rgba(59,130,246,.10); color:#3b82f6; font-weight:700; }
+  .due-fc { display:inline-flex; align-items:flex-end; gap:3px; margin-left:8px; }
+  .due-fc i { display:inline-block; width:7px; background:#3b82f6; opacity:.45; border-radius:2px 2px 0 0; }
+  .due-fc i.over { opacity:.9; background:#d9534f; }
 </style>
 </head>
 <body>
@@ -1309,12 +1318,42 @@ function statusOf(id) {
   if (sr && sr.box >= 4) return { k: 'known', label: '定着' };
   return { k: 'learning', label: '学習中' };
 }
-const SRS_INTERVALS = [1, 2, 4, 7, 14, 30];
+/* 箱は8段。2026-08-27に 6段（最大30日）から広げた。
+   段が少ないと、覚えた単語でも30日ごとに必ず全部戻ってくるので、
+   語数が増えるほど「今日の復習」が構造的に溢れる。60→120日を足すと
+   平均間隔が倍近くになり、空いた枠を「前回まちがえた語」に回せる。
+   下の1日あたりの上限を成立させるための前提。
+   これまでの記録は箱0〜5のままなので、そのまま続きから伸びていく。 */
+const SRS_INTERVALS = [1, 2, 4, 7, 14, 30, 60, 120];
+const DAY_MS = 86400000;
 function srsOf(id) { return U.srs[String(id)] || { box: 0, due: 0, last: 0 }; }
+/* 予定日のならし。同じ日に解いた語は同じ日に戻ってくるので、放っておくと
+   「ある日だけ80語、次の日は0語」という山ができる。次の期限を決めるとき、
+   その前後で予定がいちばん空いている日を選んでおくと、1日あたりの語数がならされる。
+   まちがえた直後（箱0・1）はずらさない。今すぐ出さないと消えてしまうため。 */
+function dayKeyMs(ms) { const d = new Date(ms); d.setHours(0, 0, 0, 0); return d.getTime(); }
+function spreadDue(box, skipId) {
+  const off = SRS_INTERVALS[box], base = Date.now() + off * DAY_MS;
+  const win = off >= 30 ? 3 : (off >= 12 ? 2 : (off >= 5 ? 1 : 0));
+  if (!win) return base;
+  const load = {};
+  Object.keys(U.srs).forEach(k => {
+    if (String(k) === String(skipId)) return;
+    const d = U.srs[k] && U.srs[k].due;
+    if (d) load[dayKeyMs(d)] = (load[dayKeyMs(d)] || 0) + 1;
+  });
+  let best = base, bestN = load[dayKeyMs(base)] || 0;
+  for (let d = -win; d <= win; d++) {
+    if (d === 0 || off + d < 1) continue;
+    const t = Date.now() + (off + d) * DAY_MS, n = load[dayKeyMs(t)] || 0;
+    if (n < bestN) { best = t; bestN = n; }
+  }
+  return best;
+}
 function srsUpdate(id, correct) {
   const cur = srsOf(id);
   const box = correct ? Math.min(cur.box + 1, SRS_INTERVALS.length - 1) : 0;
-  const due = Date.now() + SRS_INTERVALS[box] * 86400000;
+  const due = spreadDue(box, id);
   U.srs[String(id)] = { box: box, due: due, last: Date.now() };
   const s = statOf(id);
   U.stats[String(id)] = { ok: s.ok + (correct ? 1 : 0), ng: s.ng + (correct ? 0 : 1), last: Date.now() };
@@ -1327,6 +1366,76 @@ function dueWords() {
     const s = U.srs[String(w.id)];
     return s && s.due && s.due <= now;
   }).sort((a, b) => srsOf(a.id).due - srsOf(b.id).due);
+}
+
+/* ================= 1日あたりの復習の上限（2026-08-27 追加） =================
+   期限が来た語を全部出していると、語数が増えるほど1日の復習が膨らんで回らなくなる。
+   「今日つかう時間」を決めて、そのぶんの語数だけ出す。溢れたぶんは翌日以降に回る。
+   何を落とすかが肝で、箱が低いもの（＝前回まちがえた＝いちばん早く消える）から先に出す。
+   箱が高いものは数日ずれても壊れないので、後回しにしても記憶は保てる。 */
+const REVIEW_MIN_KEY = 'vocabNote_reviewMin';
+const REVIEW_PACE_KEY = 'vocabNote_reviewPace';
+const REVIEW_MIN_CHOICES = [10, 15, 20, 30];
+const REVIEW_MIN_DEFAULT = 30;
+const PACE_DEFAULT = 15;   // 1問あたりの初期値（秒）。実測が3回たまると置き換わる
+function loadRev(key, def) {
+  try { const v = localStorage.getItem(key); return v === null ? def : JSON.parse(v); } catch (e) { return def; }
+}
+function reviewMinutes() {
+  const v = loadRev(REVIEW_MIN_KEY, REVIEW_MIN_DEFAULT);
+  return REVIEW_MIN_CHOICES.indexOf(v) >= 0 ? v : REVIEW_MIN_DEFAULT;
+}
+function setReviewMinutes(m) {
+  try { localStorage.setItem(REVIEW_MIN_KEY, JSON.stringify(m)); } catch (e) {}
+  renderReview(); renderTestSetup();
+}
+/* 1問あたりの秒数は実測の中央値。ただし画面を開きっぱなしにした回が混ざると
+   一気に狂うので、標本は初期値の 0.3〜3倍に丸めてから貯める */
+function pushPace(seconds, items) {
+  if (!items || !(seconds > 0)) return;
+  const per = Math.min(PACE_DEFAULT * 3, Math.max(PACE_DEFAULT * 0.3, seconds / items));
+  const l = loadRev(REVIEW_PACE_KEY, []);
+  try { localStorage.setItem(REVIEW_PACE_KEY,
+    JSON.stringify((Array.isArray(l) ? l : []).concat(Math.round(per)).slice(-10))); } catch (e) {}
+}
+function paceOf() {
+  const l = loadRev(REVIEW_PACE_KEY, []), a = (Array.isArray(l) ? l : []).slice().sort((x, y) => x - y);
+  return a.length < 3 ? PACE_DEFAULT : a[Math.floor(a.length / 2)];
+}
+function reviewCap() { return Math.max(3, Math.round(reviewMinutes() * 60 / paceOf())); }
+function overdueDaysOf(id) {
+  const d = srsOf(id).due;
+  return d ? Math.max(0, Math.floor((Date.now() - d) / DAY_MS)) : 0;
+}
+/* 上限に収める順番＝忘れかけている順。箱が低いほど先。
+   ただし箱が高くても期限を2週間以上過ぎていれば、忘れているとみなして箱1相当まで前に出す */
+function riskRank(id) {
+  const b = srsOf(id).box || 0;
+  return overdueDaysOf(id) >= 14 ? Math.min(b, 1) : b;
+}
+/* 期限が来た語から、今日ぶんだけを切り出す */
+function dueToday() {
+  return dueWords().slice().sort((a, b) => {
+    const ra = riskRank(a.id), rb = riskRank(b.id);
+    if (ra !== rb) return ra - rb;
+    return srsOf(a.id).due - srsOf(b.id).due;
+  }).slice(0, reviewCap());
+}
+/* この先7日ぶんの予定語数（1日あたりの山を見えるようにする） */
+function dueForecast() {
+  const out = [];
+  for (let i = 1; i <= 7; i++) {
+    const k = dayKeyMs(Date.now() + i * DAY_MS);
+    out.push(Object.keys(U.srs).filter(id => U.srs[id] && dayKeyMs(U.srs[id].due) === k).length);
+  }
+  return out;
+}
+function reviewMinChipsHtml() {
+  const cur = reviewMinutes();
+  return '<div class="rev-min-row">今日つかう時間: '
+    + REVIEW_MIN_CHOICES.map(m => '<button class="rev-min' + (m === cur ? ' on' : '')
+        + '" onclick="setReviewMinutes(' + m + ')">' + m + '分</button>').join('')
+    + '</div>';
 }
 function weakWords() {
   return WORDS.filter(w => statusOf(w.id).k === 'weak')
@@ -2014,7 +2123,7 @@ function renderTestSetup() {
   const gs = groupByWeek(WORDS);
   const cur = sel.value;
   sel.innerHTML = '<option value="all">📚 全期間（' + WORDS.length + '語）</option>'
-    + '<option value="due">🔁 今日の復習（' + dueWords().length + '語）</option>'
+    + '<option value="due">🔁 今日の復習（今日ぶん ' + dueToday().length + '語 / 期限 ' + dueWords().length + '語）</option>'
     + '<option value="favs">⭐ お気に入り（' + favWords().length + '語）</option>'
     + '<option value="weak">⚠️ 苦手な単語（' + weakWords().length + '語）</option>'
     + gs.map(g => '<option value="' + g.key + '">📅 ' + g.label + (g.key === THIS_WEEK_KEY ? '（今週）' : '') + ' — ' + g.items.length + '語</option>').join('');
@@ -2043,13 +2152,15 @@ function startTest() {
   const sel = document.getElementById('testWeekSel');
   T.week = sel.value || 'all';
   let list = sourceWords(T.week);
+  // 今日の復習は1日ぶんに切る。落とすのは箱が高い（＝しばらく持つ）語から
+  if (T.week === 'due') list = dueToday();
   if (T.scope === 'weak') list = list.filter(w => statusOf(w.id).k === 'weak');
   if (!list.length) { showToast('出題できる単語がありません'); return; }
   if (T.scope === 'r10') list = shuffle(list).slice(0, 10);
   if (T.scope === 'r20') list = shuffle(list).slice(0, 20);
   const qs = buildQuestions(list, T.kind);
   if (!qs.length) { showToast('この形式で出せる問題がありません'); return; }
-  T.qs = qs; T.i = 0; T.res = []; T.answered = false;
+  T.qs = qs; T.i = 0; T.res = []; T.answered = false; T.startedAt = Date.now();
   document.getElementById('testSetup').hidden = true;
   document.getElementById('testResult').hidden = true;
   document.getElementById('testRun').hidden = false;
@@ -2060,10 +2171,12 @@ function renderQuestion() {
   const el = document.getElementById('testRun');
   T.answered = false;
   let h = '<div class="panel">';
-  h += '<div class="q-head"><span>' + (T.i + 1) + ' / ' + T.qs.length + '</span>'
+  // おかわりを後ろに足しても「◯/◯」の分母は動かさない（本編の問数だけを数える）
+  const qN = T.qs.filter(x => !x.again).length || T.qs.length;
+  h += '<div class="q-head"><span>' + (q.again ? '🔁 もう一度（この1問は記録に入りません）' : (T.i + 1) + ' / ' + qN) + '</span>'
     + '<span class="q-kind">' + KIND_LABEL[q.kind] + '</span>'
     + '<button class="btn-mini" onclick="quitTest()">やめる</button></div>';
-  h += '<div class="q-bar"><div style="width:' + (T.i / T.qs.length * 100) + '%"></div></div>';
+  h += '<div class="q-bar"><div style="width:' + (Math.min(1, T.i / qN) * 100) + '%"></div></div>';
   if (q.kind === 'cloze') {
     h += '<div class="q-sent">' + q.prompt + '</div><div class="q-sub" style="text-align:left">' + escapeHtml(q.sub) + '</div>';
   } else if (q.kind === 'e2j') {
@@ -2090,9 +2203,21 @@ function renderQuestion() {
     inp.focus();
   }
 }
+/* ---- おかわり（2026-08-27 追加） ----
+   1日に出せる語数を上限で削るので、1回の復習を「必ず一度は正解して終わる」形にしておく。
+   まちがえた語を、そのセッションの最後にもう1問だけ足す（上限の語数には数えない）。
+   ここで正解しても箱は動かさない。箱は1回目の答えで確定していて、
+   「今日もう一度言えた」と「日をおいても言える」は別のことだから。 */
+function queueAgain(q, correct) {
+  if (correct || T.week !== 'due' || q.again) return;
+  if (T.qs.some(x => x.again && x.w.id === q.w.id)) return;
+  T.qs.push(Object.assign({}, q, { again: true }));
+}
 function recordAnswer(q, correct, userAns) {
+  if (q.again) return;   // おかわりは記録に入れない（箱も成績も1回目のまま）
   srsUpdate(q.w.id, correct);
   T.res.push({ q: q, ok: correct, user: userAns || '' });
+  queueAgain(q, correct);
 }
 function judgeBoxHtml(q, correct, userAns, showDiff) {
   let h = '<div class="judge ' + (correct ? 'ok' : 'ng') + '">' + (correct ? '⭕️ 正解' : '❌ 不正解') + '</div>';
@@ -2171,6 +2296,8 @@ function quitTest() {
   updateCounts();
 }
 function saveTestResult() {
+  // 1問あたりに実際どれくらいかかったかを控える（次からの「今日つかう時間 → 語数」の換算に使う）
+  if (T.week === 'due' && T.startedAt && T.res.length) pushPace((Date.now() - T.startedAt) / 1000, T.res.length);
   const correct = T.res.filter(r => r.ok).length;
   U.hist.unshift({ at: Date.now(), week: T.week, kind: T.kind, n: T.res.length, correct: correct });
   if (U.hist.length > 60) U.hist = U.hist.slice(0, 60);
@@ -2251,11 +2378,24 @@ function renderRoots() {
 
 /* ================= 今日の復習・ダッシュボード ================= */
 function renderReview() {
-  const due = dueWords();
-  document.getElementById('dueNum').textContent = due.length + ' 語';
-  document.getElementById('dueHint').innerHTML = due.length
-    ? '前回まちがえた語ほど早く、覚えた語ほど間を空けて出てきます（1→2→4→7→14→30日）。'
-    : 'いま復習の期限が来ている単語はありません。<b>先取りで10語</b>を押すか、テストタブから好きな週を選んで解いてください。';
+  const due = dueWords(), today = dueToday(), cap = reviewCap();
+  const rest = due.length - today.length;
+  const over = due.filter(w => overdueDaysOf(w.id) >= 1).length;
+  const fc = dueForecast(), mx = Math.max(cap, Math.max.apply(null, fc.concat([1])));
+  document.getElementById('dueNum').textContent = today.length + ' 語';
+  document.getElementById('dueHint').innerHTML = (due.length
+    ? '期限が来たのは <b>' + due.length + '</b> 語'
+      + (over ? '（うち繰越 ' + over + ' 語）' : '') + '。'
+      + '今日はそのうち <b>' + today.length + '</b> 語を出します。'
+      + (rest ? '<br>残り <b>' + rest + '</b> 語は翌日以降に回ります（1回で出すのは選んだ時間に収まる語数まで）。' : '')
+      + '<br>忘れかけている順（前回まちがえた語から）に出します。'
+      + '正解した語ほど間が空きます（1→2→4→7→14→30→60→120日）。'
+      + '<br><span class="due-fc">この先7日: ' + fc.map(function (x, i) {
+          return '<i class="' + (x > cap ? 'over' : '') + '" style="height:'
+            + Math.max(2, Math.round(x / mx * 18)) + 'px" title="' + (i + 1) + '日後 ' + x + '語"></i>'; }).join('')
+      + '</span>'
+    : 'いま復習の期限が来ている単語はありません。<b>先取りで10語</b>を押すか、テストタブから好きな週を選んで解いてください。')
+    + reviewMinChipsHtml();
   const counts = { new: 0, learning: 0, weak: 0, known: 0 };
   WORDS.forEach(w => { counts[statusOf(w.id).k]++; });
   document.getElementById('stNew').textContent = counts.new;
