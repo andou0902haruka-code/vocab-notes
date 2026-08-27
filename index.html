@@ -1,0 +1,2427 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="英単語ノート">
+<meta name="theme-color" content="#2c7a7b">
+<title>英単語ノート - 意味・語源・語族・例文</title>
+<style>
+  :root {
+    --teal: #2c7a7b;
+    --teal-dark: #1d4e4f;
+    --teal-bg: #e6fffa;
+    --bg: #f4f6f9;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #1a202c;
+    --sub: #718096;
+    --orange: #c05621;
+    --orange-bg: #fffaf0;
+    --green: #2f855a;
+    --green-bg: #e9f7ef;
+    --purple: #6b46c1;
+    --purple-bg: #f3ecff;
+    --red: #c53030;
+    --red-bg: #fff5f5;
+    --gold: #b7791f;
+    --gold-bg: #fffbea;
+    --blue: #2b6cb0;
+    --blue-bg: #ebf4ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding-bottom: 40px;
+    -webkit-text-size-adjust: 100%;
+  }
+  header {
+    background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+    color: #fff;
+    padding: 16px 14px 0;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  header h1 { margin: 0 0 2px; font-size: 1.2rem; }
+  header p { margin: 0; font-size: 0.78rem; opacity: 0.85; }
+  .refresh-btn {
+    background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 8px; color: #fff; font-size: 0.75rem; padding: 7px 9px; white-space: nowrap;
+  }
+  .refresh-btn:active { background: rgba(255,255,255,0.35); }
+  nav.tabs {
+    display: flex; gap: 4px; margin-top: 12px; overflow-x: auto;
+    scrollbar-width: none; -ms-overflow-style: none;
+  }
+  nav.tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    background: transparent; border: none; color: rgba(255,255,255,0.72);
+    font-size: 0.82rem; padding: 9px 11px; border-bottom: 3px solid transparent;
+    white-space: nowrap; font-weight: 600;
+  }
+  .tab.active { color: #fff; border-bottom-color: #fff; }
+  .tab .cnt { font-size: 0.7rem; opacity: 0.8; }
+  main { max-width: 680px; margin: 0 auto; padding: 16px; }
+  button { font-family: inherit; cursor: pointer; }
+  .panel {
+    background: var(--card); border-radius: 14px; padding: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 18px;
+  }
+  .panel-title { margin: 0 0 8px; font-size: 1rem; }
+  .hint-line { font-size: 0.8rem; color: var(--sub); margin-top: 8px; line-height: 1.6; }
+  .word-input, .memo-input, .select, .search-box, .ans-input {
+    width: 100%; border: 1px solid var(--border); border-radius: 10px;
+    padding: 11px 12px; font-size: 1rem; font-family: inherit; background: var(--card);
+  }
+  .word-input { font-size: 1.15rem; font-weight: 600; letter-spacing: 0.01em; }
+  .word-input:focus, .memo-input:focus, .ans-input:focus { outline: 2px solid var(--teal); }
+  .memo-input { min-height: 52px; resize: vertical; font-size: 0.92rem; margin-top: 8px; }
+  .btn-save {
+    width: 100%; background: var(--teal); color: #fff; border: none; border-radius: 10px;
+    padding: 12px; font-size: 1rem; font-weight: 600; margin-top: 8px;
+  }
+  .btn-save:active { background: var(--teal-dark); }
+  .btn-primary {
+    background: var(--teal); color: #fff; border: none; border-radius: 9px;
+    padding: 10px 14px; font-size: 0.88rem; font-weight: 600;
+  }
+  .btn-outline {
+    background: var(--card); color: var(--teal); border: 1px solid var(--teal);
+    border-radius: 9px; padding: 10px 14px; font-size: 0.88rem; font-weight: 600;
+  }
+  .btn-mini {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 6px 10px; font-size: 0.76rem; color: var(--sub);
+  }
+  .btn-mini.on { background: var(--teal-bg); border-color: var(--teal); color: var(--teal-dark); }
+  .row-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .row-btns > * { flex: 1; min-width: 130px; }
+  .search-box { margin-bottom: 14px; }
+  .section-title {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin: 20px 0 10px; flex-wrap: wrap;
+  }
+  .section-title h2 { margin: 0; font-size: 0.95rem; }
+  .section-actions { display: flex; gap: 6px; align-items: center; }
+  .seg { display: inline-flex; background: #edf2f7; border-radius: 9px; padding: 3px; gap: 2px; }
+  .seg-btn {
+    background: transparent; border: none; border-radius: 7px; padding: 7px 10px;
+    font-size: 0.76rem; color: var(--sub); white-space: nowrap;
+  }
+  .seg-btn.active { background: var(--card); color: var(--teal-dark); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+  .list-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .field-label { display: block; font-size: 0.78rem; color: var(--sub); margin: 12px 0 5px; font-weight: 600; }
+  .empty { color: var(--sub); font-size: 0.85rem; text-align: center; padding: 22px 10px; line-height: 1.7; }
+  .howto { background: var(--card); border-radius: 12px; padding: 4px 14px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .howto summary { font-size: 0.85rem; font-weight: 600; padding: 10px 0; cursor: pointer; color: var(--teal-dark); }
+  .howto ol { font-size: 0.82rem; line-height: 1.85; color: #4a5568; padding-left: 20px; margin: 0 0 12px; }
+  .howto code { background: #edf2f7; padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+
+  /* ---- 単語カード ---- */
+  .wcard {
+    background: var(--card); border-radius: 14px; padding: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 12px;
+  }
+  .w-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .w-word { font-size: 1.3rem; font-weight: 700; letter-spacing: 0.01em; }
+  .w-ipa { font-size: 0.82rem; color: var(--sub); }
+  .w-spacer { flex: 1; }
+  .play-btn {
+    background: var(--teal-bg); border: 1px solid #b2f5ea; border-radius: 50%;
+    width: 34px; height: 34px; font-size: 0.95rem; line-height: 1; padding: 0; color: var(--teal-dark);
+  }
+  .play-btn.playing { background: var(--teal); color: #fff; }
+  .play-btn.sm { width: 28px; height: 28px; font-size: 0.8rem; }
+  .fav-btn { background: transparent; border: none; font-size: 1.25rem; padding: 2px 4px; color: #cbd5e0; }
+  .fav-btn.on { color: #ecc94b; }
+  .w-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 7px; }
+  .tag {
+    font-size: 0.68rem; padding: 2px 8px; border-radius: 20px;
+    background: #edf2f7; color: var(--sub); font-weight: 600;
+  }
+  .tag.st-new { background: var(--blue-bg); color: var(--blue); }
+  .tag.st-learning { background: var(--gold-bg); color: var(--gold); }
+  .tag.st-weak { background: var(--red-bg); color: var(--red); }
+  .tag.st-known { background: var(--green-bg); color: var(--green); }
+  .sense { border-left: 3px solid var(--teal); padding: 2px 0 2px 10px; margin: 12px 0; }
+  .sense-head { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+  .pos {
+    font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 6px;
+    background: var(--teal-bg); color: var(--teal-dark); white-space: nowrap;
+  }
+  .sense-ja { font-size: 0.98rem; font-weight: 600; }
+  .sense-def { font-size: 0.8rem; color: var(--sub); margin-top: 3px; line-height: 1.6; }
+  .ex-box { background: #f7fafc; border-radius: 9px; padding: 9px 11px; margin-top: 8px; }
+  .ex-en { font-size: 0.92rem; line-height: 1.65; display: flex; gap: 7px; align-items: flex-start; }
+  .ex-en b { color: var(--teal-dark); }
+  .ex-ja { font-size: 0.8rem; color: var(--sub); margin-top: 4px; line-height: 1.6; }
+  .colloc { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 7px; }
+  .colloc .chip {
+    font-size: 0.75rem; padding: 3px 9px; border-radius: 7px;
+    background: var(--blue-bg); color: var(--blue); font-weight: 600;
+  }
+  .box-title { font-size: 0.76rem; font-weight: 700; color: var(--sub); margin-bottom: 6px; letter-spacing: 0.02em; }
+  .origin-box { background: var(--purple-bg); border-radius: 10px; padding: 10px 12px; margin-top: 12px; }
+  .origin-parts { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .opart {
+    background: #fff; border: 1px solid #d6bcfa; border-radius: 8px;
+    padding: 4px 9px; font-size: 0.8rem; color: var(--purple); font-weight: 700;
+  }
+  .opart em { font-style: normal; font-weight: 400; color: var(--sub); font-size: 0.9em; margin-left: 4px; }
+  .oplus { color: #b794f4; font-weight: 700; }
+  .origin-note { font-size: 0.8rem; color: #4a5568; margin-top: 7px; line-height: 1.65; }
+  .fam-box { background: var(--green-bg); border-radius: 10px; padding: 10px 12px; margin-top: 10px; }
+  .fam-item { display: flex; gap: 7px; align-items: baseline; font-size: 0.85rem; padding: 3px 0; flex-wrap: wrap; }
+  .fam-item b { color: var(--green); font-weight: 700; }
+  .fam-item .fpos { font-size: 0.68rem; background: #fff; color: var(--green); padding: 1px 6px; border-radius: 5px; }
+  .fam-item span { color: #4a5568; font-size: 0.82rem; }
+  .mate-box { background: var(--gold-bg); border-radius: 10px; padding: 10px 12px; margin-top: 10px; }
+  .mate-item { font-size: 0.83rem; padding: 3px 0; color: #4a5568; }
+  .mate-item b { color: var(--gold); }
+  .conf-box { background: var(--red-bg); border-radius: 10px; padding: 10px 12px; margin-top: 10px; }
+  .conf-item { font-size: 0.83rem; padding: 3px 0; color: #4a5568; }
+  .conf-item b { color: var(--red); }
+  .memo-box { background: var(--orange-bg); border-radius: 10px; padding: 10px 12px; margin-top: 10px; }
+  .memo-text { font-size: 0.85rem; line-height: 1.7; white-space: pre-wrap; color: #4a5568; min-height: 1.2em; }
+  .memo-text.blank { color: #a0aec0; }
+  .memo-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .card-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; font-size: 0.72rem; color: var(--sub); }
+  .fold-btn { background: none; border: none; color: var(--teal); font-size: 0.78rem; font-weight: 600; padding: 4px 0; }
+
+  /* ---- 未清書メモ ---- */
+  .pcard {
+    background: var(--card); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07); border-left: 4px solid var(--gold);
+  }
+  .pcard .pw { font-size: 1.05rem; font-weight: 700; }
+  .pcard .pr { font-size: 0.82rem; color: var(--sub); margin-top: 4px; line-height: 1.6; }
+  .pcard .pm { font-size: 0.8rem; color: var(--orange); margin-top: 4px; }
+  .pcard .pfoot { display: flex; justify-content: space-between; align-items: center; margin-top: 7px; font-size: 0.72rem; color: var(--sub); }
+  .del-btn { background: none; border: none; color: #cbd5e0; font-size: 0.95rem; padding: 2px 6px; }
+  .dup-notice {
+    background: var(--gold-bg); border: 1px solid #f6e05e; border-radius: 10px;
+    padding: 11px 12px; margin-top: 10px; font-size: 0.84rem; line-height: 1.65;
+  }
+  .dup-notice .dn-t { font-weight: 700; color: var(--gold); margin-bottom: 5px; }
+  .dup-actions { display: flex; gap: 7px; margin-top: 9px; flex-wrap: wrap; }
+
+  /* ---- 週トグル ---- */
+  .wk { background: var(--card); border-radius: 12px; margin-bottom: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .wk-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 12px 14px; cursor: pointer; background: var(--card); border: none; width: 100%; text-align: left;
+  }
+  .wk-head .wk-t { font-size: 0.9rem; font-weight: 700; }
+  .wk-head .wk-s { font-size: 0.74rem; color: var(--sub); margin-top: 2px; }
+  .wk-head .wk-arrow { color: var(--sub); font-size: 0.8rem; }
+  .wk-badge { font-size: 0.68rem; background: var(--teal-bg); color: var(--teal-dark); padding: 2px 8px; border-radius: 20px; font-weight: 700; }
+  .wk-body { padding: 0 12px 12px; }
+  .wk-actions { display: flex; gap: 7px; flex-wrap: wrap; padding: 0 12px 12px; }
+  .wk-actions > * { flex: 1; min-width: 120px; }
+  .day-head { font-size: 0.76rem; color: var(--sub); font-weight: 700; margin: 12px 0 6px; }
+  .mini {
+    display: flex; align-items: center; gap: 8px; padding: 8px 0;
+    border-bottom: 1px solid var(--border); font-size: 0.88rem; flex-wrap: wrap;
+  }
+  .mini:last-child { border-bottom: none; }
+  .mini .mw { font-weight: 700; min-width: 92px; }
+  .mini .mj { color: #4a5568; font-size: 0.82rem; flex: 1; }
+  .mini .mj.hid { color: transparent; background: #edf2f7; border-radius: 5px; cursor: pointer; }
+
+  /* ---- 通し再生 ---- */
+  .player-bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    background: var(--card); border-top: 1px solid var(--border);
+    box-shadow: 0 -3px 14px rgba(0,0,0,0.13); padding: 10px 14px 16px;
+    max-width: 680px; margin: 0 auto;
+  }
+  .pl-top { display: flex; justify-content: space-between; align-items: center; }
+  .pl-title { font-size: 0.82rem; font-weight: 700; color: var(--teal-dark); }
+  .pl-close { background: none; border: none; font-size: 1rem; color: var(--sub); padding: 4px 6px; }
+  .pl-progress { height: 4px; background: #edf2f7; border-radius: 3px; margin: 8px 0; overflow: hidden; }
+  .pl-fill { height: 100%; background: var(--teal); width: 0%; transition: width 0.25s; }
+  .pl-body { text-align: center; padding: 6px 0 8px; min-height: 74px; }
+  .pl-count { font-size: 0.72rem; color: var(--sub); display: flex; gap: 7px; justify-content: center; align-items: center; }
+  .pl-phase { font-size: 0.66rem; padding: 1px 7px; border-radius: 20px; font-weight: 700; }
+  .pl-phase.ja { background: var(--orange-bg); color: var(--orange); }
+  .pl-phase.en { background: var(--teal-bg); color: var(--teal-dark); }
+  .pl-phase.ex { background: var(--blue-bg); color: var(--blue); }
+  .pl-en { font-size: 1.15rem; font-weight: 700; margin-top: 5px; min-height: 1.4em; }
+  .pl-ja { font-size: 0.85rem; color: var(--sub); margin-top: 3px; }
+  .pl-ex { font-size: 0.78rem; color: #4a5568; margin-top: 4px; line-height: 1.5; }
+  .pl-ctrl { display: flex; justify-content: center; gap: 16px; align-items: center; margin: 4px 0 10px; }
+  .pl-btn { background: #edf2f7; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 0.95rem; color: var(--teal-dark); }
+  .pl-btn.main { width: 52px; height: 52px; background: var(--teal); color: #fff; font-size: 1.1rem; }
+  .pl-lab { font-size: 0.7rem; color: var(--sub); display: block; margin-bottom: 4px; }
+  .pl-speed { width: 100%; justify-content: space-between; }
+  .pl-speed .seg-btn { flex: 1; padding: 6px 2px; font-size: 0.72rem; }
+  .pl-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .pl-row .select { flex: 1; padding: 7px 10px; font-size: 0.8rem; }
+  .pl-opts { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 9px; font-size: 0.76rem; color: var(--sub); }
+  .pl-opts label { display: flex; align-items: center; gap: 4px; }
+
+  /* ---- テスト ---- */
+  .q-head { display: flex; justify-content: space-between; align-items: center; font-size: 0.76rem; color: var(--sub); margin-bottom: 10px; }
+  .q-bar { height: 4px; background: #edf2f7; border-radius: 3px; overflow: hidden; margin-bottom: 14px; }
+  .q-bar > div { height: 100%; background: var(--teal); transition: width 0.25s; }
+  .q-kind { font-size: 0.68rem; font-weight: 700; padding: 2px 9px; border-radius: 20px; background: var(--purple-bg); color: var(--purple); }
+  .q-prompt { font-size: 1.35rem; font-weight: 700; text-align: center; padding: 10px 0 4px; line-height: 1.5; }
+  .q-sub { font-size: 0.85rem; color: var(--sub); text-align: center; line-height: 1.6; }
+  .q-sent { font-size: 1rem; line-height: 1.8; padding: 6px 2px; }
+  .q-blank { display: inline-block; min-width: 82px; border-bottom: 2px solid var(--teal); text-align: center; color: var(--teal); font-weight: 700; }
+  .choices { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+  .choice {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; font-size: 0.9rem; text-align: left; line-height: 1.55; width: 100%;
+  }
+  .choice:active { background: #f7fafc; }
+  .choice.correct { background: var(--green-bg); border-color: var(--green); color: var(--green); font-weight: 600; }
+  .choice.wrong { background: var(--red-bg); border-color: var(--red); color: var(--red); }
+  .judge { text-align: center; font-size: 1.05rem; font-weight: 700; margin: 12px 0 6px; }
+  .judge.ok { color: var(--green); }
+  .judge.ng { color: var(--red); }
+  .ans-line { font-size: 1.15rem; font-weight: 700; text-align: center; color: var(--teal-dark); }
+  .diff-box { text-align: center; font-size: 1.02rem; margin: 8px 0; line-height: 1.7; word-break: break-word; }
+  .diff-box .ok { color: var(--green); }
+  .diff-box .ng { color: var(--red); text-decoration: line-through; }
+  .diff-box .miss { color: var(--red); background: var(--red-bg); border-radius: 4px; padding: 0 3px; }
+  .self-btns { display: flex; gap: 8px; margin-top: 12px; }
+  .self-btns button { flex: 1; padding: 13px; border-radius: 10px; font-size: 0.92rem; font-weight: 700; border: none; }
+  .self-ok { background: var(--green-bg); color: var(--green); }
+  .self-ng { background: var(--red-bg); color: var(--red); }
+  .score-big { font-size: 2.1rem; font-weight: 800; text-align: center; color: var(--teal-dark); }
+  .score-sub { text-align: center; font-size: 0.85rem; color: var(--sub); margin-top: 4px; }
+  .rlist { margin-top: 14px; }
+  .rrow { display: flex; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.86rem; flex-wrap: wrap; }
+  .rrow .rm { width: 20px; text-align: center; }
+  .rrow .rw { font-weight: 700; min-width: 92px; }
+  .rrow .rj { color: var(--sub); font-size: 0.8rem; flex: 1; }
+  .hist-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: var(--card); border-radius: 10px; margin-bottom: 8px; font-size: 0.84rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .hist-row .hs { font-weight: 700; color: var(--teal-dark); }
+
+  /* ---- 語根マップ ---- */
+  .root-group { background: var(--card); border-radius: 12px; padding: 13px 14px; margin-bottom: 11px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .root-title { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .root-title b { font-size: 1.05rem; color: var(--purple); }
+  .root-title span { font-size: 0.8rem; color: var(--sub); }
+  .root-words { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 9px; }
+  .rchip {
+    font-size: 0.82rem; padding: 5px 11px; border-radius: 8px; border: none;
+    background: var(--purple-bg); color: var(--purple); font-weight: 700;
+  }
+  .rchip.ghost { background: #f7fafc; color: var(--sub); font-weight: 500; border: 1px dashed var(--border); }
+
+  /* ---- 復習・ダッシュボード ---- */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .stat {
+    background: var(--card); border-radius: 11px; padding: 11px 6px; text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .stat .sv { font-size: 1.3rem; font-weight: 800; }
+  .stat .sl { font-size: 0.66rem; color: var(--sub); margin-top: 2px; }
+  .stat.c-new .sv { color: var(--blue); }
+  .stat.c-learn .sv { color: var(--gold); }
+  .stat.c-weak .sv { color: var(--red); }
+  .stat.c-known .sv { color: var(--green); }
+  .streak { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 0.85rem; color: #4a5568; }
+  .streak b { font-size: 1.25rem; color: var(--orange); }
+  .heat { display: flex; gap: 3px; margin-top: 10px; }
+  .heat i { flex: 1; height: 22px; border-radius: 4px; background: #edf2f7; display: block; }
+  .heat i.on { background: var(--teal); }
+  .heat i.half { background: #81e6d9; }
+  .heat-lab { display: flex; gap: 3px; margin-top: 3px; }
+  .heat-lab i { flex: 1; text-align: center; font-size: 0.6rem; color: var(--sub); font-style: normal; }
+  .due-box { background: var(--teal-bg); border-radius: 12px; padding: 13px 14px; margin-bottom: 14px; }
+  .due-n { font-size: 1.5rem; font-weight: 800; color: var(--teal-dark); }
+
+  .toast {
+    position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: rgba(26,32,44,0.94); color: #fff; padding: 11px 20px; border-radius: 22px;
+    font-size: 0.85rem; opacity: 0; pointer-events: none; transition: 0.25s; z-index: 60; max-width: 90%;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .sync-line { font-size: 0.72rem; color: var(--sub); margin-top: 10px; text-align: center; }
+  .sync-line a { color: var(--teal); text-decoration: underline; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-row">
+    <div>
+      <h1>📕 英単語ノート</h1>
+      <p>気になった英単語を、意味・語源・語族・例文つきで貯める</p>
+    </div>
+    <button class="refresh-btn" id="forceRefreshBtn">⟳ 更新</button>
+  </div>
+  <nav class="tabs">
+    <button class="tab active" data-view="words">📕 単語</button>
+    <button class="tab" data-view="review">🔁 今日の復習<span class="cnt" id="tabDue"></span></button>
+    <button class="tab" data-view="favs">⭐ お気に入り</button>
+    <button class="tab" data-view="weeks">📅 週まとめ</button>
+    <button class="tab" data-view="test">✍️ テスト</button>
+    <button class="tab" data-view="roots">🌳 語根マップ</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ============ 単語タブ ============ -->
+<section id="view-words">
+
+  <div class="panel">
+    <input type="text" class="word-input" id="wordInput" placeholder="英単語・英語表現を入力（例: conduct）" autocomplete="off" autocapitalize="none" spellcheck="false">
+    <textarea class="memo-input" id="memoInput" placeholder="ひとことメモ（任意）どこで見た／なぜ気になったか"></textarea>
+    <button class="btn-save" id="saveBtn">＋ 保存する</button>
+    <div class="dup-notice" id="dupNotice" hidden></div>
+  </div>
+
+  <details class="howto">
+    <summary>使い方</summary>
+    <ol>
+      <li>気になった英単語を入力して「保存する」。その場で簡易的な意味（機械翻訳）が出る</li>
+      <li>未清書メモが溜まったら「📋 コピー」でJSONをコピー</li>
+      <li>Claude Codeに貼り付けて <code>/vocab-note-add</code> と伝える → <b>意味・品詞ごとの例文・語源（接頭辞/語根/接尾辞）・語族（conduct→conductivity）・コロケーション・音声</b>つきで「保存済み単語」に清書される</li>
+      <li>すでに追加した単語をもう一度保存しようとすると<b>「この単語はすでにノートにあります（追加日）」</b>と出て、前回の内容もその場で確認できる</li>
+      <li>各カードの<b>📝 メモ</b>は自分で自由に書き換えられる（合言葉を設定すればPC⇄スマホで共有される）</li>
+      <li><b>☆</b>で<b>⭐ お気に入り</b>に登録。<b>📅 週まとめ</b>は月曜〜日曜の週ごとに並び、<b>🎧 通し再生</b>で手を使わず流せる</li>
+      <li><b>✍️ テスト</b>は5種類（意味を選ぶ／英単語を書く／例文穴埋め／語族／ミックス）。成績は週ごとに記録される</li>
+      <li><b>🔁 今日の復習</b>は間隔反復。まちがえた単語ほど早く、覚えた単語ほど間を空けて出てくる</li>
+      <li><b>🌳 語根マップ</b>は語根・接頭辞ごとに単語をまとめる。1語おぼえると芋づる式に増える</li>
+    </ol>
+  </details>
+
+  <input type="text" class="search-box" id="searchBox" placeholder="🔍 単語・意味・例文・メモを検索">
+
+  <div class="section-title">
+    <h2>🕓 未清書メモ（この端末のみ・<span id="pendingCount">0</span>件）</h2>
+    <div class="section-actions">
+      <button class="btn-mini" id="copyBtn">📋 コピー</button>
+      <button class="btn-mini" id="clearBtn">🗑 全消去</button>
+    </div>
+  </div>
+  <div id="pendingList"></div>
+
+  <div class="section-title">
+    <h2>📚 保存済み単語（<span id="polishedCount">0</span>件）</h2>
+    <div class="section-actions">
+      <button class="btn-mini" id="hideModeBtn">🙈 意味を隠す</button>
+    </div>
+  </div>
+  <div class="list-toolbar">
+    <div class="seg" id="viewSeg">
+      <button class="seg-btn active" data-pview="week">📅 週ごと</button>
+      <button class="seg-btn" data-pview="flat">🕘 新しい順</button>
+      <button class="seg-btn" data-pview="az">🔤 A→Z</button>
+    </div>
+    <button class="btn-mini" id="wkExpandBtn">全て開く</button>
+  </div>
+  <div id="polishedList"></div>
+  <div class="sync-line">端末間の共有（メモ・お気に入り・成績）: <span id="syncLabel">確認中…</span> ／ <a id="syncChange">合言葉を変更</a></div>
+
+</section>
+
+<!-- ============ 今日の復習タブ ============ -->
+<section id="view-review" hidden>
+  <div class="due-box">
+    <div class="box-title">🔁 今日やる復習</div>
+    <div class="due-n" id="dueNum">0 語</div>
+    <div class="hint-line" id="dueHint"></div>
+    <div class="row-btns">
+      <button class="btn-primary" id="dueStartBtn">▶ 今日の復習を始める</button>
+      <button class="btn-outline" id="dueAheadBtn">先取りで10語</button>
+    </div>
+  </div>
+
+  <div class="section-title"><h2>📊 いまの定着ぐあい</h2></div>
+  <div class="stat-grid">
+    <div class="stat c-new"><div class="sv" id="stNew">0</div><div class="sl">未着手</div></div>
+    <div class="stat c-learn"><div class="sv" id="stLearn">0</div><div class="sl">学習中</div></div>
+    <div class="stat c-weak"><div class="sv" id="stWeak">0</div><div class="sl">苦手</div></div>
+    <div class="stat c-known"><div class="sv" id="stKnown">0</div><div class="sl">定着</div></div>
+  </div>
+  <div class="panel" style="margin-top:12px">
+    <div class="streak">🔥 連続学習 <b id="streakN">0</b> 日<span style="color:var(--sub);font-size:0.78rem" id="streakSub"></span></div>
+    <div class="heat" id="heat"></div>
+    <div class="heat-lab" id="heatLab"></div>
+  </div>
+
+  <div class="section-title"><h2>⚠️ 苦手な単語</h2></div>
+  <div id="weakList"></div>
+</section>
+
+<!-- ============ お気に入りタブ ============ -->
+<section id="view-favs" hidden>
+  <div class="panel">
+    <h2 class="panel-title">⭐ お気に入りリスト</h2>
+    <div class="hint-line" id="favSummary"></div>
+    <div class="row-btns">
+      <button class="btn-primary" id="favTestBtn">✍️ お気に入りをテスト</button>
+      <button class="btn-outline" id="favPlayBtn">🎧 通し再生</button>
+    </div>
+  </div>
+  <input type="text" class="search-box" id="favSearch" placeholder="🔍 お気に入りを検索">
+  <div class="section-title">
+    <h2>⭐ お気に入り（<span id="favCount">0</span>件）</h2>
+    <div class="section-actions">
+      <div class="seg" id="favSortSeg">
+        <button class="seg-btn active" data-sort="fav">⭐順</button>
+        <button class="seg-btn" data-sort="date">📅順</button>
+        <button class="seg-btn" data-sort="az">A→Z</button>
+      </div>
+    </div>
+  </div>
+  <div id="favList"></div>
+</section>
+
+<!-- ============ 週まとめタブ ============ -->
+<section id="view-weeks" hidden>
+  <div class="panel">
+    <h2 class="panel-title">📅 週ごとのまとめ</h2>
+    <div class="hint-line" id="weeksSummary"></div>
+  </div>
+  <div id="weekList"></div>
+</section>
+
+<!-- ============ 通し再生プレイヤー ============ -->
+<div class="player-bar" id="playerBar" hidden>
+  <div class="pl-top">
+    <div class="pl-title">🎧 通し再生 <span id="plWeekLabel"></span></div>
+    <button class="pl-close" id="plCloseBtn" aria-label="閉じる">✕</button>
+  </div>
+  <div class="pl-progress"><div class="pl-fill" id="plFill" style="width:0%"></div></div>
+  <div class="pl-body">
+    <div class="pl-count"><span id="plCount"></span><span class="pl-phase en" id="plPhase">英語</span></div>
+    <div class="pl-en" id="plEn"></div>
+    <div class="pl-ja" id="plJa"></div>
+    <div class="pl-ex" id="plEx"></div>
+  </div>
+  <div class="pl-ctrl">
+    <button class="pl-btn" id="plPrevBtn" aria-label="前へ">⏮</button>
+    <button class="pl-btn main" id="plPlayBtn" aria-label="再生／一時停止">⏸</button>
+    <button class="pl-btn" id="plNextBtn" aria-label="次へ">⏭</button>
+  </div>
+  <span class="pl-lab">流す順番</span>
+  <div class="seg" id="plDirSeg" style="width:100%">
+    <button class="seg-btn active" data-dir="en2ja" style="flex:1">英語 →（間）→ 意味</button>
+    <button class="seg-btn" data-dir="ja2en" style="flex:1">意味 →（間）→ 英語</button>
+  </div>
+  <span class="pl-lab" style="margin-top:9px">英語の速度（日本語は常に等倍）</span>
+  <div class="seg pl-speed" id="plSpeedSeg">
+    <button class="seg-btn" data-rate="0.6">0.6x</button>
+    <button class="seg-btn" data-rate="0.75">0.75x</button>
+    <button class="seg-btn active" data-rate="1">1.0x</button>
+    <button class="seg-btn" data-rate="1.25">1.25x</button>
+    <button class="seg-btn" data-rate="1.5">1.5x</button>
+  </div>
+  <div class="pl-row">
+    <span class="pl-lab" style="margin:0">考える間</span>
+    <select class="select" id="plGapSel">
+      <option value="0">なし</option>
+      <option value="1000">1秒</option>
+      <option value="2000" selected>2秒</option>
+      <option value="3000">3秒</option>
+      <option value="5000">5秒</option>
+    </select>
+  </div>
+  <div class="pl-opts">
+    <label><input type="checkbox" id="plEx2" checked> 例文も流す</label>
+    <label><input type="checkbox" id="plRepeatEn"> 英語を2回</label>
+    <label><input type="checkbox" id="plLoop"> くり返す</label>
+    <label><input type="checkbox" id="plShowEn"> 文字を先に出す</label>
+  </div>
+</div>
+
+<!-- ============ テストタブ ============ -->
+<section id="view-test" hidden>
+  <div id="testSetup">
+    <div class="panel">
+      <h2 class="panel-title">✍️ 復習テスト</h2>
+      <label class="field-label">出題する範囲</label>
+      <select id="testWeekSel" class="select"></select>
+      <label class="field-label">テストの形式</label>
+      <div class="seg" id="testKindSeg" style="flex-wrap:wrap">
+        <button class="seg-btn active" data-kind="mix">🎲 ミックス</button>
+        <button class="seg-btn" data-kind="e2j">📖 意味を選ぶ</button>
+        <button class="seg-btn" data-kind="j2e">⌨️ 英単語を書く</button>
+        <button class="seg-btn" data-kind="cloze">📝 例文穴埋め</button>
+        <button class="seg-btn" data-kind="family">🌱 語族</button>
+        <button class="seg-btn" data-kind="oral">🗣 言う</button>
+      </div>
+      <label class="field-label">問題数</label>
+      <div class="seg" id="testScopeSeg">
+        <button class="seg-btn active" data-scope="all">すべて</button>
+        <button class="seg-btn" data-scope="r10">ランダム10問</button>
+        <button class="seg-btn" data-scope="r20">ランダム20問</button>
+        <button class="seg-btn" data-scope="weak">苦手だけ</button>
+      </div>
+      <button class="btn-save" id="testStartBtn" style="margin-top:14px">▶ テスト開始</button>
+      <div class="hint-line" id="testSetupInfo"></div>
+    </div>
+    <div class="section-title"><h2>📊 テスト履歴</h2></div>
+    <div id="testHistory"></div>
+  </div>
+  <div id="testRun" hidden></div>
+  <div id="testResult" hidden></div>
+</section>
+
+<!-- ============ 語根マップタブ ============ -->
+<section id="view-roots" hidden>
+  <div class="panel">
+    <h2 class="panel-title">🌳 語根・接頭辞マップ</h2>
+    <div class="hint-line">同じ部品（語根・接頭辞）を持つ単語をまとめて表示します。<b>薄い枠の語</b>はまだノートに無い「仲間の単語」——気になったら単語タブで保存してください。</div>
+    <div class="list-toolbar" style="margin-top:10px;margin-bottom:0">
+      <div class="seg" id="rootKindSeg">
+        <button class="seg-btn active" data-rk="語根">語根で見る</button>
+        <button class="seg-btn" data-rk="接頭辞">接頭辞で見る</button>
+        <button class="seg-btn" data-rk="接尾辞">接尾辞で見る</button>
+      </div>
+    </div>
+  </div>
+  <div id="rootList"></div>
+</section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+/* ================= 保存済み単語（/vocab-note-add が追記する） ================= */
+const WORDS = [
+{
+  id: 1787044500000,
+  word: "conduct",
+  ipa: "動 /kənˈdʌkt/ ・ 名 /ˈkɑːndʌkt/（品詞でアクセントが動く）",
+  tags: ["TOEFL", "アカデミック"],
+  senses: [
+    {
+      pos: "動詞",
+      ja: "（調査・実験などを）行う、実施する",
+      def: "to organize and carry out a particular activity",
+      ex: "Our team conducted a survey of 500 international students.",
+      target: "conducted",
+      exJa: "私たちのチームは留学生500人を対象に調査を行った。",
+      colloc: ["conduct research", "conduct a survey", "conduct an experiment", "conduct an interview"]
+    },
+    {
+      pos: "動詞",
+      ja: "（熱・電気を）伝導する",
+      def: "to allow heat or electricity to pass along or through",
+      ex: "Copper conducts electricity better than iron.",
+      target: "conducts",
+      exJa: "銅は鉄よりもよく電気を通す。",
+      colloc: ["conduct heat", "conduct electricity"]
+    },
+    {
+      pos: "名詞",
+      ja: "行い、ふるまい（改まった語）",
+      def: "the way a person behaves, especially in public or at work",
+      ex: "Students are expected to follow the code of conduct at all times.",
+      target: "conduct",
+      exJa: "学生は常に行動規範に従うことが求められる。",
+      colloc: ["code of conduct", "professional conduct"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "con-", type: "接頭辞", mean: "共に・まとめて" },
+      { p: "duct", type: "語根", mean: "導く（ラテン語 ducere）" }
+    ],
+    note: "「まとめて導く」が芯の意味。そこから「（人や物事を）率いて実施する」「（電気を）導いて通す」「（自分を）導く＝ふるまい」まで広がる。名詞と動詞でアクセント位置が変わる典型語。"
+  },
+  family: [
+    { w: "conductor", pos: "名", ja: "指揮者、車掌、（電気の）導体" },
+    { w: "conductive", pos: "形", ja: "伝導性の" },
+    { w: "conductivity", pos: "名", ja: "伝導率、電導度" },
+    { w: "misconduct", pos: "名", ja: "不正行為、非行" }
+  ],
+  mates: [
+    { w: "produce", ja: "生産する（前へ pro- 導く）" },
+    { w: "reduce", ja: "減らす（後ろへ re- 導く）" },
+    { w: "introduce", ja: "紹介する、導入する（中へ intro- 導く）" },
+    { w: "educate", ja: "教育する（外へ e- 引き出す）" }
+  ],
+  confuse: [
+    { w: "conduit", ja: "導管・パイプ。語源は同じ duct だがモノを指す名詞で、conduct とは意味も発音も別。" }
+  ],
+  memo: "",
+  savedAt: "2026-08-18T09:15:00.000Z"
+},
+{
+  id: 1787089200000,
+  word: "sustain",
+  ipa: "/səˈsteɪn/",
+  tags: ["TOEFL", "ライティング頻出"],
+  senses: [
+    {
+      pos: "動詞",
+      ja: "（状態を）維持する、持続させる",
+      def: "to keep something going over a period of time",
+      ex: "It is difficult to sustain economic growth without a skilled workforce.",
+      target: "sustain",
+      exJa: "熟練した労働力なしに経済成長を持続させるのは難しい。",
+      colloc: ["sustain growth", "sustain interest", "sustain a level"]
+    },
+    {
+      pos: "動詞",
+      ja: "（損害・けがを）こうむる、負う（改まった語）",
+      def: "to suffer damage or an injury",
+      ex: "Two passengers sustained minor injuries in the accident.",
+      target: "sustained",
+      exJa: "その事故で乗客2名が軽傷を負った。",
+      colloc: ["sustain injuries", "sustain damage", "sustain losses"]
+    },
+    {
+      pos: "動詞",
+      ja: "（重み・命を）支える、養う",
+      def: "to hold the weight of something, or to keep someone alive",
+      ex: "These crops sustained the entire village through the winter.",
+      target: "sustained",
+      exJa: "これらの作物が冬のあいだ村全体を養った。",
+      colloc: ["sustain life", "sustain the weight of"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "sus-", type: "接頭辞", mean: "下から（sub- の変形）" },
+      { p: "tain", type: "語根", mean: "保つ・つかむ（ラテン語 tenere）" }
+    ],
+    note: "「下から保つ」＝支え続ける。だから「維持する」も「（重みを）支える」も同じ1語。ダメージを sustain するのは「受け止めて（身に）保つ」という発想。"
+  },
+  family: [
+    { w: "sustainable", pos: "形", ja: "持続可能な" },
+    { w: "sustainability", pos: "名", ja: "持続可能性" },
+    { w: "sustained", pos: "形", ja: "長く続く、途切れない" },
+    { w: "sustenance", pos: "名", ja: "栄養、生活の糧" }
+  ],
+  mates: [
+    { w: "maintain", ja: "維持する（手で man- 保つ）" },
+    { w: "retain", ja: "保持する（後ろに re- 保つ）" },
+    { w: "contain", ja: "含む（中に con- 保つ）" },
+    { w: "obtain", ja: "手に入れる（向かって ob- 保つ）" }
+  ],
+  memo: "",
+  savedAt: "2026-08-18T21:40:00.000Z"
+},
+{
+  id: 1787213100000,
+  word: "inevitable",
+  ipa: "/ɪnˈevɪtəbl/",
+  tags: ["TOEFL", "エッセイ表現"],
+  senses: [
+    {
+      pos: "形容詞",
+      ja: "避けられない、必然の",
+      def: "certain to happen and impossible to avoid",
+      ex: "As cities expand, some loss of farmland is inevitable.",
+      target: "inevitable",
+      exJa: "都市が拡大すれば、農地がいくらか失われるのは避けられない。",
+      colloc: ["an inevitable consequence", "it is inevitable that ...", "the inevitable result"]
+    },
+    {
+      pos: "名詞",
+      ja: "避けられない事態（the をつけて）",
+      def: "something that is certain to happen",
+      ex: "Rather than resisting the inevitable, companies should prepare for it.",
+      target: "inevitable",
+      exJa: "避けられない事態に抵抗するより、企業は備えるべきだ。",
+      colloc: ["accept the inevitable", "resist the inevitable"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "in-", type: "接頭辞", mean: "〜でない（否定）" },
+      { p: "evit", type: "語根", mean: "避ける（ラテン語 evitare）" },
+      { p: "-able", type: "接尾辞", mean: "〜できる" }
+    ],
+    note: "「避ける・ことが・できない」を3部品でそのまま言っている語。in- + 語根 + -able の形は unavoidable, irreversible など多数あり、否定の in-/un-/ir- は次に来る音で形が変わる。"
+  },
+  family: [
+    { w: "inevitably", pos: "副", ja: "必然的に、どうしても" },
+    { w: "inevitability", pos: "名", ja: "不可避性" },
+    { w: "evitable", pos: "形", ja: "避けられる（現代ではほぼ使わない）" }
+  ],
+  mates: [
+    { w: "unavoidable", ja: "避けられない（avoid の否定・より日常的）" },
+    { w: "irreversible", ja: "元に戻せない" },
+    { w: "indispensable", ja: "欠かせない" }
+  ],
+  memo: "",
+  savedAt: "2026-08-20T08:05:00.000Z"
+},
+{
+  id: 1787340600000,
+  word: "comprehensive",
+  ipa: "/ˌkɑːmprɪˈhensɪv/",
+  tags: ["TOEFL", "リーディング頻出"],
+  senses: [
+    {
+      pos: "形容詞",
+      ja: "包括的な、網羅的な（もれがない）",
+      def: "including all or nearly all of the parts of something",
+      ex: "The report offers a comprehensive review of recent climate research.",
+      target: "comprehensive",
+      exJa: "その報告書は近年の気候研究を網羅的に検討している。",
+      colloc: ["a comprehensive study", "a comprehensive review", "comprehensive coverage"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "com-", type: "接頭辞", mean: "すべて・共に" },
+      { p: "prehend", type: "語根", mean: "つかむ（ラテン語 prehendere）" },
+      { p: "-ive", type: "接尾辞", mean: "〜の性質をもつ（形容詞化）" }
+    ],
+    note: "「すべてをつかんでいる」＝もれがない。同じ語根から comprehend（理解する＝頭でつかむ）が来る。日本語の「包括的」も「包み・くくる」で発想が同じ。"
+  },
+  family: [
+    { w: "comprehend", pos: "動", ja: "理解する、（正式に）含む" },
+    { w: "comprehension", pos: "名", ja: "理解（力）" },
+    { w: "comprehensible", pos: "形", ja: "理解できる" },
+    { w: "comprehensively", pos: "副", ja: "包括的に、徹底的に" }
+  ],
+  mates: [
+    { w: "apprehend", ja: "逮捕する、（不安を）感じ取る（〜に向かってつかむ）" },
+    { w: "apprehensive", ja: "不安な、気がかりな" },
+    { w: "prehensile", ja: "（尾などが）物をつかめる" }
+  ],
+  confuse: [
+    { w: "comprehensible", ja: "「理解できる」。comprehensive（網羅的）とは別物。a comprehensive explanation＝もれのない説明／a comprehensible explanation＝分かりやすい説明。" }
+  ],
+  memo: "",
+  savedAt: "2026-08-21T19:30:00.000Z"
+},
+{
+  id: 1787557800000,
+  word: "distinguish",
+  ipa: "/dɪˈstɪŋɡwɪʃ/",
+  tags: ["TOEFL", "アカデミック"],
+  senses: [
+    {
+      pos: "動詞",
+      ja: "区別する、見分ける",
+      def: "to recognize the difference between two or more things",
+      ex: "Young children cannot always distinguish fantasy from reality.",
+      target: "distinguish",
+      exJa: "幼い子どもは空想と現実をいつも見分けられるわけではない。",
+      colloc: ["distinguish A from B", "distinguish between A and B", "hard to distinguish"]
+    },
+    {
+      pos: "動詞",
+      ja: "（〜を）特徴づける、際立たせる",
+      def: "to be the quality that makes someone or something different",
+      ex: "What distinguishes this species is its unusually long beak.",
+      target: "distinguishes",
+      exJa: "この種を特徴づけているのは、異常に長いくちばしだ。",
+      colloc: ["distinguish oneself", "the feature that distinguishes"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "di-", type: "接頭辞", mean: "離して（dis- の変形）" },
+      { p: "stingu", type: "語根", mean: "刺す・印をつける（ラテン語 stinguere）" },
+      { p: "-ish", type: "接尾辞", mean: "〜する（動詞化）" }
+    ],
+    note: "「離して印をつける」＝線を引いて分ける。同じ語根から distinct（はっきり別の）が来る。前置詞は distinguish A from B が基本で、between を使うときは distinguish between A and B。"
+  },
+  family: [
+    { w: "distinct", pos: "形", ja: "はっきり異なる、明瞭な" },
+    { w: "distinction", pos: "名", ja: "区別、際立った優秀さ" },
+    { w: "distinctive", pos: "形", ja: "独特の、他と違う" },
+    { w: "indistinguishable", pos: "形", ja: "見分けがつかない" }
+  ],
+  mates: [
+    { w: "extinguish", ja: "消す（火を突いて消す）" },
+    { w: "instinct", ja: "本能（内から突き動かすもの）" }
+  ],
+  confuse: [
+    { w: "distinct / distinctive", ja: "distinct は「別物としてはっきりしている」、distinctive は「その物らしい特徴がある」。a distinct smell＝はっきりにおう／a distinctive smell＝そのもの特有のにおい。" }
+  ],
+  memo: "",
+  savedAt: "2026-08-24T07:50:00.000Z"
+},
+{
+  id: 1787609400000,
+  word: "accumulate",
+  ipa: "/əˈkjuːmjəleɪt/",
+  tags: ["TOEFL", "ライティング頻出"],
+  senses: [
+    {
+      pos: "動詞",
+      ja: "（少しずつ）蓄積する、ためる",
+      def: "to gradually collect a large amount of something",
+      ex: "Over the years, the museum accumulated a vast collection of manuscripts.",
+      target: "accumulated",
+      exJa: "長年かけて、その博物館は膨大な写本コレクションを蓄積した。",
+      colloc: ["accumulate wealth", "accumulate evidence", "accumulate experience"]
+    },
+    {
+      pos: "動詞",
+      ja: "（自然と）たまる、積もる",
+      def: "to gradually increase in number or amount",
+      ex: "Sediment accumulates on the ocean floor at a rate of a few millimeters per year.",
+      target: "accumulates",
+      exJa: "堆積物は年に数ミリの速さで海底にたまっていく。",
+      colloc: ["dust accumulates", "debt accumulates", "snow accumulates"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "ac-", type: "接頭辞", mean: "〜へ（ad- が c の前で変化）" },
+      { p: "cumul", type: "語根", mean: "積み重ね・山（ラテン語 cumulus）" },
+      { p: "-ate", type: "接尾辞", mean: "〜する（動詞化）" }
+    ],
+    note: "cumulus は積乱雲の「積雲」と同じ語。「山へ積み上げていく」イメージなので、一気にではなく<b>少しずつ</b>増えるのがこの語の芯。ad- は次の子音に合わせて ac-/af-/ap- などに変わる（同化）。"
+  },
+  family: [
+    { w: "accumulation", pos: "名", ja: "蓄積、堆積" },
+    { w: "accumulative", pos: "形", ja: "累積する" },
+    { w: "cumulative", pos: "形", ja: "累積的な、積み重なる" }
+  ],
+  mates: [
+    { w: "cumulus", ja: "積雲（もくもく積み上がった雲）" },
+    { w: "accrue", ja: "（利子などが）生じてたまる" }
+  ],
+  memo: "",
+  savedAt: "2026-08-24T22:10:00.000Z"
+},
+{
+  id: 1787660400000,
+  word: "transmit",
+  ipa: "/trænzˈmɪt/",
+  tags: ["TOEFL", "リスニング頻出"],
+  senses: [
+    {
+      pos: "動詞",
+      ja: "（信号・情報を）送信する、伝える",
+      def: "to send out an electronic signal, message, or information",
+      ex: "The satellite transmits data back to the ground station every six hours.",
+      target: "transmits",
+      exJa: "その衛星は6時間ごとに地上局へデータを送信する。",
+      colloc: ["transmit data", "transmit a signal", "transmit information"]
+    },
+    {
+      pos: "動詞",
+      ja: "（病気・性質を）うつす、伝える",
+      def: "to pass a disease or a characteristic from one to another",
+      ex: "The virus is transmitted through contaminated water.",
+      target: "transmitted",
+      exJa: "そのウイルスは汚染された水を介して感染する。",
+      colloc: ["transmit a disease", "sexually transmitted", "transmit genes"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "trans-", type: "接頭辞", mean: "越えて・向こうへ" },
+      { p: "mit", type: "語根", mean: "送る（ラテン語 mittere）" }
+    ],
+    note: "「向こうへ送る」。mit/miss は「送る」の最重要語根のひとつで、変化形の miss は mission（送られた任務）や missile（飛ばすもの）にも残る。"
+  },
+  family: [
+    { w: "transmission", pos: "名", ja: "送信、伝達、感染、（車の）変速機" },
+    { w: "transmitter", pos: "名", ja: "送信機" },
+    { w: "transmissible", pos: "形", ja: "伝染しうる" }
+  ],
+  mates: [
+    { w: "submit", ja: "提出する（下へ送る）" },
+    { w: "emit", ja: "放出する（外へ送る）" },
+    { w: "permit", ja: "許可する（通して送る）" },
+    { w: "omit", ja: "省く（外して送らない）" }
+  ],
+  memo: "",
+  savedAt: "2026-08-25T12:20:00.000Z"
+},
+{
+  id: 1787733600000,
+  word: "plausible",
+  ipa: "/ˈplɔːzəbl/",
+  tags: ["TOEFL", "エッセイ表現"],
+  senses: [
+    {
+      pos: "形容詞",
+      ja: "もっともらしい、ありそうな（十分に納得できる）",
+      def: "reasonable and likely to be true, though not proven",
+      ex: "The most plausible explanation is that the samples were contaminated.",
+      target: "plausible",
+      exJa: "最もありそうな説明は、試料が汚染されていたというものだ。",
+      colloc: ["a plausible explanation", "a plausible argument", "sound plausible"]
+    },
+    {
+      pos: "形容詞",
+      ja: "口先だけもっともらしい（人について・やや否定的）",
+      def: "able to sound convincing while not being honest",
+      ex: "He was a plausible speaker, but the figures did not support his claims.",
+      target: "plausible",
+      exJa: "彼は話しぶりこそもっともらしかったが、数字は主張を裏づけていなかった。",
+      colloc: ["a plausible liar", "a plausible manner"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "plaud", type: "語根", mean: "拍手する（ラテン語 plaudere）" },
+      { p: "-ible", type: "接尾辞", mean: "〜できる" }
+    ],
+    note: "元の意味は「拍手を受けられる」＝賛同できる。だから「証明済み」ではなく<b>受け入れられそう</b>という含みが残り、証拠が弱いときの逃げ道としてアカデミックな文章で多用される。"
+  },
+  family: [
+    { w: "plausibly", pos: "副", ja: "もっともらしく" },
+    { w: "plausibility", pos: "名", ja: "もっともらしさ、妥当性" },
+    { w: "implausible", pos: "形", ja: "ありそうにない" }
+  ],
+  mates: [
+    { w: "applaud", ja: "拍手する、称賛する（〜に向かって拍手）" },
+    { w: "applause", ja: "拍手喝采" },
+    { w: "explode", ja: "爆発する（元は「拍手で舞台から追い出す」）" }
+  ],
+  confuse: [
+    { w: "feasible", ja: "「実行可能な」。plausible は<b>話として</b>納得できる、feasible は<b>実際に</b>やれる。a plausible theory / a feasible plan と組み合わせが分かれる。" }
+  ],
+  memo: "",
+  savedAt: "2026-08-26T08:40:00.000Z"
+},
+{
+  id: 1787778300000,
+  word: "subsequent",
+  ipa: "/ˈsʌbsɪkwənt/",
+  tags: ["TOEFL", "つなぎ表現"],
+  senses: [
+    {
+      pos: "形容詞",
+      ja: "その後の、続いて起こる",
+      def: "happening or coming after something else",
+      ex: "The first trial failed, but subsequent experiments produced clear results.",
+      target: "subsequent",
+      exJa: "最初の試行は失敗したが、その後の実験では明確な結果が出た。",
+      colloc: ["subsequent years", "subsequent research", "in subsequent chapters"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "sub-", type: "接頭辞", mean: "下に・すぐ後に" },
+      { p: "sequ", type: "語根", mean: "続く・追う（ラテン語 sequi）" },
+      { p: "-ent", type: "接尾辞", mean: "〜している（形容詞化）" }
+    ],
+    note: "「すぐ後に続いている」。副詞 subsequently は later より硬く、論文やレポートで時系列をつなぐときの定番。sequ/secu は sequence, consequence, second など「順に続く」語の芯。"
+  },
+  family: [
+    { w: "subsequently", pos: "副", ja: "その後、続いて" },
+    { w: "sequence", pos: "名", ja: "連続、順序" },
+    { w: "sequential", pos: "形", ja: "順を追った、連続する" },
+    { w: "consequence", pos: "名", ja: "結果、影響" }
+  ],
+  mates: [
+    { w: "consecutive", ja: "連続した（3日連続などの「続き」）" },
+    { w: "pursue", ja: "追求する（前へ追う）" },
+    { w: "sequel", ja: "続編" }
+  ],
+  confuse: [
+    { w: "consequent", ja: "「結果として生じる」。subsequent は<b>時間が後</b>なだけ、consequent は<b>因果でつながる</b>。subsequent events＝その後の出来事／consequent damage＝それによる被害。" }
+  ],
+  memo: "",
+  savedAt: "2026-08-26T21:05:00.000Z"
+},
+{
+  id: 1787815800000,
+  word: "deprive",
+  ipa: "/dɪˈpraɪv/",
+  tags: ["TOEFL", "アカデミック"],
+  senses: [
+    {
+      pos: "動詞",
+      ja: "（人から〜を）奪う、与えないでおく",
+      def: "to take something away from someone, or prevent them from having it",
+      ex: "Long commutes deprive workers of time with their families.",
+      target: "deprive",
+      exJa: "長い通勤は労働者から家族と過ごす時間を奪う。",
+      colloc: ["deprive A of B", "be deprived of sleep", "sleep-deprived"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "de-", type: "接頭辞", mean: "取り去る・下へ" },
+      { p: "priv", type: "語根", mean: "自分ひとりのものにする（ラテン語 privare）" }
+    ],
+    note: "priv は「他から切り離して自分のものにする」で private（私的な）と同根。de- が付くと「切り離して取り上げる」。<b>deprive A of B</b>（AからBを奪う）の of を落とすと通じないので、必ず of ごと覚える。"
+  },
+  family: [
+    { w: "deprivation", pos: "名", ja: "剥奪、（睡眠などの）不足" },
+    { w: "deprived", pos: "形", ja: "恵まれない、貧困の" },
+    { w: "underprivileged", pos: "形", ja: "社会的に恵まれない" }
+  ],
+  mates: [
+    { w: "private", ja: "私的な（他から切り離された）" },
+    { w: "privilege", ja: "特権（自分だけに与えられた法）" },
+    { w: "privacy", ja: "私生活、プライバシー" }
+  ],
+  memo: "",
+  savedAt: "2026-08-27T07:30:00.000Z"
+}
+];
+
+/* ================= 端末に保存する学習データ ================= */
+const U_KEY = 'vocabNote_user';
+const PREF_KEY = 'vocabNote_prefs';
+const PENDING_KEY = 'vocabNote_pending';
+
+function blankUser() {
+  return { memos: {}, favs: {}, srs: {}, stats: {}, hist: [], days: {}, updatedAt: 0 };
+}
+let U = blankUser();
+function loadUser() {
+  try {
+    const raw = localStorage.getItem(U_KEY);
+    if (raw) {
+      const o = JSON.parse(raw);
+      U = Object.assign(blankUser(), o || {});
+      ['memos', 'favs', 'srs', 'stats', 'days'].forEach(k => { if (!U[k] || typeof U[k] !== 'object') U[k] = {}; });
+      if (!Array.isArray(U.hist)) U.hist = [];
+    }
+  } catch (e) { U = blankUser(); }
+}
+function saveUser(push) {
+  U.updatedAt = Date.now();
+  try { localStorage.setItem(U_KEY, JSON.stringify(U)); } catch (e) {}
+  if (push !== false) schedulePush();
+}
+
+let PREFS = { view: 'week', openWeeks: null, hide: false, player: {}, rootKind: '語根', favSort: 'fav' };
+function loadPrefs() {
+  try {
+    const o = JSON.parse(localStorage.getItem(PREF_KEY) || '{}');
+    PREFS = Object.assign(PREFS, o || {});
+  } catch (e) {}
+  if (!PREFS.player) PREFS.player = {};
+}
+function savePrefs() {
+  try { localStorage.setItem(PREF_KEY, JSON.stringify(PREFS)); } catch (e) {}
+}
+
+/* ================= 端末間の共有（合言葉・Firebase） ================= */
+const SYNC_CONFIG = {
+  apiKey: "AIzaSyASWojYpZ3KJBYG9V30Y4BmplUFORYOelw",
+  authDomain: "ai-english-review.firebaseapp.com",
+  projectId: "ai-english-review",
+  storageBucket: "ai-english-review.firebasestorage.app",
+  messagingSenderId: "146537476580",
+  appId: "1:146537476580:web:4ef3dfdf9c0969f25b17f1"
+};
+const SYNC_DOC = 'vocab_note';
+let syncRef = null, syncState = 'off', pushTimer = null, pushing = false;
+
+function syncId() {
+  let id = null;
+  try { id = localStorage.getItem('aien_sync_id'); } catch (e) {}
+  return (id && id !== '__none__') ? id : null;
+}
+function syncIdOrAsk() {
+  let id = null;
+  try { id = localStorage.getItem('aien_sync_id'); } catch (e) { return null; }
+  if (id === null) {
+    const input = prompt('メモ・お気に入り・成績を他の端末（PC/スマホ）と共有する場合は、合言葉を入力してください。\n全ての端末で同じ言葉を入力すると内容が共有されます。\n共有しない場合は空欄のままOKしてください。', '');
+    id = (input && input.trim()) ? input.trim() : '__none__';
+    try { localStorage.setItem('aien_sync_id', id); } catch (e) {}
+  }
+  return id === '__none__' ? null : id;
+}
+function changeSyncId() {
+  let cur = null;
+  try { cur = localStorage.getItem('aien_sync_id'); } catch (e) {}
+  const input = prompt('他の端末と共有するための合言葉を入力してください（全ての端末で同じ言葉にしてください）。\n共有をやめる場合は空欄のままOKしてください。', (cur && cur !== '__none__') ? cur : '');
+  if (input === null) return;
+  try { localStorage.setItem('aien_sync_id', input.trim() ? input.trim() : '__none__'); } catch (e) {}
+  location.reload();
+}
+function paintSync() {
+  const el = document.getElementById('syncLabel');
+  if (!el) return;
+  const id = syncId();
+  if (!id) { el.textContent = '共有OFF（この端末だけに保存）'; return; }
+  const s = syncState === 'ok' ? '同期OK' : syncState === 'busy' ? '同期中…' : syncState === 'error' ? '同期エラー（この端末には保存済み）' : '';
+  el.textContent = '共有ON（合言葉: ' + id + '）' + (s ? ' / ' + s : '');
+}
+function initSync() {
+  const id = syncIdOrAsk();
+  if (!id) { syncState = 'off'; paintSync(); return Promise.resolve(); }
+  try {
+    if (typeof firebase === 'undefined') { syncState = 'error'; paintSync(); return Promise.resolve(); }
+    if (!window._syncApp) window._syncApp = firebase.initializeApp(SYNC_CONFIG);
+    syncRef = firebase.firestore().collection('reviewLists').doc(id + '__' + SYNC_DOC);
+    return pullSync();
+  } catch (e) { syncState = 'error'; paintSync(); return Promise.resolve(); }
+}
+function mergeRemote(r) {
+  let changed = false;
+  ['memos', 'favs'].forEach(k => {
+    const rm = r[k] || {};
+    Object.keys(rm).forEach(id => {
+      const a = U[k][id], b = rm[id];
+      if (!b || typeof b !== 'object') return;
+      if (!a || (b.t || 0) > (a.t || 0)) { U[k][id] = b; changed = true; }
+    });
+  });
+  ['srs', 'stats'].forEach(k => {
+    const rm = r[k] || {};
+    Object.keys(rm).forEach(id => {
+      const a = U[k][id], b = rm[id];
+      if (!b || typeof b !== 'object') return;
+      if (!a || (b.last || 0) > (a.last || 0)) { U[k][id] = b; changed = true; }
+    });
+  });
+  const rd = r.days || {};
+  Object.keys(rd).forEach(d => {
+    if ((rd[d] || 0) > (U.days[d] || 0)) { U.days[d] = rd[d]; changed = true; }
+  });
+  if (Array.isArray(r.hist)) {
+    const seen = {};
+    U.hist.forEach(h => { seen[h.at] = 1; });
+    r.hist.forEach(h => { if (h && !seen[h.at]) { U.hist.push(h); seen[h.at] = 1; changed = true; } });
+    U.hist.sort((a, b) => b.at - a.at);
+    if (U.hist.length > 60) U.hist = U.hist.slice(0, 60);
+  }
+  return changed;
+}
+function pullSync() {
+  if (!syncRef) return Promise.resolve();
+  syncState = 'busy'; paintSync();
+  return Promise.race([
+    syncRef.get(),
+    new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 6000))
+  ]).then(snap => {
+    let changed = false;
+    if (snap && snap.exists) {
+      const d = snap.data();
+      if (d && typeof d.json === 'string') {
+        try { changed = mergeRemote(JSON.parse(d.json) || {}); } catch (e) {}
+      }
+    }
+    syncState = 'ok';
+    if (changed) { try { localStorage.setItem(U_KEY, JSON.stringify(U)); } catch (e) {} }
+    paintSync();
+    return changed;
+  }).catch(() => { syncState = 'error'; paintSync(); return false; });
+}
+function schedulePush() {
+  if (!syncRef) return;
+  if (pushTimer) clearTimeout(pushTimer);
+  pushTimer = setTimeout(doPush, 1500);
+}
+function doPush() {
+  pushTimer = null;
+  if (!syncRef || pushing) return;
+  pushing = true; syncState = 'busy'; paintSync();
+  syncRef.set({ json: JSON.stringify(U), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+    .then(() => { pushing = false; syncState = 'ok'; paintSync(); })
+    .catch(() => {
+      pushing = false; syncState = 'error'; paintSync();
+      if (pushTimer) clearTimeout(pushTimer);
+      pushTimer = setTimeout(doPush, 15000);
+    });
+}
+
+/* ================= 小さな道具 ================= */
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function normWord(s) {
+  return String(s || '').trim().replace(/　/g, ' ').replace(/\s+/g, ' ').replace(/[.,!?;:]+$/, '').toLowerCase();
+}
+function byId(id) { return WORDS.find(w => String(w.id) === String(id)); }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tm);
+  t._tm = setTimeout(() => t.classList.remove('show'), 2200);
+}
+const WD = ['日', '月', '火', '水', '木', '金', '土'];
+function pad2(n) { return String(n).padStart(2, '0'); }
+function ymd(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+function fmtDateFull(s) {
+  const d = new Date(s || Date.now());
+  return (d.getMonth() + 1) + '月' + d.getDate() + '日(' + WD[d.getDay()] + ')';
+}
+function fmtDateShort(s) {
+  const d = new Date(s || Date.now());
+  return (d.getMonth() + 1) + '/' + d.getDate();
+}
+function mondayOf(d) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
+  return x;
+}
+function weekKeyOf(s) { return ymd(mondayOf(new Date(s || Date.now()))); }
+function weekRangeLabel(key) {
+  const a = new Date(key + 'T00:00:00');
+  const b = new Date(a); b.setDate(b.getDate() + 6);
+  return (a.getMonth() + 1) + '/' + a.getDate() + '〜' + (b.getMonth() + 1) + '/' + b.getDate();
+}
+const THIS_WEEK_KEY = ymd(mondayOf(new Date()));
+const TODAY_KEY = ymd(new Date());
+function daysBetween(a, b) { return Math.round((new Date(b) - new Date(a)) / 86400000); }
+
+/* ================= 単語の付随データ ================= */
+function memoOf(w) {
+  const m = U.memos[String(w.id)];
+  if (m && typeof m.text === 'string') return m.text;
+  return w.memo || '';
+}
+function setMemo(id, text) {
+  U.memos[String(id)] = { t: Date.now(), text: String(text || '') };
+  saveUser();
+}
+function isFav(id) {
+  const f = U.favs[String(id)];
+  return !!(f && f.on);
+}
+function toggleFav(id) {
+  const cur = isFav(id);
+  U.favs[String(id)] = { t: Date.now(), on: !cur };
+  saveUser();
+  document.querySelectorAll('[data-fav="' + id + '"]').forEach(b => {
+    b.classList.toggle('on', !cur);
+    b.textContent = !cur ? '★' : '☆';
+  });
+  updateCounts();
+  if (currentView === 'favs') renderFavs();
+  showToast(!cur ? '⭐ お気に入りに追加しました' : 'お気に入りから外しました');
+}
+function favWords() {
+  return WORDS.filter(w => isFav(w.id))
+    .sort((a, b) => (U.favs[String(b.id)].t || 0) - (U.favs[String(a.id)].t || 0));
+}
+function statOf(id) { return U.stats[String(id)] || { ok: 0, ng: 0, last: 0 }; }
+function statusOf(id) {
+  const s = statOf(id), sr = U.srs[String(id)];
+  const n = s.ok + s.ng;
+  if (!n) return { k: 'new', label: '未着手' };
+  const rate = s.ok / n;
+  if (rate < 0.6) return { k: 'weak', label: '苦手' };
+  if (sr && sr.box >= 4) return { k: 'known', label: '定着' };
+  return { k: 'learning', label: '学習中' };
+}
+const SRS_INTERVALS = [1, 2, 4, 7, 14, 30];
+function srsOf(id) { return U.srs[String(id)] || { box: 0, due: 0, last: 0 }; }
+function srsUpdate(id, correct) {
+  const cur = srsOf(id);
+  const box = correct ? Math.min(cur.box + 1, SRS_INTERVALS.length - 1) : 0;
+  const due = Date.now() + SRS_INTERVALS[box] * 86400000;
+  U.srs[String(id)] = { box: box, due: due, last: Date.now() };
+  const s = statOf(id);
+  U.stats[String(id)] = { ok: s.ok + (correct ? 1 : 0), ng: s.ng + (correct ? 0 : 1), last: Date.now() };
+  U.days[TODAY_KEY] = (U.days[TODAY_KEY] || 0) + 1;
+  saveUser();
+}
+function dueWords() {
+  const now = Date.now();
+  return WORDS.filter(w => {
+    const s = U.srs[String(w.id)];
+    return s && s.due && s.due <= now;
+  }).sort((a, b) => srsOf(a.id).due - srsOf(b.id).due);
+}
+function weakWords() {
+  return WORDS.filter(w => statusOf(w.id).k === 'weak')
+    .sort((a, b) => (statOf(b.id).ng - statOf(b.id).ok) - (statOf(a.id).ng - statOf(a.id).ok));
+}
+
+/* ================= 音声 ================= */
+let curAudio = null, curBtn = null;
+function resetPlayBtn(btn) { if (btn) { btn.textContent = btn.dataset.icon || '🔊'; btn.classList.remove('playing'); } }
+function stopSinglePlay() {
+  if (curAudio) { try { curAudio.pause(); } catch (e) {} curAudio = null; }
+  resetPlayBtn(curBtn); curBtn = null;
+}
+function playAudio(btn, src) {
+  if (curBtn === btn && curAudio) { stopSinglePlay(); return; }
+  stopSinglePlay();
+  pauseSeqIfPlaying();
+  const a = new Audio(src);
+  curAudio = a; curBtn = btn;
+  btn.classList.add('playing'); btn.textContent = '⏸';
+  a.onended = () => { if (curAudio === a) stopSinglePlay(); };
+  a.onerror = () => { stopSinglePlay(); showToast('音声がまだありません'); };
+  a.play().catch(() => { stopSinglePlay(); showToast('音声を再生できませんでした'); });
+}
+function wordAudio(id) { return 'audio/' + id + '.mp3'; }
+function exAudio(id, i) { return 'audio/' + id + '_' + (i + 1) + '.mp3'; }
+function jaAudio(id) { return 'audio_ja/' + id + '.mp3'; }
+
+/* ================= 単語カード ================= */
+function favBtnHtml(id) {
+  const on = isFav(id);
+  return '<button class="fav-btn' + (on ? ' on' : '') + '" data-fav="' + id + '" onclick="toggleFav(' + id + ')" aria-label="お気に入り">' + (on ? '★' : '☆') + '</button>';
+}
+function senseHtml(w, s, i) {
+  const hid = PREFS.hide;
+  const ja = hid
+    ? '<span class="sense-ja mj hid" onclick="this.classList.remove(\'hid\')">' + escapeHtml(s.ja) + '</span>'
+    : '<span class="sense-ja">' + escapeHtml(s.ja) + '</span>';
+  let h = '<div class="sense"><div class="sense-head"><span class="pos">' + escapeHtml(s.pos) + '</span>' + ja + '</div>';
+  if (s.def) h += '<div class="sense-def">' + escapeHtml(s.def) + '</div>';
+  if (s.ex) {
+    h += '<div class="ex-box"><div class="ex-en">'
+      + '<button class="play-btn sm" data-icon="🔊" onclick="playAudio(this,\'' + exAudio(w.id, i) + '\')">🔊</button>'
+      + '<span>' + markTarget(s.ex, s.target || w.word) + '</span></div>';
+    if (s.exJa) h += '<div class="ex-ja">' + escapeHtml(s.exJa) + '</div>';
+    h += '</div>';
+  }
+  if (s.colloc && s.colloc.length) {
+    h += '<div class="colloc">' + s.colloc.map(c => '<span class="chip">' + escapeHtml(c) + '</span>').join('') + '</div>';
+  }
+  return h + '</div>';
+}
+function markTarget(sent, target) {
+  const esc = escapeHtml(sent);
+  if (!target) return esc;
+  const t = escapeHtml(target);
+  const re = new RegExp('\\b(' + t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')\\b', 'i');
+  return esc.replace(re, '<b>$1</b>');
+}
+function originHtml(w) {
+  if (!w.origin || !w.origin.parts || !w.origin.parts.length) return '';
+  const parts = w.origin.parts.map(p =>
+    '<span class="opart">' + escapeHtml(p.p) + '<em>' + escapeHtml(p.type) + '：' + escapeHtml(p.mean) + '</em></span>'
+  ).join('<span class="oplus">＋</span>');
+  return '<div class="origin-box"><div class="box-title">🧬 語源（部品でおぼえる）</div>'
+    + '<div class="origin-parts">' + parts + '</div>'
+    + (w.origin.note ? '<div class="origin-note">' + w.origin.note + '</div>' : '') + '</div>';
+}
+function familyHtml(w) {
+  if (!w.family || !w.family.length) return '';
+  return '<div class="fam-box"><div class="box-title">🌱 語族（同じ単語から生まれた形）</div>'
+    + w.family.map(f => '<div class="fam-item"><b>' + escapeHtml(f.w) + '</b>'
+      + (f.pos ? '<span class="fpos">' + escapeHtml(f.pos) + '</span>' : '')
+      + '<span>' + escapeHtml(f.ja) + '</span></div>').join('') + '</div>';
+}
+function matesHtml(w) {
+  if (!w.mates || !w.mates.length) return '';
+  return '<div class="mate-box"><div class="box-title">🌳 同じ語根の仲間</div>'
+    + w.mates.map(m => '<div class="mate-item"><b>' + escapeHtml(m.w) + '</b> … ' + escapeHtml(m.ja) + '</div>').join('') + '</div>';
+}
+function confuseHtml(w) {
+  if (!w.confuse || !w.confuse.length) return '';
+  return '<div class="conf-box"><div class="box-title">⚠️ まぎらわしい語</div>'
+    + w.confuse.map(c => '<div class="conf-item"><b>' + escapeHtml(c.w) + '</b> … ' + c.ja + '</div>').join('') + '</div>';
+}
+function memoHtml(w) {
+  const t = memoOf(w);
+  return '<div class="memo-box" id="memo-' + w.id + '">'
+    + '<div class="memo-row"><div class="box-title" style="margin:0">📝 自分のメモ</div>'
+    + '<button class="btn-mini" onclick="editMemo(' + w.id + ')">✏️ 編集</button></div>'
+    + '<div class="memo-text' + (t ? '' : ' blank') + '">' + (t ? escapeHtml(t) : '（タップして自分の言葉で書く。使いたい場面・混同した語・自作の例文など）') + '</div></div>';
+}
+function editMemo(id) {
+  const w = byId(id);
+  const box = document.getElementById('memo-' + id);
+  if (!box || !w) return;
+  const cur = memoOf(w);
+  box.innerHTML = '<div class="box-title">📝 自分のメモ</div>'
+    + '<textarea class="memo-input" id="memoEd-' + id + '" style="margin-top:4px">' + escapeHtml(cur) + '</textarea>'
+    + '<div class="row-btns"><button class="btn-primary" onclick="saveMemo(' + id + ')">保存</button>'
+    + '<button class="btn-outline" onclick="cancelMemo(' + id + ')">やめる</button></div>';
+  const ta = document.getElementById('memoEd-' + id);
+  ta.focus();
+}
+function saveMemo(id) {
+  const ta = document.getElementById('memoEd-' + id);
+  if (!ta) return;
+  setMemo(id, ta.value);
+  cancelMemo(id);
+  showToast('📝 メモを保存しました');
+}
+function cancelMemo(id) {
+  const w = byId(id);
+  const box = document.getElementById('memo-' + id);
+  if (box && w) box.outerHTML = memoHtml(w);
+}
+function wordCardHtml(w, opts) {
+  opts = opts || {};
+  const st = statusOf(w.id);
+  const s = statOf(w.id);
+  let h = '<div class="wcard" id="card-' + w.id + '">';
+  h += '<div class="w-head">'
+    + '<button class="play-btn" data-icon="🔊" onclick="playAudio(this,\'' + wordAudio(w.id) + '\')">🔊</button>'
+    + '<span class="w-word">' + escapeHtml(w.word) + '</span>'
+    + '<span class="w-spacer"></span>' + favBtnHtml(w.id) + '</div>';
+  if (w.ipa) h += '<div class="w-ipa">' + escapeHtml(w.ipa) + '</div>';
+  h += '<div class="w-tags"><span class="tag st-' + st.k + '">' + st.label + '</span>'
+    + (s.ok + s.ng ? '<span class="tag">正答 ' + s.ok + '/' + (s.ok + s.ng) + '</span>' : '')
+    + (w.tags || []).map(t => '<span class="tag">' + escapeHtml(t) + '</span>').join('') + '</div>';
+  (w.senses || []).forEach((sn, i) => { h += senseHtml(w, sn, i); });
+  const detail = originHtml(w) + familyHtml(w) + matesHtml(w) + confuseHtml(w);
+  if (detail) {
+    h += '<details class="w-detail"' + (opts.open ? ' open' : '') + '>'
+      + '<summary class="fold-btn">▼ 語源・語族・まぎらわしい語をひらく</summary>' + detail + '</details>';
+  }
+  h += memoHtml(w);
+  h += '<div class="card-foot"><span>追加: ' + fmtDateFull(w.savedAt) + '</span>'
+    + '<span>' + (w.senses || []).length + 'つの意味</span></div>';
+  return h + '</div>';
+}
+
+/* ================= 未清書メモ（キャプチャ） ================= */
+function getPending() {
+  try { return JSON.parse(localStorage.getItem(PENDING_KEY) || '[]'); } catch (e) { return []; }
+}
+function setPending(list) {
+  try { localStorage.setItem(PENDING_KEY, JSON.stringify(list)); } catch (e) {}
+}
+function findDuplicate(text) {
+  const n = normWord(text);
+  if (!n) return null;
+  const w = WORDS.find(x => normWord(x.word) === n);
+  if (w) return { kind: 'polished', w: w };
+  const p = getPending().find(x => normWord(x.word) === n);
+  if (p) return { kind: 'pending', p: p };
+  return null;
+}
+function hideDupNotice() {
+  const d = document.getElementById('dupNotice');
+  d.hidden = true; d.innerHTML = '';
+}
+function showDupNotice(dup, raw) {
+  const d = document.getElementById('dupNotice');
+  if (dup.kind === 'polished') {
+    const w = dup.w;
+    d.innerHTML = '<div class="dn-t">⚠️ この単語はすでにノートにあります（' + fmtDateFull(w.savedAt) + '追加）</div>'
+      + '<div><b>' + escapeHtml(w.word) + '</b> … ' + escapeHtml((w.senses[0] || {}).ja || '') + '</div>'
+      + '<div class="dup-actions">'
+      + '<button class="btn-mini" onclick="playAudio(this,\'' + wordAudio(w.id) + '\')" data-icon="🔊 発音">🔊 発音</button>'
+      + '<button class="btn-mini" onclick="jumpToWord(' + w.id + ')">🔍 ノートで見る</button>'
+      + '<button class="btn-mini" onclick="saveAnyway()">＋ それでも保存する</button></div>';
+  } else {
+    d.innerHTML = '<div class="dn-t">⚠️ この単語はすでに未清書メモにあります（' + fmtDateFull(dup.p.savedAt) + '追加）</div>'
+      + '<div><b>' + escapeHtml(dup.p.word) + '</b>' + (dup.p.rough ? ' … ' + escapeHtml(dup.p.rough) : '') + '</div>'
+      + '<div class="dup-actions"><button class="btn-mini" onclick="saveAnyway()">＋ それでも保存する</button></div>';
+  }
+  d.hidden = false;
+  d._raw = raw;
+}
+function saveAnyway() {
+  const d = document.getElementById('dupNotice');
+  doSave(d._raw || document.getElementById('wordInput').value, true);
+}
+function jumpToWord(id) {
+  hideDupNotice();
+  switchView('words');
+  PREFS.view = 'flat'; savePrefs();
+  document.querySelectorAll('#viewSeg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.pview === 'flat'));
+  document.getElementById('searchBox').value = byId(id).word;
+  renderPolished();
+  setTimeout(() => {
+    const el = document.getElementById('card-' + id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 60);
+}
+function saveWord() { doSave(document.getElementById('wordInput').value, false); }
+function doSave(raw, force) {
+  const word = String(raw || '').trim();
+  if (!word) { showToast('英単語を入力してください'); return; }
+  if (!force) {
+    const dup = findDuplicate(word);
+    if (dup) { showDupNotice(dup, word); return; }
+  }
+  hideDupNotice();
+  const memo = document.getElementById('memoInput').value.trim();
+  const item = { id: Date.now(), word: word, memo: memo, rough: '', savedAt: new Date().toISOString() };
+  const list = getPending();
+  list.unshift(item);
+  setPending(list);
+  document.getElementById('wordInput').value = '';
+  document.getElementById('memoInput').value = '';
+  renderPending();
+  showToast('＋ 保存しました（意味を調べています…）');
+  roughLookup(item.id, word);
+}
+function roughLookup(id, word) {
+  const url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(word) + '&langpair=en|ja';
+  fetch(url).then(r => r.json()).then(j => {
+    const t = j && j.responseData && j.responseData.translatedText;
+    if (!t) return;
+    const list = getPending();
+    const it = list.find(x => x.id === id);
+    if (it) { it.rough = t; setPending(list); renderPending(); }
+  }).catch(() => {});
+}
+function deletePending(id) {
+  setPending(getPending().filter(x => x.id !== id));
+  renderPending();
+}
+function clearAllPending() {
+  if (!getPending().length) return;
+  if (!confirm('未清書メモをすべて消します。よろしいですか？（清書済みの単語は消えません）')) return;
+  setPending([]);
+  renderPending();
+  showToast('未清書メモを消去しました');
+}
+function copyPending() {
+  const list = getPending();
+  if (!list.length) { showToast('コピーする未清書メモがありません'); return; }
+  const text = JSON.stringify(list, null, 2);
+  const done = () => showToast('📋 コピーしました（Claude Codeに貼って /vocab-note-add）');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  } else fallbackCopy(text, done);
+}
+function fallbackCopy(text, done) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); done(); } catch (e) { showToast('コピーできませんでした'); }
+  document.body.removeChild(ta);
+}
+function renderPending() {
+  const list = getPending().filter(p => !WORDS.some(w => normWord(w.word) === normWord(p.word)));
+  const cur = getPending();
+  if (list.length !== cur.length) setPending(list);
+  document.getElementById('pendingCount').textContent = list.length;
+  const el = document.getElementById('pendingList');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty">未清書メモはありません。<br>気になった英単語を上の欄に入力して「保存する」を押してください。</div>';
+    return;
+  }
+  el.innerHTML = list.map(p =>
+    '<div class="pcard"><div class="pw">' + escapeHtml(p.word) + '</div>'
+    + (p.rough ? '<div class="pr">' + escapeHtml(p.rough) + '<span style="font-size:0.7rem;color:#a0aec0"> ※機械翻訳の目安</span></div>' : '<div class="pr" style="color:#a0aec0">意味は清書時にClaudeが調べます</div>')
+    + (p.memo ? '<div class="pm">📝 ' + escapeHtml(p.memo) + '</div>' : '')
+    + '<div class="pfoot"><span>' + fmtDateFull(p.savedAt) + '</span>'
+    + '<button class="del-btn" onclick="deletePending(' + p.id + ')">🗑</button></div></div>'
+  ).join('');
+}
+
+/* ================= 一覧の描画 ================= */
+function matchWord(w, q) {
+  if (!q) return true;
+  const s = q.toLowerCase();
+  const hay = [w.word, w.ipa || '', memoOf(w), (w.tags || []).join(' '),
+    (w.senses || []).map(x => [x.ja, x.def, x.ex, x.exJa, (x.colloc || []).join(' ')].join(' ')).join(' '),
+    (w.family || []).map(f => f.w + f.ja).join(' '),
+    (w.mates || []).map(f => f.w + f.ja).join(' '),
+    (w.origin && w.origin.parts || []).map(p => p.p + p.mean).join(' ')
+  ].join(' ').toLowerCase();
+  return hay.indexOf(s) !== -1;
+}
+function groupByWeek(list) {
+  const map = {};
+  list.forEach(w => {
+    const k = weekKeyOf(w.savedAt);
+    (map[k] = map[k] || []).push(w);
+  });
+  return Object.keys(map).sort().reverse().map(k => ({
+    key: k, label: weekRangeLabel(k), items: map[k].sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt))
+  }));
+}
+function openWeeks() {
+  if (!PREFS.openWeeks) PREFS.openWeeks = [THIS_WEEK_KEY];
+  return PREFS.openWeeks;
+}
+function toggleOpenWeek(key) {
+  const o = openWeeks();
+  const i = o.indexOf(key);
+  if (i === -1) o.push(key); else o.splice(i, 1);
+  savePrefs();
+  renderPolished();
+}
+function toggleAllWeeks() {
+  const q = document.getElementById('searchBox').value.trim();
+  const gs = groupByWeek(WORDS.filter(w => matchWord(w, q)));
+  const all = gs.length && gs.every(g => openWeeks().indexOf(g.key) !== -1);
+  PREFS.openWeeks = all ? [] : gs.map(g => g.key);
+  savePrefs();
+  renderPolished();
+}
+function renderPolished() {
+  const q = document.getElementById('searchBox').value.trim();
+  let list = WORDS.filter(w => matchWord(w, q));
+  const el = document.getElementById('polishedList');
+  const tb = document.getElementById('wkExpandBtn');
+  tb.hidden = PREFS.view !== 'week';
+  if (!list.length) {
+    el.innerHTML = '<div class="empty">' + (q ? '「' + escapeHtml(q) + '」に一致する単語はありません。' : 'まだ保存済み単語がありません。') + '</div>';
+    return;
+  }
+  if (PREFS.view === 'flat') {
+    list = list.slice().sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+    el.innerHTML = list.map(w => wordCardHtml(w)).join('');
+  } else if (PREFS.view === 'az') {
+    list = list.slice().sort((a, b) => a.word.toLowerCase().localeCompare(b.word.toLowerCase()));
+    el.innerHTML = list.map(w => wordCardHtml(w)).join('');
+  } else {
+    const gs = groupByWeek(list);
+    const open = openWeeks();
+    el.innerHTML = gs.map(g => {
+      const isOpen = q ? true : open.indexOf(g.key) !== -1;
+      return '<div class="wk"><button class="wk-head" onclick="toggleOpenWeek(\'' + g.key + '\')">'
+        + '<div><div class="wk-t">' + g.label + (g.key === THIS_WEEK_KEY ? ' <span class="wk-badge">今週</span>' : '') + '</div>'
+        + '<div class="wk-s">' + g.items.length + '語</div></div>'
+        + '<span class="wk-arrow">' + (isOpen ? '▲' : '▼') + '</span></button>'
+        + (isOpen ? '<div class="wk-body">' + g.items.map(w => wordCardHtml(w)).join('') + '</div>' : '') + '</div>';
+    }).join('');
+  }
+}
+function renderFavs() {
+  const q = (document.getElementById('favSearch').value || '').trim();
+  let list = favWords().filter(w => matchWord(w, q));
+  if (PREFS.favSort === 'date') list = list.slice().sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+  if (PREFS.favSort === 'az') list = list.slice().sort((a, b) => a.word.toLowerCase().localeCompare(b.word.toLowerCase()));
+  document.getElementById('favCount').textContent = list.length;
+  const all = favWords().length;
+  document.getElementById('favSummary').innerHTML = all
+    ? '⭐ ' + all + '語を登録中。覚えにくい単語・使いたい単語をここに貯めて、まとめてテスト／通し再生できます。'
+    : 'まだお気に入りがありません。単語カードの ☆ を押すとここに集まります（合言葉を設定すれば他の端末にも共有されます）。';
+  const el = document.getElementById('favList');
+  el.innerHTML = list.length ? list.map(w => wordCardHtml(w)).join('')
+    : '<div class="empty">' + (q ? '一致するお気に入りはありません。' : '☆ を押した単語がここに並びます。') + '</div>';
+}
+function renderWeeks() {
+  const gs = groupByWeek(WORDS);
+  document.getElementById('weeksSummary').innerHTML =
+    '全 ' + WORDS.length + '語 / ' + gs.length + '週分。週の見出しをタップすると開きます。'
+    + '<br>🎧 <b>通し再生</b>はその週の単語を「英語 →（考える間）→ 意味 →（例文）」の順に自動で流します（順番は入れ替え可）。'
+    + '<br>✍️ <b>週テスト</b>はその週だけを出題します。';
+  const el = document.getElementById('weekList');
+  if (!gs.length) { el.innerHTML = '<div class="empty">まだ単語がありません。</div>'; return; }
+  el.innerHTML = gs.map((g, gi) => {
+    const sc = (U.hist || []).filter(h => h.week === g.key).sort((a, b) => b.at - a.at)[0];
+    const days = {};
+    g.items.forEach(w => { const d = ymd(new Date(w.savedAt)); (days[d] = days[d] || []).push(w); });
+    const open = gi === 0;
+    const body = Object.keys(days).sort().reverse().map(d =>
+      '<div class="day-head">' + fmtDateFull(d + 'T00:00:00') + '（' + days[d].length + '語）</div>'
+      + days[d].map(w => '<div class="mini">'
+        + '<button class="play-btn sm" data-icon="🔊" onclick="playAudio(this,\'' + wordAudio(w.id) + '\')">🔊</button>'
+        + '<span class="mw">' + escapeHtml(w.word) + '</span>'
+        + '<span class="mj hid" onclick="this.classList.remove(\'hid\')">' + escapeHtml((w.senses[0] || {}).ja || '') + '</span>'
+        + favBtnHtml(w.id) + '</div>').join('')
+    ).join('');
+    return '<div class="wk"><button class="wk-head" onclick="toggleWeekPanel(this)">'
+      + '<div><div class="wk-t">' + g.label + (g.key === THIS_WEEK_KEY ? ' <span class="wk-badge">今週</span>' : '') + '</div>'
+      + '<div class="wk-s">' + g.items.length + '語' + (sc ? ' / 直近テスト ' + sc.correct + '/' + sc.n + '（' + Math.round(sc.correct / sc.n * 100) + '%）' : ' / テスト未実施') + '</div></div>'
+      + '<span class="wk-arrow">' + (open ? '▲' : '▼') + '</span></button>'
+      + '<div class="wk-actions"' + (open ? '' : ' hidden') + '>'
+      + '<button class="btn-primary" onclick="startTestForWeek(\'' + g.key + '\')">✍️ この週をテスト</button>'
+      + '<button class="btn-outline" onclick="seqStart(\'' + g.key + '\')">🎧 通し再生</button></div>'
+      + '<div class="wk-body"' + (open ? '' : ' hidden') + '>' + body + '</div></div>';
+  }).join('');
+}
+function toggleWeekPanel(btn) {
+  const wk = btn.parentElement;
+  const parts = wk.querySelectorAll('.wk-body, .wk-actions');
+  const nowHidden = parts[0].hidden;
+  parts.forEach(p => { p.hidden = !nowHidden; });
+  btn.querySelector('.wk-arrow').textContent = nowHidden ? '▲' : '▼';
+}
+function updateCounts() {
+  document.getElementById('polishedCount').textContent = WORDS.length;
+  const due = dueWords().length;
+  const t = document.getElementById('tabDue');
+  t.textContent = due ? ' (' + due + ')' : '';
+}
+
+/* ================= タブ ================= */
+let currentView = 'words';
+function switchView(name) {
+  currentView = name;
+  ['words', 'review', 'favs', 'weeks', 'test', 'roots'].forEach(v => {
+    document.getElementById('view-' + v).hidden = (v !== name);
+  });
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  stopSinglePlay();
+  if (name === 'words') renderPolished();
+  if (name === 'favs') renderFavs();
+  if (name === 'weeks') renderWeeks();
+  if (name === 'test') renderTestSetup();
+  if (name === 'roots') renderRoots();
+  if (name === 'review') renderReview();
+  window.scrollTo(0, 0);
+}
+
+/* ================= 通し再生 ================= */
+const seq = { list: [], steps: [], i: 0, playing: false, timer: null, label: '', dir: 'en2ja', rate: 1, gap: 2000, ex: true, twice: false, loop: false, showEn: false };
+function loadSeqPrefs() {
+  const p = PREFS.player || {};
+  seq.dir = p.dir || 'en2ja';
+  seq.rate = p.rate || 1;
+  seq.gap = p.gap == null ? 2000 : p.gap;
+  seq.ex = p.ex !== false;
+  seq.twice = !!p.twice;
+  seq.loop = !!p.loop;
+  seq.showEn = !!p.showEn;
+}
+function saveSeqPrefs() {
+  PREFS.player = { dir: seq.dir, rate: seq.rate, gap: seq.gap, ex: seq.ex, twice: seq.twice, loop: seq.loop, showEn: seq.showEn };
+  savePrefs();
+}
+function buildSteps() {
+  const st = [];
+  seq.list.forEach((w, wi) => {
+    const en = { wi: wi, kind: 'en' }, ja = { wi: wi, kind: 'ja' };
+    if (seq.dir === 'en2ja') {
+      st.push(en);
+      if (seq.twice) st.push({ wi: wi, kind: 'en' });
+      st.push({ wi: wi, kind: 'gap' });
+      st.push(ja);
+    } else {
+      st.push(ja);
+      st.push({ wi: wi, kind: 'gap' });
+      st.push(en);
+      if (seq.twice) st.push({ wi: wi, kind: 'en' });
+    }
+    if (seq.ex && w.senses && w.senses[0] && w.senses[0].ex) st.push({ wi: wi, kind: 'ex' });
+  });
+  seq.steps = st;
+}
+function seqStart(source) {
+  let list = [], label = '';
+  if (source === 'favs') { list = favWords(); label = '⭐ お気に入り'; }
+  else if (source === 'due') { list = dueWords(); label = '🔁 今日の復習'; }
+  else { list = WORDS.filter(w => weekKeyOf(w.savedAt) === source); label = weekRangeLabel(source); }
+  if (!list.length) { showToast('再生できる単語がありません'); return; }
+  stopSinglePlay();
+  seq.list = list; seq.label = label; seq.i = 0; seq.playing = true;
+  buildSteps();
+  document.getElementById('playerBar').hidden = false;
+  document.getElementById('plWeekLabel').textContent = label;
+  syncPlayerControls();
+  document.body.style.paddingBottom = '340px';
+  seqPlayCurrent();
+}
+function seqCurWord() {
+  const s = seq.steps[seq.i];
+  return s ? seq.list[s.wi] : null;
+}
+let seqAudio = null;
+function seqRateNow() {
+  const s = seq.steps[seq.i];
+  return (s && s.kind === 'ja') ? 1 : seq.rate;
+}
+/* iOSでは要素を作り直すと2音目以降が鳴らないため、1つのaudio要素のsrcを差し替えて使う */
+function seqEl() {
+  if (!seqAudio) {
+    seqAudio = new Audio();
+    seqAudio.preload = 'auto';
+    seqAudio.addEventListener('loadedmetadata', () => { seqAudio.playbackRate = seqRateNow(); });
+    seqAudio.addEventListener('ended', () => { if (seq.playing) seqNextStep(); });
+    seqAudio.addEventListener('error', () => {
+      if (!seq.playing) return;
+      const err = seqAudio.error;
+      if (err && err.code === err.MEDIA_ERR_ABORTED) return;  /* src差し替えによる中断は無視 */
+      seqAfter(180);  /* 音声が無い場合も止めずに次へ */
+    });
+  }
+  return seqAudio;
+}
+function seqPlayCurrent() {
+  const s = seq.steps[seq.i];
+  if (!s) { seqEnd(); return; }
+  renderPlayer();
+  if (s.kind === 'gap') { seqAfter(seq.gap); return; }
+  const w = seq.list[s.wi];
+  const a = seqEl();
+  a.src = s.kind === 'ja' ? jaAudio(w.id) : s.kind === 'ex' ? exAudio(w.id, 0) : wordAudio(w.id);
+  a.playbackRate = seqRateNow();
+  const pr = a.play();
+  if (pr && pr.catch) pr.catch(() => { seq.playing = false; renderPlayer(); });
+}
+function seqAfter(ms) {
+  clearTimeout(seq.timer);
+  seq.timer = setTimeout(() => { if (seq.playing) seqNextStep(); }, ms);
+}
+function seqNextStep() {
+  if (!seq.playing) return;
+  seq.i++;
+  if (seq.i >= seq.steps.length) {
+    if (seq.loop) { seq.i = 0; seqPlayCurrent(); return; }
+    seqEnd(); return;
+  }
+  seqPlayCurrent();
+}
+function seqEnd() {
+  seq.playing = false;
+  renderPlayer();
+  showToast('🎧 通し再生が終わりました');
+}
+function seqToggle() {
+  if (seq.playing) {
+    seq.playing = false;
+    clearTimeout(seq.timer);
+    if (seqAudio) { try { seqAudio.pause(); } catch (e) {} }
+  } else {
+    seq.playing = true;
+    if (seq.i >= seq.steps.length) seq.i = 0;
+    seqPlayCurrent();
+  }
+  renderPlayer();
+}
+function pauseSeqIfPlaying() {
+  if (seq.playing) {
+    seq.playing = false;
+    clearTimeout(seq.timer);
+    if (seqAudio) { try { seqAudio.pause(); } catch (e) {} }
+    renderPlayer();
+  }
+}
+function seqJump(delta) {
+  const cur = seq.steps[seq.i];
+  if (!cur) return;
+  let wi = cur.wi + delta;
+  if (wi < 0) wi = 0;
+  if (wi > seq.list.length - 1) wi = seq.list.length - 1;
+  const idx = seq.steps.findIndex(s => s.wi === wi);
+  seq.i = idx === -1 ? 0 : idx;
+  clearTimeout(seq.timer);
+  if (seqAudio) { try { seqAudio.pause(); } catch (e) {} }
+  seq.playing = true;
+  seqPlayCurrent();
+}
+function seqStop() {
+  seq.playing = false;
+  clearTimeout(seq.timer);
+  if (seqAudio) { try { seqAudio.pause(); } catch (e) {} }
+  document.getElementById('playerBar').hidden = true;
+  document.body.style.paddingBottom = '40px';
+}
+function renderPlayer() {
+  const s = seq.steps[seq.i];
+  const w = s ? seq.list[s.wi] : null;
+  if (!w) return;
+  const kind = s.kind === 'gap' ? (seq.dir === 'en2ja' ? 'ja' : 'en') : s.kind;
+  const seen = seq.showEn || s.kind !== 'gap';
+  const revealEn = seq.showEn || seq.dir === 'en2ja' || s.kind === 'en' || s.kind === 'ex';
+  const revealJa = seq.showEn || seq.dir === 'ja2en' || s.kind === 'ja' || s.kind === 'ex';
+  document.getElementById('plCount').textContent = (s.wi + 1) + ' / ' + seq.list.length;
+  const ph = document.getElementById('plPhase');
+  ph.className = 'pl-phase ' + (s.kind === 'ex' ? 'ex' : kind === 'ja' ? 'ja' : 'en');
+  ph.textContent = s.kind === 'gap' ? '考える間' : s.kind === 'ja' ? '意味' : s.kind === 'ex' ? '例文' : '英語';
+  document.getElementById('plEn').textContent = revealEn ? w.word : '　？　';
+  document.getElementById('plJa').textContent = revealJa ? ((w.senses[0] || {}).ja || '') : '';
+  document.getElementById('plEx').textContent = (s.kind === 'ex' && w.senses[0]) ? (w.senses[0].ex || '') : '';
+  document.getElementById('plFill').style.width = ((s.wi + 1) / seq.list.length * 100) + '%';
+  document.getElementById('plPlayBtn').textContent = seq.playing ? '⏸' : '▶';
+}
+function syncPlayerControls() {
+  document.querySelectorAll('#plSpeedSeg .seg-btn').forEach(b => b.classList.toggle('active', Number(b.dataset.rate) === seq.rate));
+  document.querySelectorAll('#plDirSeg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.dir === seq.dir));
+  document.getElementById('plGapSel').value = String(seq.gap);
+  document.getElementById('plEx2').checked = seq.ex;
+  document.getElementById('plRepeatEn').checked = seq.twice;
+  document.getElementById('plLoop').checked = seq.loop;
+  document.getElementById('plShowEn').checked = seq.showEn;
+}
+
+/* ================= テスト ================= */
+let T = { qs: [], i: 0, res: [], kind: 'mix', scope: 'all', week: 'all', answered: false };
+function normAns(s) {
+  return String(s || '').trim().toLowerCase().replace(/[.,!?;:]+$/g, '').replace(/\s+/g, ' ');
+}
+function diffHtml(user, correct) {
+  const a = String(user || ''), b = String(correct || '');
+  const m = a.length, n = b.length;
+  const dp = [];
+  for (let i = 0; i <= m; i++) { dp.push(new Array(n + 1).fill(0)); }
+  for (let i = m - 1; i >= 0; i--) {
+    for (let j = n - 1; j >= 0; j--) {
+      dp[i][j] = a[i].toLowerCase() === b[j].toLowerCase() ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    }
+  }
+  let i = 0, j = 0, out = '';
+  while (i < m && j < n) {
+    if (a[i].toLowerCase() === b[j].toLowerCase()) { out += '<span class="ok">' + escapeHtml(b[j]) + '</span>'; i++; j++; }
+    else if (dp[i + 1][j] >= dp[i][j + 1]) { out += '<span class="ng">' + escapeHtml(a[i]) + '</span>'; i++; }
+    else { out += '<span class="miss">' + escapeHtml(b[j]) + '</span>'; j++; }
+  }
+  while (i < m) { out += '<span class="ng">' + escapeHtml(a[i++]) + '</span>'; }
+  while (j < n) { out += '<span class="miss">' + escapeHtml(b[j++]) + '</span>'; }
+  return out;
+}
+function shuffle(a) {
+  const x = a.slice();
+  for (let i = x.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = x[i]; x[i] = x[j]; x[j] = t; }
+  return x;
+}
+function sourceWords(week) {
+  if (week === 'all') return WORDS.slice();
+  if (week === 'favs') return favWords();
+  if (week === 'due') return dueWords();
+  if (week === 'weak') return weakWords();
+  return WORDS.filter(w => weekKeyOf(w.savedAt) === week);
+}
+function makeQuestion(w, kind, pool) {
+  const senses = w.senses || [];
+  if (kind === 'e2j') {
+    const si = Math.floor(Math.random() * senses.length);
+    const s = senses[si] || {};
+    const others = shuffle(pool.filter(x => x.id !== w.id)).slice(0, 3)
+      .map(x => (x.senses[Math.floor(Math.random() * x.senses.length)] || {}).ja || x.word);
+    if (others.length < 3) return null;
+    const choices = shuffle([s.ja].concat(others));
+    return { kind: 'e2j', w: w, si: si, prompt: w.word, sub: s.pos ? '（' + s.pos + 'としての意味）' : '', choices: choices, answer: s.ja };
+  }
+  if (kind === 'j2e') {
+    const s = senses[0] || {};
+    return { kind: 'j2e', w: w, si: 0, prompt: s.ja || '', sub: (s.pos || '') + (s.def ? ' / ' + s.def : ''), answer: w.word, accept: [w.word] };
+  }
+  if (kind === 'cloze') {
+    const idx = senses.findIndex(s => s.ex);
+    if (idx === -1) return null;
+    const s = senses[idx];
+    const tgt = s.target || w.word;
+    const re = new RegExp('\\b' + tgt.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+    if (!re.test(s.ex)) return null;
+    const blanked = escapeHtml(s.ex).replace(re, '<span class="q-blank">?</span>');
+    return { kind: 'cloze', w: w, si: idx, prompt: blanked, sub: s.exJa || '', answer: tgt, accept: [tgt, w.word], html: true };
+  }
+  if (kind === 'family') {
+    const fam = (w.family || []).filter(f => f.w && f.ja);
+    if (!fam.length) return null;
+    const f = fam[Math.floor(Math.random() * fam.length)];
+    return { kind: 'family', w: w, si: 0, prompt: f.ja, sub: w.word + ' から作る' + (f.pos ? '「' + f.pos + '」' : '') + 'の形は？', answer: f.w, accept: [f.w] };
+  }
+  if (kind === 'oral') {
+    const s = senses[0] || {};
+    return { kind: 'oral', w: w, si: 0, prompt: s.ja || '', sub: '声に出して言ってから、答えを表示', answer: w.word };
+  }
+  return null;
+}
+const KIND_LABEL = { e2j: '意味を選ぶ', j2e: '英単語を書く', cloze: '例文穴埋め', family: '語族', oral: '言う' };
+function buildQuestions(list, kind) {
+  const pool = WORDS.length >= 4 ? WORDS : list;
+  const qs = [];
+  list.forEach(w => {
+    let k = kind;
+    if (kind === 'mix') {
+      const cands = ['e2j', 'j2e', 'cloze'];
+      if ((w.family || []).length) cands.push('family');
+      k = cands[Math.floor(Math.random() * cands.length)];
+    }
+    let q = makeQuestion(w, k, pool);
+    if (!q) q = makeQuestion(w, 'j2e', pool);
+    if (q) qs.push(q);
+  });
+  return shuffle(qs);
+}
+function renderTestSetup() {
+  const sel = document.getElementById('testWeekSel');
+  const gs = groupByWeek(WORDS);
+  const cur = sel.value;
+  sel.innerHTML = '<option value="all">📚 全期間（' + WORDS.length + '語）</option>'
+    + '<option value="due">🔁 今日の復習（' + dueWords().length + '語）</option>'
+    + '<option value="favs">⭐ お気に入り（' + favWords().length + '語）</option>'
+    + '<option value="weak">⚠️ 苦手な単語（' + weakWords().length + '語）</option>'
+    + gs.map(g => '<option value="' + g.key + '">📅 ' + g.label + (g.key === THIS_WEEK_KEY ? '（今週）' : '') + ' — ' + g.items.length + '語</option>').join('');
+  if (cur) sel.value = cur;
+  document.getElementById('testSetupInfo').innerHTML =
+    '形式は6種類。<b>意味を選ぶ</b>＝4択、<b>英単語を書く</b>＝日本語から英語を入力（自動採点・差分表示）、<b>例文穴埋め</b>＝文の中で使えるか、<b>語族</b>＝conduct→conductivity のような派生形、<b>言う</b>＝口頭で答えて自己採点。<br>答えた結果は<b>🔁 今日の復習</b>の間隔にも反映されます。';
+  renderTestHistory();
+}
+function renderTestHistory() {
+  const el = document.getElementById('testHistory');
+  const h = (U.hist || []).slice(0, 12);
+  if (!h.length) { el.innerHTML = '<div class="empty">まだテスト履歴がありません。</div>'; return; }
+  el.innerHTML = h.map(x => {
+    const label = x.week === 'all' ? '全期間' : x.week === 'favs' ? '⭐お気に入り' : x.week === 'due' ? '🔁今日の復習' : x.week === 'weak' ? '⚠️苦手' : weekRangeLabel(x.week);
+    return '<div class="hist-row"><span>' + fmtDateShort(x.at) + ' ' + label + '<span style="color:var(--sub);font-size:0.76rem"> / ' + (KIND_LABEL[x.kind] || 'ミックス') + '</span></span>'
+      + '<span class="hs">' + x.correct + '/' + x.n + '（' + Math.round(x.correct / x.n * 100) + '%）</span></div>';
+  }).join('');
+}
+function startTestForWeek(key) {
+  switchView('test');
+  document.getElementById('testWeekSel').value = key;
+  T.week = key;
+  startTest();
+}
+function startTest() {
+  const sel = document.getElementById('testWeekSel');
+  T.week = sel.value || 'all';
+  let list = sourceWords(T.week);
+  if (T.scope === 'weak') list = list.filter(w => statusOf(w.id).k === 'weak');
+  if (!list.length) { showToast('出題できる単語がありません'); return; }
+  if (T.scope === 'r10') list = shuffle(list).slice(0, 10);
+  if (T.scope === 'r20') list = shuffle(list).slice(0, 20);
+  const qs = buildQuestions(list, T.kind);
+  if (!qs.length) { showToast('この形式で出せる問題がありません'); return; }
+  T.qs = qs; T.i = 0; T.res = []; T.answered = false;
+  document.getElementById('testSetup').hidden = true;
+  document.getElementById('testResult').hidden = true;
+  document.getElementById('testRun').hidden = false;
+  renderQuestion();
+}
+function renderQuestion() {
+  const q = T.qs[T.i];
+  const el = document.getElementById('testRun');
+  T.answered = false;
+  let h = '<div class="panel">';
+  h += '<div class="q-head"><span>' + (T.i + 1) + ' / ' + T.qs.length + '</span>'
+    + '<span class="q-kind">' + KIND_LABEL[q.kind] + '</span>'
+    + '<button class="btn-mini" onclick="quitTest()">やめる</button></div>';
+  h += '<div class="q-bar"><div style="width:' + (T.i / T.qs.length * 100) + '%"></div></div>';
+  if (q.kind === 'cloze') {
+    h += '<div class="q-sent">' + q.prompt + '</div><div class="q-sub" style="text-align:left">' + escapeHtml(q.sub) + '</div>';
+  } else if (q.kind === 'e2j') {
+    h += '<div class="q-prompt">' + escapeHtml(q.prompt) + '</div>'
+      + '<div style="text-align:center"><button class="play-btn" data-icon="🔊" onclick="playAudio(this,\'' + wordAudio(q.w.id) + '\')">🔊</button></div>'
+      + '<div class="q-sub">' + escapeHtml(q.sub) + '</div>';
+  } else {
+    h += '<div class="q-prompt">' + escapeHtml(q.prompt) + '</div><div class="q-sub">' + escapeHtml(q.sub) + '</div>';
+  }
+  if (q.kind === 'e2j') {
+    h += '<div class="choices">' + q.choices.map((c, i) =>
+      '<button class="choice" data-ci="' + i + '" onclick="answerChoice(' + i + ')">' + escapeHtml(c) + '</button>').join('') + '</div>';
+  } else if (q.kind === 'oral') {
+    h += '<div class="row-btns"><button class="btn-primary" onclick="revealOral()">答えを表示</button></div>';
+  } else {
+    h += '<input type="text" class="ans-input" id="ansInput" style="margin-top:14px" placeholder="英語で入力" autocomplete="off" autocapitalize="none" spellcheck="false">'
+      + '<button class="btn-save" onclick="answerTyped()">答え合わせ</button>';
+  }
+  h += '<div id="judgeBox"></div></div>';
+  el.innerHTML = h;
+  const inp = document.getElementById('ansInput');
+  if (inp) {
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); answerTyped(); } });
+    inp.focus();
+  }
+}
+function recordAnswer(q, correct, userAns) {
+  srsUpdate(q.w.id, correct);
+  T.res.push({ q: q, ok: correct, user: userAns || '' });
+}
+function judgeBoxHtml(q, correct, userAns, showDiff) {
+  let h = '<div class="judge ' + (correct ? 'ok' : 'ng') + '">' + (correct ? '⭕️ 正解' : '❌ 不正解') + '</div>';
+  if (showDiff && !correct && userAns) h += '<div class="diff-box">' + diffHtml(userAns, q.answer) + '</div>';
+  h += '<div class="ans-line">' + escapeHtml(q.answer) + '</div>';
+  const s = q.w.senses[q.si] || q.w.senses[0] || {};
+  h += '<div class="q-sub" style="margin-top:6px">' + escapeHtml(q.w.word) + ' … ' + escapeHtml(s.ja || '') + '</div>';
+  if (s.ex) h += '<div class="ex-box" style="margin-top:10px"><div class="ex-en">'
+    + '<button class="play-btn sm" data-icon="🔊" onclick="playAudio(this,\'' + exAudio(q.w.id, q.si) + '\')">🔊</button>'
+    + '<span>' + markTarget(s.ex, s.target || q.w.word) + '</span></div>'
+    + (s.exJa ? '<div class="ex-ja">' + escapeHtml(s.exJa) + '</div>' : '') + '</div>';
+  if (q.w.origin && q.w.origin.note) h += '<div class="origin-note" style="margin-top:8px">🧬 ' + q.w.origin.note + '</div>';
+  h += '<div class="row-btns"><button class="btn-primary" onclick="nextQuestion()">' + (T.i + 1 >= T.qs.length ? '結果を見る' : '次へ →') + '</button>'
+    + '<button class="btn-outline" onclick="toggleFav(' + q.w.id + ')">☆ お気に入り</button></div>';
+  return h;
+}
+function answerChoice(ci) {
+  if (T.answered) return;
+  T.answered = true;
+  const q = T.qs[T.i];
+  const picked = q.choices[ci];
+  const correct = picked === q.answer;
+  document.querySelectorAll('.choice').forEach((b, i) => {
+    if (q.choices[i] === q.answer) b.classList.add('correct');
+    else if (i === ci) b.classList.add('wrong');
+    b.onclick = null;
+  });
+  recordAnswer(q, correct, picked);
+  document.getElementById('judgeBox').innerHTML = judgeBoxHtml(q, correct, '', false);
+}
+function answerTyped() {
+  if (T.answered) return;
+  const q = T.qs[T.i];
+  const inp = document.getElementById('ansInput');
+  const val = inp ? inp.value : '';
+  if (!normAns(val)) { showToast('答えを入力してください'); return; }
+  T.answered = true;
+  if (inp) inp.disabled = true;
+  const accept = (q.accept || [q.answer]).map(normAns);
+  const correct = accept.indexOf(normAns(val)) !== -1;
+  recordAnswer(q, correct, val);
+  document.getElementById('judgeBox').innerHTML = judgeBoxHtml(q, correct, val, true);
+}
+function revealOral() {
+  if (T.answered) return;
+  T.answered = true;
+  const q = T.qs[T.i];
+  const s = q.w.senses[0] || {};
+  let h = '<div class="ans-line" style="margin-top:12px">' + escapeHtml(q.answer) + '</div>'
+    + '<div style="text-align:center;margin-top:6px"><button class="play-btn" data-icon="🔊" onclick="playAudio(this,\'' + wordAudio(q.w.id) + '\')">🔊</button></div>';
+  if (s.ex) h += '<div class="ex-box" style="margin-top:10px"><div class="ex-en">'
+    + '<button class="play-btn sm" data-icon="🔊" onclick="playAudio(this,\'' + exAudio(q.w.id, 0) + '\')">🔊</button>'
+    + '<span>' + markTarget(s.ex, s.target || q.w.word) + '</span></div>'
+    + (s.exJa ? '<div class="ex-ja">' + escapeHtml(s.exJa) + '</div>' : '') + '</div>';
+  h += '<div class="self-btns"><button class="self-ok" onclick="selfJudge(true)">⭕️ 言えた</button>'
+    + '<button class="self-ng" onclick="selfJudge(false)">❌ 言えなかった</button></div>';
+  document.getElementById('judgeBox').innerHTML = h;
+}
+function selfJudge(ok) {
+  const q = T.qs[T.i];
+  recordAnswer(q, ok, '');
+  document.getElementById('judgeBox').innerHTML = judgeBoxHtml(q, ok, '', false);
+}
+function nextQuestion() {
+  stopSinglePlay();
+  T.i++;
+  if (T.i >= T.qs.length) { finishTest(); return; }
+  renderQuestion();
+}
+function quitTest() {
+  if (T.res.length && !confirm('ここでやめます。ここまでの' + T.res.length + '問ぶんは記録されます。よろしいですか？')) return;
+  if (T.res.length) saveTestResult();
+  document.getElementById('testRun').hidden = true;
+  document.getElementById('testSetup').hidden = false;
+  renderTestSetup();
+  updateCounts();
+}
+function saveTestResult() {
+  const correct = T.res.filter(r => r.ok).length;
+  U.hist.unshift({ at: Date.now(), week: T.week, kind: T.kind, n: T.res.length, correct: correct });
+  if (U.hist.length > 60) U.hist = U.hist.slice(0, 60);
+  saveUser();
+}
+function finishTest() {
+  saveTestResult();
+  const correct = T.res.filter(r => r.ok).length;
+  const pct = Math.round(correct / T.res.length * 100);
+  const wrong = T.res.filter(r => !r.ok);
+  let h = '<div class="panel"><div class="score-big">' + correct + ' / ' + T.res.length + '</div>'
+    + '<div class="score-sub">正答率 ' + pct + '%　'
+    + (pct === 100 ? '完璧です' : pct >= 80 ? 'よく定着しています' : pct >= 50 ? 'あと一歩、まちがえた語を復習しましょう' : 'まずは意味と語源を読み直しましょう') + '</div>'
+    + '<div class="row-btns">'
+    + (wrong.length ? '<button class="btn-primary" onclick="retryWrong()">✍️ まちがえた' + wrong.length + '語をもう一度</button>' : '')
+    + '<button class="btn-outline" onclick="backToSetup()">テスト画面に戻る</button></div>'
+    + '<div class="hint-line">まちがえた語は<b>🔁 今日の復習</b>にすぐ戻ってきます（正解した語は間隔が空きます）。</div>'
+    + '<div class="rlist">' + T.res.map(r =>
+      '<div class="rrow"><span class="rm">' + (r.ok ? '⭕️' : '❌') + '</span>'
+      + '<button class="play-btn sm" data-icon="🔊" onclick="playAudio(this,\'' + wordAudio(r.q.w.id) + '\')">🔊</button>'
+      + '<span class="rw">' + escapeHtml(r.q.w.word) + '</span>'
+      + '<span class="rj">' + escapeHtml((r.q.w.senses[0] || {}).ja || '') + '</span>'
+      + favBtnHtml(r.q.w.id) + '</div>').join('') + '</div></div>';
+  document.getElementById('testRun').hidden = true;
+  document.getElementById('testResult').hidden = false;
+  document.getElementById('testResult').innerHTML = h;
+  updateCounts();
+}
+function retryWrong() {
+  const ws = T.res.filter(r => !r.ok).map(r => r.q.w);
+  const uniq = [];
+  ws.forEach(w => { if (!uniq.some(x => x.id === w.id)) uniq.push(w); });
+  T.qs = buildQuestions(uniq, T.kind); T.i = 0; T.res = [];
+  document.getElementById('testResult').hidden = true;
+  document.getElementById('testRun').hidden = false;
+  renderQuestion();
+}
+function backToSetup() {
+  document.getElementById('testResult').hidden = true;
+  document.getElementById('testSetup').hidden = false;
+  renderTestSetup();
+}
+
+/* ================= 語根マップ ================= */
+function normPart(p) { return String(p || '').replace(/-/g, '').toLowerCase(); }
+function renderRoots() {
+  const kind = PREFS.rootKind || '語根';
+  const map = {};
+  WORDS.forEach(w => {
+    ((w.origin && w.origin.parts) || []).forEach(p => {
+      if (p.type !== kind) return;
+      const k = normPart(p.p);
+      if (!map[k]) map[k] = { disp: p.p, mean: p.mean, words: [], ghosts: {} };
+      map[k].words.push(w);
+      if (kind === '語根') {
+        (w.mates || []).forEach(m => {
+          if (!WORDS.some(x => normWord(x.word) === normWord(m.w))) map[k].ghosts[m.w] = m.ja;
+        });
+      }
+    });
+  });
+  const keys = Object.keys(map).sort((a, b) => map[b].words.length - map[a].words.length || a.localeCompare(b));
+  const el = document.getElementById('rootList');
+  if (!keys.length) { el.innerHTML = '<div class="empty">この分類の部品がまだありません。</div>'; return; }
+  el.innerHTML = keys.map(k => {
+    const g = map[k];
+    const ghosts = Object.keys(g.ghosts);
+    return '<div class="root-group"><div class="root-title"><b>' + escapeHtml(g.disp) + '</b><span>' + escapeHtml(g.mean) + '</span>'
+      + '<span style="margin-left:auto;font-size:0.72rem">ノート内 ' + g.words.length + '語</span></div>'
+      + '<div class="root-words">'
+      + g.words.map(w => '<button class="rchip" onclick="jumpToWord(' + w.id + ')">' + escapeHtml(w.word) + '</button>').join('')
+      + ghosts.map(gw => '<span class="rchip ghost" title="' + escapeHtml(g.ghosts[gw]) + '">' + escapeHtml(gw) + '</span>').join('')
+      + '</div>'
+      + (ghosts.length ? '<div class="hint-line" style="margin-top:7px">薄い枠＝まだノートに無い仲間。' + ghosts.slice(0, 3).map(gw => '<b>' + escapeHtml(gw) + '</b>（' + escapeHtml(g.ghosts[gw]) + '）').join('、') + (ghosts.length > 3 ? ' ほか' : '') + '</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
+/* ================= 今日の復習・ダッシュボード ================= */
+function renderReview() {
+  const due = dueWords();
+  document.getElementById('dueNum').textContent = due.length + ' 語';
+  document.getElementById('dueHint').innerHTML = due.length
+    ? '前回まちがえた語ほど早く、覚えた語ほど間を空けて出てきます（1→2→4→7→14→30日）。'
+    : 'いま復習の期限が来ている単語はありません。<b>先取りで10語</b>を押すか、テストタブから好きな週を選んで解いてください。';
+  const counts = { new: 0, learning: 0, weak: 0, known: 0 };
+  WORDS.forEach(w => { counts[statusOf(w.id).k]++; });
+  document.getElementById('stNew').textContent = counts.new;
+  document.getElementById('stLearn').textContent = counts.learning;
+  document.getElementById('stWeak').textContent = counts.weak;
+  document.getElementById('stKnown').textContent = counts.known;
+
+  let streak = 0;
+  const d = new Date();
+  for (;;) {
+    const k = ymd(d);
+    if (U.days[k]) { streak++; d.setDate(d.getDate() - 1); }
+    else if (k === TODAY_KEY) { d.setDate(d.getDate() - 1); }
+    else break;
+  }
+  document.getElementById('streakN').textContent = streak;
+  document.getElementById('streakSub').textContent = U.days[TODAY_KEY] ? '（今日は' + U.days[TODAY_KEY] + '問）' : '（今日はまだ0問）';
+  const heat = [], lab = [];
+  for (let i = 13; i >= 0; i--) {
+    const x = new Date(); x.setDate(x.getDate() - i);
+    const n = U.days[ymd(x)] || 0;
+    heat.push('<i class="' + (n >= 10 ? 'on' : n > 0 ? 'half' : '') + '" title="' + ymd(x) + ' ' + n + '問"></i>');
+    lab.push('<i>' + (i % 2 === 0 ? x.getDate() : '') + '</i>');
+  }
+  document.getElementById('heat').innerHTML = heat.join('');
+  document.getElementById('heatLab').innerHTML = lab.join('');
+
+  const weak = weakWords();
+  document.getElementById('weakList').innerHTML = weak.length
+    ? weak.slice(0, 10).map(w => wordCardHtml(w)).join('')
+    : '<div class="empty">いまのところ苦手判定の単語はありません。</div>';
+  updateCounts();
+}
+function startDueTest() {
+  if (!dueWords().length) { showToast('復習期限の単語がありません'); return; }
+  switchView('test');
+  document.getElementById('testWeekSel').value = 'due';
+  T.scope = 'all';
+  document.querySelectorAll('#testScopeSeg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.scope === 'all'));
+  startTest();
+}
+function startAheadTest() {
+  const now = Date.now();
+  const list = WORDS.slice().sort((a, b) => (srsOf(a.id).due || 0) - (srsOf(b.id).due || 0)).slice(0, 10);
+  if (!list.length) { showToast('単語がありません'); return; }
+  switchView('test');
+  T.week = 'all';
+  T.qs = buildQuestions(list, T.kind); T.i = 0; T.res = [];
+  document.getElementById('testSetup').hidden = true;
+  document.getElementById('testResult').hidden = true;
+  document.getElementById('testRun').hidden = false;
+  renderQuestion();
+}
+
+/* ================= 起動 ================= */
+function bind() {
+  document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => switchView(b.dataset.view)));
+  document.getElementById('saveBtn').addEventListener('click', saveWord);
+  document.getElementById('wordInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); saveWord(); }
+  });
+  document.getElementById('wordInput').addEventListener('input', hideDupNotice);
+  document.getElementById('copyBtn').addEventListener('click', copyPending);
+  document.getElementById('clearBtn').addEventListener('click', clearAllPending);
+  document.getElementById('searchBox').addEventListener('input', renderPolished);
+  document.getElementById('favSearch').addEventListener('input', renderFavs);
+  document.getElementById('wkExpandBtn').addEventListener('click', toggleAllWeeks);
+  document.getElementById('hideModeBtn').addEventListener('click', () => {
+    PREFS.hide = !PREFS.hide; savePrefs();
+    document.getElementById('hideModeBtn').classList.toggle('on', PREFS.hide);
+    document.getElementById('hideModeBtn').textContent = PREFS.hide ? '👀 意味を出す' : '🙈 意味を隠す';
+    renderPolished();
+  });
+  document.querySelectorAll('#viewSeg .seg-btn').forEach(b => b.addEventListener('click', () => {
+    PREFS.view = b.dataset.pview; savePrefs();
+    document.querySelectorAll('#viewSeg .seg-btn').forEach(x => x.classList.toggle('active', x === b));
+    renderPolished();
+  }));
+  document.querySelectorAll('#favSortSeg .seg-btn').forEach(b => b.addEventListener('click', () => {
+    PREFS.favSort = b.dataset.sort; savePrefs();
+    document.querySelectorAll('#favSortSeg .seg-btn').forEach(x => x.classList.toggle('active', x === b));
+    renderFavs();
+  }));
+  document.querySelectorAll('#rootKindSeg .seg-btn').forEach(b => b.addEventListener('click', () => {
+    PREFS.rootKind = b.dataset.rk; savePrefs();
+    document.querySelectorAll('#rootKindSeg .seg-btn').forEach(x => x.classList.toggle('active', x === b));
+    renderRoots();
+  }));
+  document.querySelectorAll('#testKindSeg .seg-btn').forEach(b => b.addEventListener('click', () => {
+    T.kind = b.dataset.kind;
+    document.querySelectorAll('#testKindSeg .seg-btn').forEach(x => x.classList.toggle('active', x === b));
+  }));
+  document.querySelectorAll('#testScopeSeg .seg-btn').forEach(b => b.addEventListener('click', () => {
+    T.scope = b.dataset.scope;
+    document.querySelectorAll('#testScopeSeg .seg-btn').forEach(x => x.classList.toggle('active', x === b));
+  }));
+  document.getElementById('testStartBtn').addEventListener('click', startTest);
+  document.getElementById('favTestBtn').addEventListener('click', () => {
+    switchView('test');
+    document.getElementById('testWeekSel').value = 'favs';
+    startTest();
+  });
+  document.getElementById('favPlayBtn').addEventListener('click', () => seqStart('favs'));
+  document.getElementById('dueStartBtn').addEventListener('click', startDueTest);
+  document.getElementById('dueAheadBtn').addEventListener('click', startAheadTest);
+  document.getElementById('syncChange').addEventListener('click', changeSyncId);
+  document.getElementById('forceRefreshBtn').addEventListener('click', () => {
+    location.href = location.pathname + '?v=' + Date.now();
+  });
+  document.getElementById('plCloseBtn').addEventListener('click', seqStop);
+  document.getElementById('plPlayBtn').addEventListener('click', seqToggle);
+  document.getElementById('plPrevBtn').addEventListener('click', () => seqJump(-1));
+  document.getElementById('plNextBtn').addEventListener('click', () => seqJump(1));
+  document.querySelectorAll('#plSpeedSeg .seg-btn').forEach(b => b.addEventListener('click', () => {
+    seq.rate = Number(b.dataset.rate); saveSeqPrefs(); syncPlayerControls();
+    if (seqAudio && seq.playing) seqAudio.playbackRate = seqRateNow();
+  }));
+  document.querySelectorAll('#plDirSeg .seg-btn').forEach(b => b.addEventListener('click', () => {
+    seq.dir = b.dataset.dir; saveSeqPrefs(); syncPlayerControls();
+    const cur = seq.steps[seq.i];
+    const wi = cur ? cur.wi : 0;
+    buildSteps();
+    const idx = seq.steps.findIndex(s => s.wi === wi);
+    seq.i = idx === -1 ? 0 : idx;
+    renderPlayer();
+  }));
+  document.getElementById('plGapSel').addEventListener('change', e => { seq.gap = Number(e.target.value); saveSeqPrefs(); });
+  document.getElementById('plEx2').addEventListener('change', e => { seq.ex = e.target.checked; saveSeqPrefs(); rebuildKeepPos(); });
+  document.getElementById('plRepeatEn').addEventListener('change', e => { seq.twice = e.target.checked; saveSeqPrefs(); rebuildKeepPos(); });
+  document.getElementById('plLoop').addEventListener('change', e => { seq.loop = e.target.checked; saveSeqPrefs(); });
+  document.getElementById('plShowEn').addEventListener('change', e => { seq.showEn = e.target.checked; saveSeqPrefs(); renderPlayer(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { stopSinglePlay(); pauseSeqIfPlaying(); } else if (syncRef) pullSync().then(ch => { if (ch) refreshAll(); }); });
+}
+function rebuildKeepPos() {
+  const cur = seq.steps[seq.i];
+  const wi = cur ? cur.wi : 0;
+  buildSteps();
+  const idx = seq.steps.findIndex(s => s.wi === wi);
+  seq.i = idx === -1 ? 0 : idx;
+}
+function refreshAll() {
+  updateCounts();
+  if (currentView === 'words') renderPolished();
+  if (currentView === 'favs') renderFavs();
+  if (currentView === 'weeks') renderWeeks();
+  if (currentView === 'review') renderReview();
+  if (currentView === 'test') renderTestSetup();
+}
+function init() {
+  loadUser();
+  loadPrefs();
+  loadSeqPrefs();
+  document.querySelectorAll('#viewSeg .seg-btn').forEach(x => x.classList.toggle('active', x.dataset.pview === PREFS.view));
+  document.querySelectorAll('#favSortSeg .seg-btn').forEach(x => x.classList.toggle('active', x.dataset.sort === PREFS.favSort));
+  document.querySelectorAll('#rootKindSeg .seg-btn').forEach(x => x.classList.toggle('active', x.dataset.rk === PREFS.rootKind));
+  const hb = document.getElementById('hideModeBtn');
+  hb.classList.toggle('on', PREFS.hide);
+  hb.textContent = PREFS.hide ? '👀 意味を出す' : '🙈 意味を隠す';
+  bind();
+  renderPending();
+  renderPolished();
+  updateCounts();
+  paintSync();
+  initSync().then(changed => { if (changed) refreshAll(); paintSync(); });
+}
+init();
+</script>
+</body>
+</html>
