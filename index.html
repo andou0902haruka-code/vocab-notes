@@ -359,6 +359,117 @@
   .due-fc { display:inline-flex; align-items:flex-end; gap:3px; margin-left:8px; }
   .due-fc i { display:inline-block; width:7px; background:#3b82f6; opacity:.45; border-radius:2px 2px 0 0; }
   .due-fc i.over { opacity:.9; background:#d9534f; }
+/* ここから下は .claude/skills_assets/motivation/motiv.css をそのまま配ったもの。
+   直すときは motiv.css を直して inject.py を回す（ここを書き換えても消える） */
+/* MOTIV:CSS:BEGIN */
+/* ============================================================
+   やる気の仕掛け — 見た目（連続日数＋12週カレンダー／レベル＆XP／バッジ12種）
+   正本: .claude/skills_assets/motivation/motiv.css
+   4つのアプリ（writing-compose / speaking-compose / 表現メモ / 英単語ノート）へ
+   inject.py が同じ中身を配る。直すときは必ずこのファイルを直して inject.py を回すこと
+   （生成HTMLを直接いじっても build.py / inject.py で消える）。
+   ・色はアプリの変数に頼らず、この中で完結させる（4アプリで同じ見た目にするため）。
+     アプリ側で色を変えたいときは .mv-wrap の --mv-* を上書きする
+   ・クラス名は全て mv- 始まり。4アプリのどれとも衝突していないことを確認済み
+   ============================================================ */
+.mv-wrap{
+  --mv-fire:#e2701a; --mv-fire-soft:#fdf1e4; --mv-fire-line:#f3d6b4;
+  --mv-lv:#3552d8;   --mv-lv-soft:#eef1ff;   --mv-lv-line:#ccd6f7;
+  --mv-cal0:#eceff5; --mv-cal1:#cfe3d8; --mv-cal2:#8fcbab; --mv-cal3:#4da97c; --mv-cal4:#1c7f52;
+  --mv-ink:#181d27; --mv-sub:#5f6879; --mv-mute:#8a93a3; --mv-line:#e4e7ee; --mv-card:#fff;
+  font-size:16px; line-height:1.7; color:var(--mv-ink);
+}
+.mv-wrap *{box-sizing:border-box;}
+
+/* --- 上段: レベル＆XP と 連続日数 --- */
+.mv-top{display:flex;gap:12px;flex-wrap:wrap;align-items:stretch;}
+.mv-box{flex:1 1 240px;border:1px solid var(--mv-line);border-radius:12px;padding:14px 16px;background:var(--mv-card);}
+.mv-box.mv-b-lv{border-color:var(--mv-lv-line);background:var(--mv-lv-soft);}
+.mv-box.mv-b-fire{border-color:var(--mv-fire-line);background:var(--mv-fire-soft);}
+.mv-lv-row{display:flex;align-items:center;gap:13px;}
+.mv-chip{flex:0 0 auto;width:58px;height:58px;border-radius:50%;background:var(--mv-lv);color:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;}
+.mv-chip .mv-c-l{font-size:.6rem;letter-spacing:.06em;opacity:.85;}
+.mv-chip .mv-c-n{font-size:1.5rem;font-weight:700;letter-spacing:-.02em;}
+.mv-lv-main{flex:1 1 auto;min-width:0;}
+.mv-title{font-weight:700;font-size:1rem;color:var(--mv-lv);}
+.mv-xp{font-size:.78rem;color:var(--mv-sub);}
+.mv-bar{height:9px;border-radius:999px;background:#dbe2f6;overflow:hidden;margin:7px 0 4px;}
+.mv-bar i{display:block;height:100%;background:var(--mv-lv);border-radius:999px;transition:width .5s ease;}
+.mv-next{font-size:.75rem;color:var(--mv-mute);}
+
+.mv-fire-row{display:flex;align-items:center;gap:13px;}
+.mv-flame{font-size:2.1rem;line-height:1;filter:grayscale(1);opacity:.4;}
+.mv-flame.mv-on{filter:none;opacity:1;}
+.mv-days{font-size:1rem;color:var(--mv-fire);font-weight:700;}
+.mv-days b{font-size:1.9rem;letter-spacing:-.02em;}
+.mv-sub{font-size:.75rem;color:var(--mv-sub);font-weight:400;}
+
+/* --- 12週カレンダー（1マス=1日・12列×7行） --- */
+.mv-cal-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:6px;
+  margin:18px 0 8px;}
+.mv-cal-ttl{font-weight:700;font-size:.92rem;}
+.mv-cal-note{font-size:.74rem;color:var(--mv-mute);}
+.mv-cal{display:flex;gap:6px;align-items:flex-start;overflow-x:auto;padding-bottom:4px;}
+.mv-wd{display:grid;grid-template-rows:repeat(7,1fr);gap:3px;flex:0 0 auto;padding-top:15px;}
+.mv-wd span{height:14px;font-size:.6rem;color:var(--mv-mute);line-height:14px;}
+.mv-grid{flex:1 1 auto;display:grid;grid-template-columns:repeat(12,1fr);gap:3px;min-width:250px;}
+.mv-col{display:grid;grid-template-rows:auto repeat(7,1fr);gap:3px;}
+.mv-mon{height:12px;font-size:.58rem;color:var(--mv-mute);text-align:left;white-space:nowrap;}
+.mv-d{height:14px;border-radius:3px;background:var(--mv-cal0);}
+.mv-d.mv-l1{background:var(--mv-cal1);}
+.mv-d.mv-l2{background:var(--mv-cal2);}
+.mv-d.mv-l3{background:var(--mv-cal3);}
+.mv-d.mv-l4{background:var(--mv-cal4);}
+.mv-d.mv-today{box-shadow:0 0 0 2px var(--mv-fire);}
+.mv-d.mv-future{background:transparent;border:1px dashed #e8ebf2;}
+.mv-legend{display:flex;align-items:center;gap:5px;justify-content:flex-end;margin-top:7px;
+  font-size:.68rem;color:var(--mv-mute);}
+.mv-legend i{width:12px;height:12px;border-radius:3px;display:inline-block;background:var(--mv-cal0);}
+.mv-legend i.mv-l1{background:var(--mv-cal1);} .mv-legend i.mv-l2{background:var(--mv-cal2);}
+.mv-legend i.mv-l3{background:var(--mv-cal3);} .mv-legend i.mv-l4{background:var(--mv-cal4);}
+
+/* --- バッジ12種 --- */
+.mv-bd-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:6px;
+  margin:20px 0 8px;}
+.mv-bd-ttl{font-weight:700;font-size:.92rem;}
+.mv-bd-n{font-size:.74rem;color:var(--mv-mute);}
+.mv-badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;}
+.mv-bd{border:1px solid var(--mv-line);border-radius:11px;padding:10px 8px;text-align:center;
+  background:#f7f8fb;color:var(--mv-mute);}
+.mv-bd .mv-bd-ic{font-size:1.5rem;line-height:1.2;filter:grayscale(1);opacity:.35;}
+.mv-bd .mv-bd-nm{font-size:.72rem;font-weight:700;margin-top:3px;line-height:1.4;}
+.mv-bd .mv-bd-cd{font-size:.64rem;margin-top:2px;line-height:1.4;}
+.mv-bd.mv-got{background:#fff;border-color:var(--mv-fire-line);color:var(--mv-ink);
+  box-shadow:0 1px 2px rgba(24,29,39,.05);}
+.mv-bd.mv-got .mv-bd-ic{filter:none;opacity:1;}
+.mv-bd.mv-got .mv-bd-cd{color:var(--mv-fire);}
+/* もう少しで取れるバッジ（進み具合を下に出す） */
+.mv-bd .mv-pg{height:4px;border-radius:999px;background:#e4e7ee;overflow:hidden;margin-top:6px;}
+.mv-bd .mv-pg i{display:block;height:100%;background:var(--mv-fire);opacity:.6;}
+
+/* --- 出たり消えたりする通知（XP・レベルアップ・バッジ獲得） --- */
+.mv-toast-box{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:9999;
+  display:flex;flex-direction:column;align-items:center;gap:7px;pointer-events:none;
+  width:max-content;max-width:92vw;}
+.mv-toast{background:#181d27;color:#fff;border-radius:999px;padding:8px 18px;font-size:.85rem;
+  font-weight:700;box-shadow:0 6px 22px rgba(24,29,39,.28);opacity:0;transform:translateY(10px);
+  animation:mvPop .35s ease forwards;line-height:1.5;text-align:center;}
+.mv-toast.mv-t-lv{background:var(--mv-lv);}
+.mv-toast.mv-t-bd{background:var(--mv-fire);}
+.mv-toast.mv-out{animation:mvOut .4s ease forwards;}
+@keyframes mvPop{to{opacity:1;transform:translateY(0);}}
+@keyframes mvOut{to{opacity:0;transform:translateY(-8px);}}
+@media (prefers-reduced-motion:reduce){
+  .mv-toast{animation:none;opacity:1;transform:none;}
+  .mv-bar i{transition:none;}
+}
+@media (max-width:480px){
+  .mv-badges{grid-template-columns:repeat(3,1fr);}
+  .mv-chip{width:50px;height:50px;}
+  .mv-chip .mv-c-n{font-size:1.3rem;}
+}
+/* MOTIV:CSS:END */
 </style>
 </head>
 <body>
@@ -378,6 +489,7 @@
     <button class="tab" data-view="weeks">📅 週まとめ</button>
     <button class="tab" data-view="test">✍️ テスト</button>
     <button class="tab" data-view="roots">🌳 語根マップ</button>
+    <button class="tab" data-view="motiv">🔥 記録</button>
   </nav>
 </header>
 
@@ -596,6 +708,20 @@
     </div>
   </div>
   <div id="rootList"></div>
+</section>
+
+<!-- ============ 記録タブ（やる気の仕掛け） ============
+     連続日数＋12週カレンダー／レベル＆XP／バッジ12種。
+     中身は .claude/skills_assets/motivation/motiv.js が描く（mvRender）。
+     今日の復習タブの「🔥 連続学習・14日ヒートマップ」はその日の調子を見るための小さい表示で、
+     こちらは全期間を通した記録。数え方はどちらも U.days（1問＝1件）で揃えてある -->
+<section id="view-motiv" hidden>
+  <div class="panel">
+    <h2 class="panel-title">🔥 やる気の記録</h2>
+    <div class="hint-line">テストや復習で答え合わせが済むたびに増えます（1問10XP・正解でさらに5XP・その日の1問目には連続日数ボーナス）。
+      <b>1日1問でも連続日数は途切れません。</b></div>
+  </div>
+  <div id="motiv-body"></div>
 </section>
 
 </main>
@@ -1082,7 +1208,7 @@ const PREF_KEY = 'vocabNote_prefs';
 const PENDING_KEY = 'vocabNote_pending';
 
 function blankUser() {
-  return { memos: {}, favs: {}, srs: {}, stats: {}, hist: [], days: {}, updatedAt: 0 };
+  return { memos: {}, favs: {}, srs: {}, stats: {}, hist: [], days: {}, motiv: null, updatedAt: 0 };
 }
 let U = blankUser();
 function loadUser() {
@@ -1189,6 +1315,12 @@ function mergeRemote(r) {
   Object.keys(rd).forEach(d => {
     if ((rd[d] || 0) > (U.days[d] || 0)) { U.days[d] = rd[d]; changed = true; }
   });
+  /* やる気の記録は日ごとに「多い方」を採って合流させる（片方の端末の学習日が消えないため） */
+  if (r.motiv && typeof r.motiv === 'object') {
+    U.motiv = mvMerge(U.motiv, r.motiv);
+    MV_ST = null;   /* 合流後の内容で読み直す */
+    changed = true;
+  }
   if (Array.isArray(r.hist)) {
     const seen = {};
     U.hist.forEach(h => { seen[h.at] = 1; });
@@ -1367,6 +1499,347 @@ function dueWords() {
     return s && s.due && s.due <= now;
   }).sort((a, b) => srsOf(a.id).due - srsOf(b.id).due);
 }
+
+/* ================= やる気の仕掛け（連続日数＋12週カレンダー／レベル＆XP／バッジ12種） =================
+   本体は .claude/skills_assets/motivation/motiv.js が正本で、inject.py が下の目印の間へ配る。
+   ここで用意するのは「どこに保存するか」「過去の記録をどう引き継ぐか」だけ。
+   保存先を U の中（U.motiv）にしてあるので、合言葉を設定していれば端末間で共有される。 */
+const MV_ENV = {
+  unit: '問',
+  mount: 'motiv-body',
+  load() { return U.motiv || null; },
+  save(st) { U.motiv = st; saveUser(); },
+  /* すでに持っている「日ごとの問数」（U.days）から1回だけ復元する。
+     復習タブの🔥連続学習・14日ヒートマップと同じ数え方なので、記録がずれない */
+  seed() { return Object.assign({}, U.days); }
+};
+/* MOTIV:JS:BEGIN */
+/* ============================================================
+   やる気の仕掛け — 中身（連続日数＋12週カレンダー／レベル＆XP／バッジ12種）
+   正本: .claude/skills_assets/motivation/motiv.js
+   4つのアプリ（writing-compose / speaking-compose / 表現メモ / 英単語ノート）へ
+   inject.py が同じ中身を配る。直すときは必ずこのファイルを直して inject.py を回すこと
+   （生成HTMLを直接いじっても build.py / inject.py で消える）。
+
+   ------------------------------------------------------------
+   アプリ側がこのブロックより前に用意するもの:
+     var MV_ENV = {
+       load(){ return 保存してある状態オブジェクト or null },
+       save(st){ 状態を保存する（クラウド同期もここで） },
+       seed(){ return { 'YYYY-MM-DD': 件数 } },  // 任意。既存の記録から日ごとの件数を復元
+       unit: '問',                                // 任意。件数の単位（既定は '件'）
+       mount: 'motiv-body'                        // 描画先の要素id
+     }
+   呼びかた:
+     mvGain(ok)   … 1件ぶん答え合わせが済んだ瞬間に呼ぶ。ok は true / false / 'half'
+     mvRender()   … 画面を描き直す
+     mvMerge(a,b) … 2台ぶんの状態を合流させる（合言葉同期の取り込み側で使う）
+
+   設計の約束:
+   ・記録するのは「答え合わせ・採点が済んだ瞬間」だけ。出題しただけでは増やさない
+     （途中でやめてもそこまでは残る、という他コーナーの数え方と揃える）
+   ・XP は 1件10点＋正解でさらに5点（半分の出来なら2点）。その日の1件目には
+     連続日数ボーナス（連続日数×5点・7日ぶんで頭打ち）が乗る
+   ・過去にさかのぼって XP を書き換えない（消えない記録にする）
+   ============================================================ */
+
+/* --- XP とレベルの決まり --- */
+var MV_XP_BASE = 10, MV_XP_OK = 5, MV_XP_HALF = 2;
+var MV_STREAK_XP = 5, MV_STREAK_CAP = 7;
+var MV_CAL_WEEKS = 12;                       /* カレンダーの週数（12週＝84日） */
+var MV_STEPS = [1, 5, 10, 20];               /* カレンダーの濃さの段（件数） */
+
+function mvNeed(lv) { return 100 + (lv - 1) * 50; }          /* lv → lv+1 に必要なXP */
+function mvTitle(lv) {
+  if (lv >= 30) return '名人';
+  if (lv >= 20) return '師範';
+  if (lv >= 15) return '達人';
+  if (lv >= 10) return '常連';
+  if (lv >= 5) return 'みならい';
+  return 'かけだし';
+}
+function mvLevel(xp) {
+  var lv = 1, rest = Math.max(0, xp | 0);
+  while (lv < 99 && rest >= mvNeed(lv)) { rest -= mvNeed(lv); lv++; }
+  return { lv: lv, cur: rest, need: mvNeed(lv), title: mvTitle(lv) };
+}
+
+/* --- 日付（端末のローカル日付。UTCずれで日をまたがせない） --- */
+function mvYmd(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function mvToday() { return mvYmd(new Date()); }
+function mvShift(ymd, n) {
+  var p = String(ymd).split('-');
+  var d = new Date(+p[0], +p[1] - 1, +p[2]);
+  d.setDate(d.getDate() + n);
+  return mvYmd(d);
+}
+
+/* --- 状態 --- */
+function mvBlank() { return { v: 1, days: {}, xp: 0, badges: {}, seeded: 0 }; }
+var MV_ST = null;
+function mvEnv() { return (typeof MV_ENV !== 'undefined' && MV_ENV) ? MV_ENV : {}; }
+function mvUnit() { return mvEnv().unit || '件'; }
+function mvState() {
+  if (MV_ST) return MV_ST;
+  var raw = null;
+  try { raw = mvEnv().load ? mvEnv().load() : null; } catch (e) { raw = null; }
+  MV_ST = Object.assign(mvBlank(), (raw && typeof raw === 'object') ? raw : {});
+  if (!MV_ST.days || typeof MV_ST.days !== 'object') MV_ST.days = {};
+  if (!MV_ST.badges || typeof MV_ST.badges !== 'object') MV_ST.badges = {};
+  MV_ST.xp = MV_ST.xp | 0;
+  /* 過去の記録から日ごとの件数を1回だけ復元する（このアプリを使ってきた分をゼロに戻さないため） */
+  if (!MV_ST.seeded && mvEnv().seed) {
+    var s = null;
+    try { s = mvEnv().seed(); } catch (e) { s = null; }
+    if (s && typeof s === 'object') {
+      Object.keys(s).forEach(function (d) {
+        var n = s[d] | 0;
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || n <= 0) return;
+        var cur = MV_ST.days[d] || { n: 0, xp: 0 };
+        if (n > cur.n) { cur.n = n; cur.xp = n * MV_XP_BASE; MV_ST.days[d] = cur; }
+      });
+      MV_ST.xp = mvSumXp(MV_ST);
+    }
+    MV_ST.seeded = 1;
+    mvCheckBadges(MV_ST);
+    mvSave();
+  }
+  return MV_ST;
+}
+function mvSave() {
+  try { if (mvEnv().save) mvEnv().save(MV_ST); } catch (e) {}
+}
+function mvSumXp(st) {
+  var t = 0;
+  Object.keys(st.days).forEach(function (d) { t += (st.days[d].xp | 0); });
+  return t;
+}
+function mvTotalItems(st) {
+  var t = 0;
+  Object.keys(st.days).forEach(function (d) { t += (st.days[d].n | 0); });
+  return t;
+}
+function mvActiveDays(st) {
+  return Object.keys(st.days).filter(function (d) { return (st.days[d].n | 0) > 0; }).length;
+}
+function mvMaxDay(st) {
+  var m = 0;
+  Object.keys(st.days).forEach(function (d) { m = Math.max(m, st.days[d].n | 0); });
+  return m;
+}
+function mvHasFlag(st, f) {
+  return Object.keys(st.days).some(function (d) { return !!st.days[d][f]; });
+}
+
+/* --- 連続日数 ---
+   今日やっていれば今日から、まだなら昨日から数える（今日が終わるまでは連続が続いている扱い）。
+   最長は全期間から計算し直す（ずれても自動で直る） */
+function mvStreak(st) {
+  st = st || mvState();
+  var today = mvToday();
+  var has = function (d) { return (st.days[d] && (st.days[d].n | 0) > 0); };
+  var cur = 0, at = has(today) ? today : (has(mvShift(today, -1)) ? mvShift(today, -1) : null);
+  while (at && has(at)) { cur++; at = mvShift(at, -1); }
+  var ds = Object.keys(st.days).filter(function (d) { return has(d); }).sort();
+  var best = 0, run = 0, prev = null;
+  ds.forEach(function (d) {
+    run = (prev && mvShift(prev, 1) === d) ? run + 1 : 1;
+    prev = d;
+    if (run > best) best = run;
+  });
+  return { cur: cur, best: Math.max(best, cur), today: has(today) ? (st.days[today].n | 0) : 0 };
+}
+
+/* --- バッジ12種 ---
+   条件は「いま何件／目標何件」の形で持つ。取れていないバッジにも進み具合を出す */
+var MV_BADGES = [
+  { k: 'first', ic: '🌱', nm: 'はじめの一歩', cd: '1件やってみる', goal: 1, now: function (st) { return mvTotalItems(st); } },
+  { k: 's3', ic: '🔥', nm: '3日つづいた', cd: '3日連続', goal: 3, now: function (st) { return mvStreak(st).best; } },
+  { k: 's7', ic: '🔥', nm: '1週間つづいた', cd: '7日連続', goal: 7, now: function (st) { return mvStreak(st).best; } },
+  { k: 's14', ic: '💪', nm: '2週間つづいた', cd: '14日連続', goal: 14, now: function (st) { return mvStreak(st).best; } },
+  { k: 's30', ic: '👑', nm: '1か月つづいた', cd: '30日連続', goal: 30, now: function (st) { return mvStreak(st).best; } },
+  { k: 'd30', ic: '📅', nm: 'のべ30日', cd: '学習した日が30日', goal: 30, now: function (st) { return mvActiveDays(st); } },
+  { k: 'i100', ic: '💯', nm: 'のべ100件', cd: '答え合わせ100件', goal: 100, now: function (st) { return mvTotalItems(st); } },
+  { k: 'i500', ic: '🏆', nm: 'のべ500件', cd: '答え合わせ500件', goal: 500, now: function (st) { return mvTotalItems(st); } },
+  { k: 'burst', ic: '🎯', nm: '1日30件', cd: '1日に30件', goal: 30, now: function (st) { return mvMaxDay(st); } },
+  { k: 'morning', ic: '🌅', nm: '朝の学習', cd: '朝5〜9時にやる', goal: 1, now: function (st) { return mvHasFlag(st, 'am') ? 1 : 0; } },
+  { k: 'night', ic: '🌙', nm: '夜の学習', cd: '22時〜4時にやる', goal: 1, now: function (st) { return mvHasFlag(st, 'pm') ? 1 : 0; } },
+  { k: 'lv10', ic: '⭐', nm: 'レベル10', cd: 'レベル10に到達', goal: 10, now: function (st) { return mvLevel(st.xp).lv; } }
+];
+/* 条件を満たしたバッジに取得日を付ける。新しく取れたものの一覧を返す */
+function mvCheckBadges(st) {
+  st = st || mvState();
+  var got = [], today = mvToday();
+  MV_BADGES.forEach(function (b) {
+    if (st.badges[b.k]) return;
+    if (b.now(st) >= b.goal) { st.badges[b.k] = today; got.push(b); }
+  });
+  return got;
+}
+
+/* --- 1件ぶん記録する（答え合わせが済んだ瞬間に呼ぶ） --- */
+function mvGain(ok, n) {
+  var st = mvState();
+  n = Math.max(1, n || 1);
+  var d = mvToday(), h = new Date().getHours();
+  var rec = st.days[d] || (st.days[d] = { n: 0, xp: 0 });
+  var first = (rec.n | 0) === 0;
+  var beforeLv = mvLevel(st.xp).lv;
+  var xp = (MV_XP_BASE + (ok === true ? MV_XP_OK : (ok === 'half' ? MV_XP_HALF : 0))) * n;
+  rec.n = (rec.n | 0) + n;
+  if (h >= 5 && h < 9) rec.am = 1;
+  if (h >= 22 || h < 4) rec.pm = 1;
+  if (first) xp += Math.min(mvStreak(st).cur, MV_STREAK_CAP) * MV_STREAK_XP;
+  rec.xp = (rec.xp | 0) + xp;
+  st.xp = (st.xp | 0) + xp;
+  var newBadges = mvCheckBadges(st);
+  var afterLv = mvLevel(st.xp).lv;
+  mvSave();
+  mvToast('＋' + xp + ' XP');
+  if (first && mvStreak(st).cur > 1) mvToast('🔥 ' + mvStreak(st).cur + '日連続', 'fire');
+  if (afterLv > beforeLv) mvToast('レベル' + afterLv + '（' + mvTitle(afterLv) + '）になりました', 'lv');
+  newBadges.forEach(function (b) { mvToast('バッジ獲得 ' + b.ic + ' ' + b.nm, 'bd'); });
+  mvRender();
+  return { xp: xp, level: afterLv, levelUp: afterLv > beforeLv, badges: newBadges };
+}
+
+/* --- 2台ぶんの記録を合流させる（合言葉同期の取り込み側で使う） ---
+   片方が遅れていても、多い方の件数・XP を残す＝どちらの端末の学習も消えない */
+function mvMerge(local, remote) {
+  var a = Object.assign(mvBlank(), (local && typeof local === 'object') ? local : {});
+  var b = (remote && typeof remote === 'object') ? remote : {};
+  /* 渡された側を書き換えないよう、日ごとの記録とバッジは1段深くまで写しておく */
+  var ld = (a.days && typeof a.days === 'object') ? a.days : {};
+  a.days = {};
+  Object.keys(ld).forEach(function (d) { if (ld[d] && typeof ld[d] === 'object') a.days[d] = Object.assign({}, ld[d]); });
+  a.badges = Object.assign({}, (a.badges && typeof a.badges === 'object') ? a.badges : {});
+  var bd = (b.days && typeof b.days === 'object') ? b.days : {};
+  Object.keys(bd).forEach(function (d) {
+    var r = bd[d] || {}, l = a.days[d];
+    if (!l || (r.n | 0) > (l.n | 0)) {
+      a.days[d] = { n: r.n | 0, xp: Math.max(r.xp | 0, l ? (l.xp | 0) : 0), am: (r.am || (l && l.am)) ? 1 : undefined, pm: (r.pm || (l && l.pm)) ? 1 : undefined };
+    } else {
+      l.xp = Math.max(l.xp | 0, r.xp | 0);
+      if (r.am) l.am = 1;
+      if (r.pm) l.pm = 1;
+    }
+    if (a.days[d].am === undefined) delete a.days[d].am;
+    if (a.days[d].pm === undefined) delete a.days[d].pm;
+  });
+  var rb = (b.badges && typeof b.badges === 'object') ? b.badges : {};
+  Object.keys(rb).forEach(function (k) {
+    if (!a.badges[k] || rb[k] < a.badges[k]) a.badges[k] = rb[k];   /* 先に取った日を残す */
+  });
+  a.xp = Math.max(mvSumXp(a), a.xp | 0, b.xp | 0);
+  a.seeded = (a.seeded || b.seeded) ? 1 : 0;
+  return a;
+}
+
+/* --- 通知（画面下に出て消える） --- */
+var MV_TOASTS = null;
+function mvToast(msg, kind) {
+  if (typeof document === 'undefined' || !document.body) return;
+  if (!MV_TOASTS || !MV_TOASTS.isConnected) {
+    MV_TOASTS = document.createElement('div');
+    MV_TOASTS.className = 'mv-toast-box';
+    document.body.appendChild(MV_TOASTS);
+  }
+  var el = document.createElement('div');
+  el.className = 'mv-toast' + (kind ? ' mv-t-' + kind : '');
+  el.textContent = msg;
+  MV_TOASTS.appendChild(el);
+  setTimeout(function () {
+    el.classList.add('mv-out');
+    setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 420);
+  }, kind ? 3200 : 2000);
+}
+
+/* --- 12週カレンダー ---
+   今週の月曜から11週さかのぼった月曜が左端。1列＝1週・上から月〜日 */
+function mvCalHtml(st) {
+  var today = new Date(); today.setHours(0, 0, 0, 0);
+  var back = (today.getDay() + 6) % 7;                    /* 月曜=0 になるようにずらす */
+  var start = new Date(today); start.setDate(start.getDate() - back - (MV_CAL_WEEKS - 1) * 7);
+  var tKey = mvToday(), cols = [], prevMon = -1;
+  for (var w = 0; w < MV_CAL_WEEKS; w++) {
+    var cells = [], monLab = '';
+    for (var i = 0; i < 7; i++) {
+      var d = new Date(start); d.setDate(d.getDate() + w * 7 + i);
+      var key = mvYmd(d), rec = st.days[key], n = rec ? (rec.n | 0) : 0;
+      if (i === 0) {
+        if (d.getMonth() !== prevMon) { monLab = (d.getMonth() + 1) + '月'; prevMon = d.getMonth(); }
+      }
+      var cls = 'mv-d';
+      if (key > tKey) cls += ' mv-future';
+      else if (n >= MV_STEPS[3]) cls += ' mv-l4';
+      else if (n >= MV_STEPS[2]) cls += ' mv-l3';
+      else if (n >= MV_STEPS[1]) cls += ' mv-l2';
+      else if (n >= MV_STEPS[0]) cls += ' mv-l1';
+      if (key === tKey) cls += ' mv-today';
+      cells.push('<i class="' + cls + '" title="' + key + ' ' + n + mvUnit() + '"></i>');
+    }
+    cols.push('<div class="mv-col"><span class="mv-mon">' + monLab + '</span>' + cells.join('') + '</div>');
+  }
+  return '<div class="mv-cal">'
+    + '<div class="mv-wd"><span>月</span><span></span><span>水</span><span></span><span>金</span><span></span><span>日</span></div>'
+    + '<div class="mv-grid">' + cols.join('') + '</div></div>'
+    + '<div class="mv-legend">すくない<i></i><i class="mv-l1"></i><i class="mv-l2"></i><i class="mv-l3"></i><i class="mv-l4"></i>おおい</div>';
+}
+
+/* --- バッジ一覧 --- */
+function mvBadgeHtml(st) {
+  return MV_BADGES.map(function (b) {
+    var got = st.badges[b.k], now = Math.min(b.now(st), b.goal);
+    var pct = Math.round(now / b.goal * 100);
+    return '<div class="mv-bd' + (got ? ' mv-got' : '') + '">'
+      + '<div class="mv-bd-ic">' + b.ic + '</div>'
+      + '<div class="mv-bd-nm">' + b.nm + '</div>'
+      + '<div class="mv-bd-cd">' + (got ? got.slice(5).replace('-', '/') + ' 獲得' : b.cd) + '</div>'
+      + (got ? '' : '<div class="mv-pg"><i style="width:' + pct + '%"></i></div>')
+      + '</div>';
+  }).join('');
+}
+
+/* --- 全体を描く --- */
+function mvHtml() {
+  var st = mvState(), lv = mvLevel(st.xp), sk = mvStreak(st);
+  var pct = Math.round(lv.cur / lv.need * 100);
+  var total = mvTotalItems(st), gotN = Object.keys(st.badges).length;
+  return '<div class="mv-wrap">'
+    + '<div class="mv-top">'
+    + '<div class="mv-box mv-b-lv"><div class="mv-lv-row">'
+    + '<div class="mv-chip"><span class="mv-c-l">LEVEL</span><span class="mv-c-n">' + lv.lv + '</span></div>'
+    + '<div class="mv-lv-main">'
+    + '<div class="mv-title">' + lv.title + '</div>'
+    + '<div class="mv-xp">合計 ' + st.xp + ' XP ・ のべ ' + total + mvUnit() + '</div>'
+    + '<div class="mv-bar"><i style="width:' + pct + '%"></i></div>'
+    + '<div class="mv-next">次のレベルまで あと ' + (lv.need - lv.cur) + ' XP</div>'
+    + '</div></div></div>'
+    + '<div class="mv-box mv-b-fire"><div class="mv-fire-row">'
+    + '<div class="mv-flame' + (sk.cur > 0 ? ' mv-on' : '') + '">🔥</div>'
+    + '<div><div class="mv-days"><b>' + sk.cur + '</b> 日連続</div>'
+    + '<div class="mv-sub">最長 ' + sk.best + '日 ・ '
+    + (sk.today ? '今日は ' + sk.today + mvUnit() : '今日はまだ0' + mvUnit()) + '</div></div>'
+    + '</div></div>'
+    + '</div>'
+    + '<div class="mv-cal-head"><span class="mv-cal-ttl">この12週間</span>'
+    + '<span class="mv-cal-note">1マス＝1日。色が濃いほどたくさんやった日</span></div>'
+    + mvCalHtml(st)
+    + '<div class="mv-bd-head"><span class="mv-bd-ttl">バッジ</span>'
+    + '<span class="mv-bd-n">' + gotN + ' / ' + MV_BADGES.length + ' 個</span></div>'
+    + '<div class="mv-badges">' + mvBadgeHtml(st) + '</div>'
+    + '</div>';
+}
+function mvRender() {
+  if (typeof document === 'undefined') return;
+  var id = mvEnv().mount || 'motiv-body';
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = mvHtml();
+}
+/* MOTIV:JS:END */
 
 /* ================= 1日あたりの復習の上限（2026-08-27 追加） =================
    期限が来た語を全部出していると、語数が増えるほど1日の復習が膨らんで回らなくなる。
@@ -1840,7 +2313,7 @@ function updateCounts() {
 let currentView = 'words';
 function switchView(name) {
   currentView = name;
-  ['words', 'review', 'favs', 'weeks', 'test', 'roots'].forEach(v => {
+  ['words', 'review', 'favs', 'weeks', 'test', 'roots', 'motiv'].forEach(v => {
     document.getElementById('view-' + v).hidden = (v !== name);
   });
   document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.view === name));
@@ -1851,6 +2324,7 @@ function switchView(name) {
   if (name === 'test') renderTestSetup();
   if (name === 'roots') renderRoots();
   if (name === 'review') renderReview();
+  if (name === 'motiv') mvRender();
   window.scrollTo(0, 0);
 }
 
@@ -2216,6 +2690,7 @@ function queueAgain(q, correct) {
 function recordAnswer(q, correct, userAns) {
   if (q.again) return;   // おかわりは記録に入れない（箱も成績も1回目のまま）
   srsUpdate(q.w.id, correct);
+  mvGain(correct);   /* やる気の記録（連続日数・XP・バッジ） */
   T.res.push({ q: q, ok: correct, user: userAns || '' });
   queueAgain(q, correct);
 }
@@ -2543,6 +3018,7 @@ function refreshAll() {
   if (currentView === 'weeks') renderWeeks();
   if (currentView === 'review') renderReview();
   if (currentView === 'test') renderTestSetup();
+  if (currentView === 'motiv') mvRender();
 }
 function init() {
   loadUser();
