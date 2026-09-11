@@ -30,6 +30,8 @@
     --gold-bg: #fffbea;
     --blue: #2b6cb0;
     --blue-bg: #ebf4ff;
+    --note: #8b5e34;
+    --note-bg: #fbf1e6;
   }
   * { box-sizing: border-box; }
   body {
@@ -151,6 +153,11 @@
   .tag.st-learning { background: var(--gold-bg); color: var(--gold); }
   .tag.st-weak { background: var(--red-bg); color: var(--red); }
   .tag.st-known { background: var(--green-bg); color: var(--green); }
+  .tag.src-note { background: var(--note-bg); color: var(--note); }
+  .w-src { font-size: 0.72rem; color: var(--note); margin-top: 5px; }
+  .mini .mnote { font-size: 0.7rem; color: var(--note); font-weight: 600; white-space: nowrap; }
+  .toolbar-right { display: flex; gap: 6px; align-items: center; margin-left: auto; }
+  .list-toolbar .seg { flex: 0 0 auto; }
   .sense { border-left: 3px solid var(--teal); padding: 2px 0 2px 10px; margin: 12px 0; }
   .sense-head { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
   .pos {
@@ -517,6 +524,7 @@
       <li><b>✍️ テスト</b>は5種類（意味を選ぶ／英単語を書く／例文穴埋め／語族／ミックス）。成績は週ごとに記録される</li>
       <li><b>🔁 今日の復習</b>は間隔反復。まちがえた単語ほど早く、覚えた単語ほど間を空けて出てくる</li>
       <li><b>🌳 語根マップ</b>は語根・接頭辞ごとに単語をまとめる。1語おぼえると芋づる式に増える</li>
+      <li><b>📓 ノートから</b>… 手書きノートの写真から <code>/note-phrase-add</code> で取り込んだ単語。カードに「📓 ノートから」と出典（ノート名・画像名）が付く。一覧の「📓 ノートから」ボタンで絞り込めて、テストの出題範囲でも選べる</li>
     </ol>
   </details>
 
@@ -543,7 +551,10 @@
       <button class="seg-btn" data-pview="flat">🕘 新しい順</button>
       <button class="seg-btn" data-pview="az">🔤 A→Z</button>
     </div>
-    <button class="btn-mini" id="wkExpandBtn">全て開く</button>
+    <div class="toolbar-right">
+      <button class="btn-mini" id="noteOnlyBtn" hidden>📓 ノートから</button>
+      <button class="btn-mini" id="wkExpandBtn">全て開く</button>
+    </div>
   </div>
   <div id="polishedList"></div>
   <div class="sync-line">端末間の共有（メモ・お気に入り・成績）: <span id="syncLabel">確認中…</span> ／ <a id="syncChange">合言葉を変更</a></div>
@@ -731,7 +742,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
-/* ================= 保存済み単語（/vocab-note-add が追記する） ================= */
+/* ================= 保存済み単語（/vocab-note-add が追記する） =================
+   ノートの写真から取り込んだもの（/note-phrase-add）は src: "note", srcRef: "ノート名/画像名" が付く */
 const WORDS = [
 {
   id: 1787044500000,
@@ -11725,6 +11737,54 @@ const WORDS = [
   ],
   memo: "",
   savedAt: "2026-09-07T10:51:14.826Z"
+},
+{
+  id: 1789107663306,
+  word: "chores",
+  ipa: "/tʃɔːrz/（単数 chore /tʃɔːr/）",
+  tags: ["リスニング頻出", "会話表現"],
+  senses: [
+    {
+      pos: "名詞",
+      ja: "家事（掃除・洗濯・皿洗いなど日々の用事）",
+      def: "the regular jobs that need to be done at home, such as cleaning and washing",
+      ex: "Studies show that sharing household chores reduces stress among couples who both work full time.",
+      target: "chores",
+      exJa: "共働きの夫婦では、家事を分担するとストレスが減ることが研究で示されている。",
+      colloc: ["household chores", "do the chores", "share the chores", "daily chores"]
+    },
+    {
+      pos: "名詞",
+      ja: "（単数 a chore で）面倒な仕事、うんざりする作業",
+      def: "a task that is boring or unpleasant but has to be done",
+      ex: "Before computers, calculating the results of a large survey was a time-consuming chore.",
+      target: "chore",
+      exJa: "コンピューターが登場する前は、大規模な調査の結果を計算するのは時間のかかる面倒な作業だった。",
+      colloc: ["a real chore", "a tedious chore", "feel like a chore"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "chore", type: "語根", mean: "ひと回り・一回分の仕事（古英語 cierr＝回ること、一回）" },
+      { p: "-s", type: "接尾辞", mean: "複数（いくつもある日々の用事）" }
+    ],
+    note: "古英語 cierr は「回ること・一回分」。そこから「その都度こなす半端な仕事」の意味になり、イギリスの chare（charwoman＝通いの家政婦 の char）がアメリカで chore の形になった。<b>毎日くり返し回ってくる用事</b>なので、家事の意味では<b>複数形 chores</b> で使うことが多い。"
+  },
+  family: [
+    { w: "chore", pos: "名", ja: "面倒な仕事、雑用（単数）" },
+    { w: "household chores", pos: "名", ja: "家事、家の雑用" },
+    { w: "chore chart", pos: "名", ja: "家事の当番表" }
+  ],
+  mates: [
+    { w: "ajar", ja: "（ドアが）少し開いて（on char＝回りかけ）" }
+  ],
+  confuse: [
+    { w: "housework", ja: "<b>housework は不可算名詞</b>で「家事全般」（a housework・houseworks とは言えない）。<b>chore は可算名詞</b>で「一つひとつの家事」。do housework ／ do the chores と使い分ける。" }
+  ],
+  memo: "",
+  src: "note",
+  srcRef: "Bizmate 表現まとめ/IMG_2158.HEIC",
+  savedAt: "2026-09-11T06:21:03.306Z"
 }
 ];
 
@@ -12551,6 +12611,26 @@ function cancelMemo(id) {
   const box = document.getElementById('memo-' + id);
   if (box && w) box.outerHTML = memoHtml(w);
 }
+/* ================= 📓 ノートから =================
+   /note-phrase-add が手書きノートの写真から取り込んだ単語には
+   src: "note" と srcRef（"ノート名/画像名"）が付く。
+   カードのタグと出典、一覧の絞り込み、テストの出題範囲で使う。 */
+function isNoteWord(w) { return !!(w && w.src === 'note'); }
+function noteWords() { return WORDS.filter(isNoteWord); }
+/* 絞り込みが効いているか（ノート由来が1語も無いときは押せないので効かない） */
+function noteFilterOn() { return !!PREFS.noteOnly && noteWords().length > 0; }
+/* 📚 保存済み単語の一覧に出す元の集合（検索語 q で絞る） */
+function polishedBase(q) { return (noteFilterOn() ? noteWords() : WORDS).filter(w => matchWord(w, q)); }
+function noteSrcLabel(w) { return String(w.srcRef || '').split('/').filter(Boolean).join(' ・ '); }
+function updateNoteOnlyBtn() {
+  const btn = document.getElementById('noteOnlyBtn');
+  if (!btn) return;
+  const n = noteWords().length;
+  btn.hidden = !n;
+  btn.textContent = '📓 ノートから（' + n + '）';
+  btn.classList.toggle('on', noteFilterOn());
+}
+
 function wordCardHtml(w, opts) {
   opts = opts || {};
   const st = statusOf(w.id);
@@ -12562,8 +12642,10 @@ function wordCardHtml(w, opts) {
     + '<span class="w-spacer"></span>' + favBtnHtml(w.id) + '</div>';
   if (w.ipa) h += '<div class="w-ipa">' + escapeHtml(w.ipa) + '</div>';
   h += '<div class="w-tags"><span class="tag st-' + st.k + '">' + st.label + '</span>'
+    + (isNoteWord(w) ? '<span class="tag src-note">📓 ノートから</span>' : '')
     + (s.ok + s.ng ? '<span class="tag">正答 ' + s.ok + '/' + (s.ok + s.ng) + '</span>' : '')
     + (w.tags || []).map(t => '<span class="tag">' + escapeHtml(t) + '</span>').join('') + '</div>';
+  if (isNoteWord(w) && w.srcRef) h += '<div class="w-src">出典: ' + escapeHtml(noteSrcLabel(w)) + '</div>';
   (w.senses || []).forEach((sn, i) => { h += senseHtml(w, sn, i); });
   const detail = originHtml(w) + familyHtml(w) + matesHtml(w) + confuseHtml(w);
   if (detail) {
@@ -12710,7 +12792,7 @@ function renderPending() {
 function matchWord(w, q) {
   if (!q) return true;
   const s = q.toLowerCase();
-  const hay = [w.word, w.ipa || '', memoOf(w), (w.tags || []).join(' '),
+  const hay = [w.word, w.ipa || '', memoOf(w), (w.tags || []).join(' '), w.srcRef || '',
     (w.senses || []).map(x => [x.ja, x.def, x.ex, x.exJa, (x.colloc || []).join(' ')].join(' ')).join(' '),
     (w.family || []).map(f => f.w + f.ja).join(' '),
     (w.mates || []).map(f => f.w + f.ja).join(' '),
@@ -12741,7 +12823,7 @@ function toggleOpenWeek(key) {
 }
 function toggleAllWeeks() {
   const q = document.getElementById('searchBox').value.trim();
-  const gs = groupByWeek(WORDS.filter(w => matchWord(w, q)));
+  const gs = groupByWeek(polishedBase(q));
   const all = gs.length && gs.every(g => openWeeks().indexOf(g.key) !== -1);
   PREFS.openWeeks = all ? [] : gs.map(g => g.key);
   savePrefs();
@@ -12749,12 +12831,13 @@ function toggleAllWeeks() {
 }
 function renderPolished() {
   const q = document.getElementById('searchBox').value.trim();
-  let list = WORDS.filter(w => matchWord(w, q));
+  let list = polishedBase(q);
   const el = document.getElementById('polishedList');
   const tb = document.getElementById('wkExpandBtn');
   tb.hidden = PREFS.view !== 'week';
+  updateNoteOnlyBtn();
   if (!list.length) {
-    el.innerHTML = '<div class="empty">' + (q ? '「' + escapeHtml(q) + '」に一致する単語はありません。' : 'まだ保存済み単語がありません。') + '</div>';
+    el.innerHTML = '<div class="empty">' + (q ? '「' + escapeHtml(q) + '」に一致する' + (noteFilterOn() ? 'ノートからの' : '') + '単語はありません。' : 'まだ保存済み単語がありません。') + '</div>';
     return;
   }
   if (PREFS.view === 'flat') {
@@ -12808,6 +12891,7 @@ function renderWeeks() {
       + days[d].map(w => '<div class="mini">'
         + '<button class="play-btn sm" data-icon="🔊" onclick="playAudio(this,\'' + wordAudio(w.id) + '\')">🔊</button>'
         + '<span class="mw">' + escapeHtml(w.word) + '</span>'
+        + (isNoteWord(w) ? '<span class="mnote" title="ノートから">📓 ノート</span>' : '')
         + '<span class="mj hid" onclick="this.classList.remove(\'hid\')">' + escapeHtml((w.senses[0] || {}).ja || '') + '</span>'
         + favBtnHtml(w.id) + '</div>').join('')
     ).join('');
@@ -13062,6 +13146,7 @@ function sourceWords(week) {
   if (week === 'favs') return favWords();
   if (week === 'due') return dueWords();
   if (week === 'weak') return weakWords();
+  if (week === 'note') return noteWords();
   return WORDS.filter(w => weekKeyOf(w.savedAt) === week);
 }
 function makeQuestion(w, kind, pool) {
@@ -13126,6 +13211,7 @@ function renderTestSetup() {
     + '<option value="due">🔁 今日の復習（今日ぶん ' + dueToday().length + '語 / 期限 ' + dueWords().length + '語）</option>'
     + '<option value="favs">⭐ お気に入り（' + favWords().length + '語）</option>'
     + '<option value="weak">⚠️ 苦手な単語（' + weakWords().length + '語）</option>'
+    + (noteWords().length ? '<option value="note">📓 ノートから（' + noteWords().length + '語）</option>' : '')
     + gs.map(g => '<option value="' + g.key + '">📅 ' + g.label + (g.key === THIS_WEEK_KEY ? '（今週）' : '') + ' — ' + g.items.length + '語</option>').join('');
   if (cur) sel.value = cur;
   document.getElementById('testSetupInfo').innerHTML =
@@ -13137,7 +13223,7 @@ function renderTestHistory() {
   const h = (U.hist || []).slice(0, 12);
   if (!h.length) { el.innerHTML = '<div class="empty">まだテスト履歴がありません。</div>'; return; }
   el.innerHTML = h.map(x => {
-    const label = x.week === 'all' ? '全期間' : x.week === 'favs' ? '⭐お気に入り' : x.week === 'due' ? '🔁今日の復習' : x.week === 'weak' ? '⚠️苦手' : weekRangeLabel(x.week);
+    const label = x.week === 'all' ? '全期間' : x.week === 'favs' ? '⭐お気に入り' : x.week === 'due' ? '🔁今日の復習' : x.week === 'note' ? '📓ノートから' : x.week === 'weak' ? '⚠️苦手' : weekRangeLabel(x.week);
     return '<div class="hist-row"><span>' + fmtDateShort(x.at) + ' ' + label + '<span style="color:var(--sub);font-size:0.76rem"> / ' + (KIND_LABEL[x.kind] || 'ミックス') + '</span></span>'
       + '<span class="hs">' + x.correct + '/' + x.n + '（' + Math.round(x.correct / x.n * 100) + '%）</span></div>';
   }).join('');
@@ -13464,6 +13550,10 @@ function bind() {
   document.getElementById('searchBox').addEventListener('input', renderPolished);
   document.getElementById('favSearch').addEventListener('input', renderFavs);
   document.getElementById('wkExpandBtn').addEventListener('click', toggleAllWeeks);
+  document.getElementById('noteOnlyBtn').addEventListener('click', () => {
+    PREFS.noteOnly = !noteFilterOn(); savePrefs();
+    renderPolished();
+  });
   document.getElementById('hideModeBtn').addEventListener('click', () => {
     PREFS.hide = !PREFS.hide; savePrefs();
     document.getElementById('hideModeBtn').classList.toggle('on', PREFS.hide);
