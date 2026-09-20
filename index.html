@@ -368,6 +368,81 @@
   .due-fc i.over { opacity:.9; background:#d9534f; }
 /* ここから下は .claude/skills_assets/motivation/motiv.css をそのまま配ったもの。
    直すときは motiv.css を直して inject.py を回す（ここを書き換えても消える） */
+/* HIST:CSS:BEGIN */
+/* ============================================================
+   学習の履歴 — 見た目（いつ・何を・何％で解いたかの一覧＋点数フィルタ）
+   正本: .claude/skills_assets/history/hist.css
+   7つのアプリへ inject.py が同じ中身を配る。直すときは必ずこのファイルを直して
+   inject.py を回すこと（生成HTMLを直接いじっても build.py / inject.py で消える）。
+   ・色はアプリの変数に頼らず、この中で完結させる（7アプリで同じ見た目にするため）。
+     アプリ側で色を変えたいときは .hs-wrap の --hs-* を上書きする
+   ・クラス名は全て hs- 始まり。7アプリのどれとも衝突していないことを確認済み
+   ============================================================ */
+.hs-wrap{
+  --hs-ok:#1c7f52;   --hs-ok-soft:#e8f5ee;   --hs-ok-line:#b9ddc9;
+  --hs-mid:#b26a06;  --hs-mid-soft:#fdf3e2;  --hs-mid-line:#f0d6a8;
+  --hs-ng:#b3261e;   --hs-ng-soft:#fdecea;   --hs-ng-line:#f2c4bf;
+  --hs-ink:#181d27;  --hs-sub:#5f6879; --hs-mute:#8a93a3; --hs-line:#e4e7ee; --hs-card:#fff;
+  font-size:16px; line-height:1.7; color:var(--hs-ink);
+}
+.hs-wrap *{box-sizing:border-box;}
+
+/* --- 上の1行（のべ件数・平均） --- */
+.hs-sum{font-size:.9rem;color:var(--hs-sub);margin-bottom:10px;}
+.hs-sum b{font-size:1.15rem;color:var(--hs-ink);letter-spacing:-.01em;}
+.hs-sum-sub{font-size:.76rem;color:var(--hs-mute);}
+
+/* --- 点数フィルタ --- */
+.hs-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.hs-chip{appearance:none;cursor:pointer;font:inherit;font-size:.78rem;line-height:1.2;
+  border:1px solid var(--hs-line);background:#f7f8fb;color:var(--hs-sub);
+  border-radius:999px;padding:7px 12px;display:inline-flex;align-items:center;gap:6px;}
+.hs-chip i{font-style:normal;font-size:.7rem;font-weight:700;opacity:.75;}
+.hs-chip:hover{background:#eef0f5;}
+.hs-chip.hs-ok{color:var(--hs-ok);border-color:var(--hs-ok-line);background:var(--hs-ok-soft);}
+.hs-chip.hs-mid{color:var(--hs-mid);border-color:var(--hs-mid-line);background:var(--hs-mid-soft);}
+.hs-chip.hs-ng{color:var(--hs-ng);border-color:var(--hs-ng-line);background:var(--hs-ng-soft);}
+.hs-chip.hs-on{color:#fff;background:var(--hs-ink);border-color:var(--hs-ink);font-weight:700;}
+.hs-chip.hs-on i{opacity:.9;}
+.hs-chip.hs-ok.hs-on{background:var(--hs-ok);border-color:var(--hs-ok);}
+.hs-chip.hs-mid.hs-on{background:var(--hs-mid);border-color:var(--hs-mid);}
+.hs-chip.hs-ng.hs-on{background:var(--hs-ng);border-color:var(--hs-ng);}
+
+/* --- 一覧 --- */
+.hs-list{border:1px solid var(--hs-line);border-radius:12px;overflow:hidden;background:var(--hs-card);}
+.hs-day{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;
+  padding:9px 14px;background:#f7f8fb;border-top:1px solid var(--hs-line);border-bottom:1px solid var(--hs-line);}
+.hs-list > .hs-day:first-child{border-top:0;}
+.hs-day-n{font-weight:700;font-size:.85rem;}
+.hs-day-s{font-size:.74rem;color:var(--hs-mute);}
+.hs-row{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-bottom:1px solid #f0f2f6;}
+.hs-row:last-child{border-bottom:0;}
+.hs-time{flex:0 0 auto;width:42px;font-size:.72rem;color:var(--hs-mute);padding-top:3px;
+  font-variant-numeric:tabular-nums;}
+.hs-score{flex:0 0 auto;width:52px;text-align:center;font-size:.78rem;font-weight:700;
+  border-radius:999px;padding:3px 0;border:1px solid var(--hs-line);font-variant-numeric:tabular-nums;}
+.hs-score.hs-ok{color:var(--hs-ok);background:var(--hs-ok-soft);border-color:var(--hs-ok-line);}
+.hs-score.hs-mid{color:var(--hs-mid);background:var(--hs-mid-soft);border-color:var(--hs-mid-line);}
+.hs-score.hs-ng{color:var(--hs-ng);background:var(--hs-ng-soft);border-color:var(--hs-ng-line);}
+.hs-body{flex:1 1 auto;min-width:0;}
+.hs-q{font-size:.86rem;line-height:1.55;word-break:break-word;}
+.hs-a{font-size:.82rem;line-height:1.55;color:var(--hs-sub);margin-top:2px;word-break:break-word;}
+.hs-k{font-size:.68rem;color:var(--hs-mute);margin-top:4px;}
+
+.hs-more{appearance:none;cursor:pointer;font:inherit;font-size:.8rem;
+  display:block;width:100%;margin-top:10px;padding:10px;border-radius:10px;
+  border:1px solid var(--hs-line);background:#f7f8fb;color:var(--hs-sub);}
+.hs-more:hover{background:#eef0f5;}
+.hs-empty{font-size:.85rem;color:var(--hs-mute);padding:18px 14px;line-height:1.7;}
+.hs-note{font-size:.72rem;color:var(--hs-mute);margin-top:9px;line-height:1.6;}
+
+@media (max-width:480px){
+  .hs-time{width:36px;font-size:.68rem;}
+  .hs-score{width:46px;font-size:.72rem;}
+  .hs-row{padding:10px 11px;gap:8px;}
+  .hs-day{padding:8px 11px;}
+}
+/* HIST:CSS:END */
 /* MOTIV:CSS:BEGIN */
 /* ============================================================
    やる気の仕掛け — 見た目（連続日数＋12週カレンダー／レベル＆XP／バッジ12種）
@@ -733,6 +808,15 @@
       <b>1日1問でも連続日数は途切れません。</b></div>
   </div>
   <div id="motiv-body"></div>
+
+  <!-- 学習の履歴（いつ・何を・何％で解いたかの一覧＋点数フィルタ）。
+       中身は .claude/skills_assets/history/hist.js が描く（hsRender） -->
+  <div class="panel" style="margin-top:22px">
+    <h2 class="panel-title">🕘 学習の履歴</h2>
+    <div class="hint-line">答え合わせが済むたびに1問ずつたまります。このノートは⭕❌の2つで採点するので、
+      点数は100%と0%の2つです（点数を押すと、まちがえた問題だけを取り出せます）。</div>
+  </div>
+  <div id="hist-body"></div>
 </section>
 
 </main>
@@ -12817,7 +12901,7 @@ const PREF_KEY = 'vocabNote_prefs';
 const PENDING_KEY = 'vocabNote_pending';
 
 function blankUser() {
-  return { memos: {}, favs: {}, srs: {}, stats: {}, hist: [], days: {}, motiv: null, updatedAt: 0 };
+  return { memos: {}, favs: {}, srs: {}, stats: {}, hist: [], qhist: [], days: {}, motiv: null, updatedAt: 0 };
 }
 let U = blankUser();
 function loadUser() {
@@ -12828,6 +12912,7 @@ function loadUser() {
       U = Object.assign(blankUser(), o || {});
       ['memos', 'favs', 'srs', 'stats', 'days'].forEach(k => { if (!U[k] || typeof U[k] !== 'object') U[k] = {}; });
       if (!Array.isArray(U.hist)) U.hist = [];
+      if (!Array.isArray(U.qhist)) U.qhist = [];   /* 1問ごとの学習の履歴 */
     }
   } catch (e) { U = blankUser(); }
 }
@@ -12929,6 +13014,13 @@ function mergeRemote(r) {
     U.motiv = mvMerge(U.motiv, r.motiv);
     MV_ST = null;   /* 合流後の内容で読み直す */
     changed = true;
+  }
+  /* 1問ごとの学習の履歴は2台ぶんを合流させる（片方の端末で解いたぶんが消えないため） */
+  if (Array.isArray(r.qhist)) {
+    const before = U.qhist.length;
+    U.qhist = hsMerge(U.qhist, r.qhist);
+    HS_LIST = null;
+    if (U.qhist.length !== before) changed = true;
   }
   if (Array.isArray(r.hist)) {
     const seen = {};
@@ -13122,6 +13214,19 @@ const MV_ENV = {
      復習タブの🔥連続学習・14日ヒートマップと同じ数え方なので、記録がずれない */
   seed() { return Object.assign({}, U.days); }
 };
+/* ============ 学習の履歴（いつ・何を・何％で解いたかの一覧＋点数フィルタ） ============
+   本体は .claude/skills_assets/history/hist.js が正本で、inject.py が下の目印の間へ配る。
+   このノートの答え合わせは⭕❌の2つなので、点数は 100% と 0% の2つだけになる
+   （点数フィルタは「正解だけ／不正解だけ」を取り出す使い方になる）。 */
+const HS_ENV = {
+  unit: '問',
+  mount: 'hist-body',
+  load(){ return U.qhist; },
+  /* 端末へは1問ごと、クラウドへはまとめて（push のときだけ）送る */
+  save(list, push){ U.qhist = list; saveUser(push ? true : false); }
+};
+/* 履歴に残す「何を」。例文穴埋めの問題文はHTMLなので、タグを落として文だけにする */
+function histQ(q){ return String(q.prompt || '').replace(/<[^>]*>/g, ' '); }
 /* MOTIV:JS:BEGIN */
 /* ============================================================
    やる気の仕掛け — 中身（連続日数＋12週カレンダー／レベル＆XP／バッジ12種）
@@ -13449,6 +13554,273 @@ function mvRender() {
   el.innerHTML = mvHtml();
 }
 /* MOTIV:JS:END */
+/* HIST:JS:BEGIN */
+/* ============================================================
+   学習の履歴 — 中身（いつ・何を・何％で解いたかの一覧＋点数フィルタ）
+   正本: .claude/skills_assets/history/hist.js
+   7つのアプリ（日替わり学習 / writing-compose / speaking-compose /
+   表現メモ / 英単語ノート / Gimmy英作文 / TOEFL Speaking瞬間英作文）へ
+   inject.py が同じ中身を配る。直すときは必ずこのファイルを直して inject.py を回すこと
+   （生成HTMLを直接いじっても build.py / inject.py で消える）。
+
+   ------------------------------------------------------------
+   アプリ側がこのブロックより前に用意するもの:
+     var HS_ENV = {
+       load(){ return 保存してある配列 or null },
+       save(list, push){ 配列を保存する。push が true のときだけクラウドへ送る },
+       seed(){ return [{t,p,q,a,k}, ...] },      // 任意。既存の記録から1回だけ復元する
+       mount: 'hist-body',                       // 描画先の要素id
+       unit: '問',                                // 任意。件数の単位（既定は '件'）
+       note: 'この端末に残ります'                 // 任意。一覧の下に出す但し書き
+     }
+   呼びかた:
+     hsAdd({q, a, p, k})  … 1件ぶん答え合わせが済んだ瞬間に呼ぶ（p は 0〜100 の点数）
+     hsRender()           … 画面を描き直す
+     hsMerge(a, b)        … 2台ぶんの履歴を合流させる（合言葉同期の取り込み側で使う）
+     hsFlush()            … 貯めたぶんをクラウドへ送る（画面を離れるとき・結果画面など）
+
+   設計の約束:
+   ・記録するのは「答え合わせ・採点が済んだ瞬間」だけ。出題しただけでは増やさない
+     （途中でやめてもそこまでは残る、という他コーナーの数え方と揃える）
+   ・点の付け直しでは増やさない。アプリ側が最初の1回だけ呼ぶ
+   ・保存は1件ごとに端末へ、クラウドへは間を置いてまとめて送る
+     （1件ごとに送ると通信が重く、スマホで答え合わせが詰まるため）
+   ・古いものから落ちる（HS_MAX 件で頭打ち）。さかのぼって書き換えはしない
+   ============================================================ */
+
+var HS_MAX = 800;          /* 残す件数。1件およそ150バイトなので最大でも約120KB */
+var HS_TEXT_MAX = 160;     /* 問題文・答えの保存する長さ */
+var HS_PAGE = 40;          /* 一覧を一度に出す件数 */
+var HS_PUSH_MS = 6000;     /* クラウドへ送るまでの待ち時間 */
+
+/* 点数の帯。区切りは各アプリの「正解 / 惜しい / まだ」と揃えてある（80以上＝正解・40以上＝惜しい） */
+var HS_BANDS = [
+  { k: '100', nm: '100%',    lo: 100, hi: 100, cls: 'hs-ok' },
+  { k: '80',  nm: '80〜99%', lo: 80,  hi: 99,  cls: 'hs-ok' },
+  { k: '60',  nm: '60〜79%', lo: 60,  hi: 79,  cls: 'hs-mid' },
+  { k: '40',  nm: '40〜59%', lo: 40,  hi: 59,  cls: 'hs-mid' },
+  { k: '20',  nm: '20〜39%', lo: 20,  hi: 39,  cls: 'hs-ng' },
+  { k: '0',   nm: '0〜19%',  lo: 0,   hi: 19,  cls: 'hs-ng' }
+];
+function hsBandOf(p) {
+  for (var i = 0; i < HS_BANDS.length; i++) {
+    if (p >= HS_BANDS[i].lo && p <= HS_BANDS[i].hi) return HS_BANDS[i];
+  }
+  return HS_BANDS[HS_BANDS.length - 1];
+}
+
+var HS_LIST = null;        /* 読み込んだ履歴（新しい順） */
+var HS_BAND = 'all';       /* いま選んでいる点数の帯 */
+var HS_SHOWN = HS_PAGE;    /* いま出している件数 */
+var HS_TIMER = null;
+var HS_HOOKED = 0;
+
+function hsEnv() { return (typeof HS_ENV !== 'undefined' && HS_ENV) ? HS_ENV : {}; }
+function hsUnit() { return hsEnv().unit || '件'; }
+function hsEsc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function hsCut(s) {
+  s = String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
+  return s.length > HS_TEXT_MAX ? s.slice(0, HS_TEXT_MAX - 1) + '…' : s;
+}
+function hsPct(v) {
+  var n = Number(v);
+  if (!isFinite(n)) return 0;
+  if (n > 0 && n <= 1) n = n * 100;          /* 0〜1 で渡されたスコアも受ける */
+  return Math.max(0, Math.min(100, Math.round(n)));
+}
+
+/* --- 日付（端末のローカル日付。UTCずれで日をまたがせない） --- */
+function hsYmd(ms) {
+  var d = new Date(ms);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function hsHm(ms) {
+  var d = new Date(ms);
+  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+var HS_WD = ['日', '月', '火', '水', '木', '金', '土'];
+function hsDayLabel(ymd) {
+  var p = String(ymd).split('-');
+  var d = new Date(+p[0], +p[1] - 1, +p[2]);
+  var today = hsYmd(Date.now());
+  var yest = hsYmd(Date.now() - 86400000);
+  var head = (+p[1]) + '月' + (+p[2]) + '日（' + HS_WD[d.getDay()] + '）';
+  if (ymd === today) return '今日 ' + head;
+  if (ymd === yest) return 'きのう ' + head;
+  return head;
+}
+
+/* --- 読み書き --- */
+function hsNorm(e) {
+  if (!e || typeof e !== 'object') return null;
+  var t = Number(e.t);
+  if (!isFinite(t) || t <= 0) return null;
+  var o = { t: Math.round(t), p: hsPct(e.p), q: hsCut(e.q), a: hsCut(e.a) };
+  if (e.k) o.k = hsCut(e.k);
+  if (e.s) o.s = 1;                           /* 既存の記録から復元したぶん（時刻は分からない） */
+  return o;
+}
+function hsList() {
+  if (HS_LIST) return HS_LIST;
+  var raw = null;
+  try { raw = hsEnv().load ? hsEnv().load() : null; } catch (e) { raw = null; }
+  HS_LIST = hsClean(Array.isArray(raw) ? raw : []);
+  /* 既存の記録から1回だけ復元する（このアプリを使ってきたぶんを空にしないため） */
+  if (!HS_LIST.length && hsEnv().seed) {
+    var s = null;
+    try { s = hsEnv().seed(); } catch (e) { s = null; }
+    if (s && s.length) {
+      HS_LIST = hsClean(s.map(function (x) { x.s = 1; return x; }));
+      hsSave(true);
+    }
+  }
+  return HS_LIST;
+}
+function hsClean(arr) {
+  var out = [], seen = {};
+  arr.forEach(function (x) {
+    var e = hsNorm(x);
+    if (!e) return;
+    var key = e.t + '|' + e.q;
+    if (seen[key]) return;
+    seen[key] = 1; out.push(e);
+  });
+  out.sort(function (a, b) { return b.t - a.t; });
+  return out.slice(0, HS_MAX);
+}
+function hsSave(push) {
+  try { if (hsEnv().save) hsEnv().save(HS_LIST || [], !!push); } catch (e) {}
+}
+/* クラウドへは間を置いてまとめて送る。画面を離れるときは取りこぼさないよう必ず送る */
+function hsSchedulePush() {
+  if (HS_TIMER) clearTimeout(HS_TIMER);
+  HS_TIMER = setTimeout(hsFlush, HS_PUSH_MS);
+  if (!HS_HOOKED && typeof window !== 'undefined' && window.addEventListener) {
+    HS_HOOKED = 1;
+    window.addEventListener('pagehide', hsFlush);
+    window.addEventListener('visibilitychange', function () {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') hsFlush();
+    });
+  }
+}
+function hsFlush() {
+  if (HS_TIMER) { clearTimeout(HS_TIMER); HS_TIMER = null; }
+  if (HS_LIST) hsSave(true);
+}
+
+/* --- 1件ぶん記録する（答え合わせが済んだ瞬間に呼ぶ） --- */
+function hsAdd(e) {
+  var list = hsList();
+  var rec = hsNorm({ t: (e && e.t) || Date.now(), p: e && e.p, q: e && e.q, a: e && e.a, k: e && e.k });
+  if (!rec) return null;
+  /* 同じ時刻・同じ問題が二重に入らないようにする（付け直しで2回呼ばれても増えない） */
+  if (list.length && list[0].t === rec.t && list[0].q === rec.q) { list[0] = rec; }
+  else { list.unshift(rec); if (list.length > HS_MAX) list.length = HS_MAX; }
+  hsSave(false);
+  hsSchedulePush();
+  return rec;
+}
+
+/* --- 2台ぶんの履歴を合流させる（合言葉同期の取り込み側で使う） --- */
+function hsMerge(local, remote) {
+  return hsClean((Array.isArray(local) ? local : []).concat(Array.isArray(remote) ? remote : []));
+}
+
+/* --- 集計 --- */
+function hsCounts(list) {
+  var c = { all: list.length };
+  HS_BANDS.forEach(function (b) { c[b.k] = 0; });
+  list.forEach(function (e) { c[hsBandOf(e.p).k]++; });
+  return c;
+}
+function hsAvg(list) {
+  if (!list.length) return 0;
+  var t = 0;
+  list.forEach(function (e) { t += e.p; });
+  return Math.round(t / list.length);
+}
+function hsFiltered(list, band) {
+  if (!band || band === 'all') return list;
+  var b = null;
+  HS_BANDS.forEach(function (x) { if (x.k === band) b = x; });
+  if (!b) return list;
+  return list.filter(function (e) { return e.p >= b.lo && e.p <= b.hi; });
+}
+/* 日ごとにまとめる（新しい日が上） */
+function hsGroup(list) {
+  var order = [], byDay = {};
+  list.forEach(function (e) {
+    var d = hsYmd(e.t);
+    if (!byDay[d]) { byDay[d] = []; order.push(d); }
+    byDay[d].push(e);
+  });
+  return order.map(function (d) { return { d: d, items: byDay[d] }; });
+}
+
+/* --- 操作 --- */
+function hsPick(band) { HS_BAND = band; HS_SHOWN = HS_PAGE; hsRender(); }
+function hsMore() { HS_SHOWN += HS_PAGE; hsRender(); }
+
+/* --- 画面 --- */
+function hsRender() {
+  var id = hsEnv().mount || 'hist-body';
+  var el = (typeof document !== 'undefined') ? document.getElementById(id) : null;
+  if (!el) return;
+  var all = hsList(), unit = hsUnit();
+  if (!all.length) {
+    el.innerHTML = '<div class="hs-wrap"><div class="hs-empty">まだ履歴がありません。'
+      + '答え合わせをすると、ここに「いつ・何を・何％で」解いたかが1' + hsEsc(unit) + 'ずつたまります。</div></div>';
+    return;
+  }
+  var c = hsCounts(all);
+  var chips = '<button type="button" class="hs-chip' + (HS_BAND === 'all' ? ' hs-on' : '')
+    + '" onclick="hsPick(\'all\')">すべて<i>' + c.all + '</i></button>';
+  HS_BANDS.forEach(function (b) {
+    if (!c[b.k]) return;                      /* 1件も無い帯は出さない（アプリごとに点の刻みが違うため） */
+    chips += '<button type="button" class="hs-chip ' + b.cls + (HS_BAND === b.k ? ' hs-on' : '')
+      + '" onclick="hsPick(\'' + b.k + '\')">' + b.nm + '<i>' + c[b.k] + '</i></button>';
+  });
+
+  var view = hsFiltered(all, HS_BAND);
+  var shown = view.slice(0, HS_SHOWN);
+  var groups = hsGroup(shown);
+  var body = groups.map(function (g) {
+    var head = '<div class="hs-day"><span class="hs-day-n">' + hsEsc(hsDayLabel(g.d)) + '</span>'
+      + '<span class="hs-day-s">' + g.items.length + hsEsc(unit) + '・平均 ' + hsAvg(g.items) + '%</span></div>';
+    var rows = g.items.map(function (e) {
+      var b = hsBandOf(e.p);
+      return '<div class="hs-row">'
+        + '<div class="hs-time">' + (e.s ? '—' : hsEsc(hsHm(e.t))) + '</div>'
+        + '<div class="hs-score ' + b.cls + '">' + e.p + '%</div>'
+        + '<div class="hs-body">'
+        + (e.q ? '<div class="hs-q">' + hsEsc(e.q) + '</div>' : '')
+        + (e.a ? '<div class="hs-a">' + hsEsc(e.a) + '</div>' : '')
+        + (e.k ? '<div class="hs-k">' + hsEsc(e.k) + '</div>' : '')
+        + '</div></div>';
+    }).join('');
+    return head + rows;
+  }).join('');
+
+  var rest = view.length - shown.length;
+  var more = rest > 0
+    ? '<button type="button" class="hs-more" onclick="hsMore()">もっと見る（残り ' + rest + hsEsc(unit) + '）</button>'
+    : '';
+  var none = view.length ? '' : '<div class="hs-empty">この点数の履歴はまだありません。</div>';
+  var note = hsEnv().note ? '<div class="hs-note">' + hsEsc(hsEnv().note) + '</div>' : '';
+
+  el.innerHTML = '<div class="hs-wrap">'
+    + '<div class="hs-sum">のべ <b>' + all.length + '</b>' + hsEsc(unit) + '　平均 <b>' + hsAvg(all) + '%</b>'
+    + '　<span class="hs-sum-sub">直近 ' + hsEsc(hsDayLabel(hsYmd(all[0].t))) + '</span></div>'
+    + '<div class="hs-chips">' + chips + '</div>'
+    + '<div class="hs-list">' + body + none + '</div>'
+    + more + note
+    + '</div>';
+}
+/* HIST:JS:END */
 
 /* ================= 1日あたりの復習の上限（2026-08-27 追加） =================
    期限が来た語を全部出していると、語数が増えるほど1日の復習が膨らんで回らなくなる。
@@ -13957,7 +14329,7 @@ function switchView(name) {
   if (name === 'test') renderTestSetup();
   if (name === 'roots') renderRoots();
   if (name === 'review') renderReview();
-  if (name === 'motiv') mvRender();
+  if (name === 'motiv') { mvRender(); hsRender(); }
   window.scrollTo(0, 0);
 }
 
@@ -14326,6 +14698,8 @@ function recordAnswer(q, correct, userAns) {
   if (q.again) return;   // おかわりは記録に入れない（箱も成績も1回目のまま）
   srsUpdate(q.w.id, correct);
   mvGain(correct);   /* やる気の記録（連続日数・XP・バッジ） */
+  hsAdd({ q: histQ(q), a: q.answer, p: correct ? 100 : 0,
+          k: (KIND_LABEL[q.kind] || '') + '（' + q.w.word + '）' });   /* 学習の履歴 */
   T.res.push({ q: q, ok: correct, user: userAns || '' });
   queueAgain(q, correct);
 }
@@ -14409,6 +14783,7 @@ function saveTestResult() {
   // 1問あたりに実際どれくらいかかったかを控える（次からの「今日つかう時間 → 語数」の換算に使う）
   if (T.week === 'due' && T.startedAt && T.res.length) pushPace((Date.now() - T.startedAt) / 1000, T.res.length);
   const correct = T.res.filter(r => r.ok).length;
+  hsFlush();   /* この回の履歴をクラウドへ送る（結果画面が区切り） */
   U.hist.unshift({ at: Date.now(), week: T.week, kind: T.kind, n: T.res.length, correct: correct });
   if (U.hist.length > 60) U.hist = U.hist.slice(0, 60);
   saveUser();
@@ -14657,7 +15032,7 @@ function refreshAll() {
   if (currentView === 'weeks') renderWeeks();
   if (currentView === 'review') renderReview();
   if (currentView === 'test') renderTestSetup();
-  if (currentView === 'motiv') mvRender();
+  if (currentView === 'motiv') { mvRender(); hsRender(); }
 }
 function init() {
   loadUser();
