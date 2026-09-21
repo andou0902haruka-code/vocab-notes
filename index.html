@@ -31,6 +31,8 @@
     --blue: #2b6cb0;
     --blue-bg: #ebf4ff;
     --note: #8b5e34;
+    --web: #0f766e;
+    --web-bg: #e6f4f1;
     --note-bg: #fbf1e6;
   }
   * { box-sizing: border-box; }
@@ -154,8 +156,12 @@
   .tag.st-weak { background: var(--red-bg); color: var(--red); }
   .tag.st-known { background: var(--green-bg); color: var(--green); }
   .tag.src-note { background: var(--note-bg); color: var(--note); }
+  .tag.src-web { background: var(--web-bg); color: var(--web); }
   .w-src { font-size: 0.72rem; color: var(--note); margin-top: 5px; }
+  .w-src.web { color: var(--web); }
+  .w-src.web a { color: inherit; text-decoration: underline; }
   .mini .mnote { font-size: 0.7rem; color: var(--note); font-weight: 600; white-space: nowrap; }
+  .mini .mnote.web { color: var(--web); }
   .toolbar-right { display: flex; gap: 6px; align-items: center; margin-left: auto; }
   .list-toolbar .seg { flex: 0 0 auto; }
   .sense { border-left: 3px solid var(--teal); padding: 2px 0 2px 10px; margin: 12px 0; }
@@ -600,6 +606,7 @@
       <li><b>🔁 今日の復習</b>は間隔反復。まちがえた単語ほど早く、覚えた単語ほど間を空けて出てくる</li>
       <li><b>🌳 語根マップ</b>は語根・接頭辞ごとに単語をまとめる。1語おぼえると芋づる式に増える</li>
       <li><b>📓 ノートから</b>… 手書きノートの写真から <code>/note-phrase-add</code> で取り込んだ単語。カードに「📓 ノートから」と出典（ノート名・画像名）が付く。一覧の「📓 ノートから」ボタンで絞り込めて、テストの出題範囲でも選べる</li>
+      <li><b>🌐 調べて</b>… テーマを決めて複数のサイトを調べ、<code>/phrase-research</code> で取り込んだ単語。カードにテーマと調べたサイトのリンクが付く。こちらも一覧のボタンで絞り込めて、テストの出題範囲で選べる</li>
     </ol>
   </details>
 
@@ -628,6 +635,7 @@
     </div>
     <div class="toolbar-right">
       <button class="btn-mini" id="noteOnlyBtn" hidden>📓 ノートから</button>
+      <button class="btn-mini" id="webOnlyBtn" hidden>🌐 調べて</button>
       <button class="btn-mini" id="wkExpandBtn">全て開く</button>
     </div>
   </div>
@@ -827,7 +835,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
 /* ================= 保存済み単語（/vocab-note-add が追記する） =================
-   ノートの写真から取り込んだもの（/note-phrase-add）は src: "note", srcRef: "ノート名/画像名" が付く */
+   ノートの写真から取り込んだもの（/note-phrase-add）は src: "note", srcRef: "ノート名/画像名" が付く。
+   テーマで調べて取り込んだもの（/phrase-research）は src: "web", srcRef: "テーマ名",
+   srcUrl: [{name, url}]（載っていたサイト）が付く */
 const WORDS = [
 {
   id: 1787044500000,
@@ -14015,7 +14025,10 @@ function noteWords() { return WORDS.filter(isNoteWord); }
 /* 絞り込みが効いているか（ノート由来が1語も無いときは押せないので効かない） */
 function noteFilterOn() { return !!PREFS.noteOnly && noteWords().length > 0; }
 /* 📚 保存済み単語の一覧に出す元の集合（検索語 q で絞る） */
-function polishedBase(q) { return (noteFilterOn() ? noteWords() : WORDS).filter(w => matchWord(w, q)); }
+function polishedBase(q) {
+  const base = noteFilterOn() ? noteWords() : webFilterOn() ? webWords() : WORDS;
+  return base.filter(w => matchWord(w, q));
+}
 function noteSrcLabel(w) { return String(w.srcRef || '').split('/').filter(Boolean).join(' ・ '); }
 function updateNoteOnlyBtn() {
   const btn = document.getElementById('noteOnlyBtn');
@@ -14024,6 +14037,29 @@ function updateNoteOnlyBtn() {
   btn.hidden = !n;
   btn.textContent = '📓 ノートから（' + n + '）';
   btn.classList.toggle('on', noteFilterOn());
+}
+
+/* ================= 🌐 調べて =================
+   /phrase-research がテーマ（「空港でのやりとり」など）で複数のサイトを調べて
+   取り込んだ単語には src: "web"、srcRef（テーマ名）、srcUrl（[{name, url}]）が付く。 */
+function isWebWord(w) { return !!(w && w.src === 'web'); }
+function webWords() { return WORDS.filter(isWebWord); }
+function webFilterOn() { return !!PREFS.webOnly && webWords().length > 0; }
+function webSrcHtml(w) {
+  if (!isWebWord(w)) return '';
+  const links = (Array.isArray(w.srcUrl) ? w.srcUrl : []).filter(x => x && x.url && x.name)
+    .map(x => '<a href="' + escapeHtml(x.url) + '" target="_blank" rel="noopener">' + escapeHtml(x.name) + '</a>').join(' ・ ');
+  const theme = w.srcRef ? escapeHtml(w.srcRef) : '';
+  if (!theme && !links) return '';
+  return '<div class="w-src web">調べて: ' + theme + (links ? '（' + links + '）' : '') + '</div>';
+}
+function updateWebOnlyBtn() {
+  const btn = document.getElementById('webOnlyBtn');
+  if (!btn) return;
+  const n = webWords().length;
+  btn.hidden = !n;
+  btn.textContent = '🌐 調べて（' + n + '）';
+  btn.classList.toggle('on', webFilterOn());
 }
 
 function wordCardHtml(w, opts) {
@@ -14038,9 +14074,11 @@ function wordCardHtml(w, opts) {
   if (w.ipa) h += '<div class="w-ipa">' + escapeHtml(w.ipa) + '</div>';
   h += '<div class="w-tags"><span class="tag st-' + st.k + '">' + st.label + '</span>'
     + (isNoteWord(w) ? '<span class="tag src-note">📓 ノートから</span>' : '')
+    + (isWebWord(w) ? '<span class="tag src-web">🌐 調べて</span>' : '')
     + (s.ok + s.ng ? '<span class="tag">正答 ' + s.ok + '/' + (s.ok + s.ng) + '</span>' : '')
     + (w.tags || []).map(t => '<span class="tag">' + escapeHtml(t) + '</span>').join('') + '</div>';
   if (isNoteWord(w) && w.srcRef) h += '<div class="w-src">出典: ' + escapeHtml(noteSrcLabel(w)) + '</div>';
+  h += webSrcHtml(w);
   (w.senses || []).forEach((sn, i) => { h += senseHtml(w, sn, i); });
   const detail = originHtml(w) + familyHtml(w) + matesHtml(w) + confuseHtml(w);
   if (detail) {
@@ -14231,8 +14269,9 @@ function renderPolished() {
   const tb = document.getElementById('wkExpandBtn');
   tb.hidden = PREFS.view !== 'week';
   updateNoteOnlyBtn();
+  updateWebOnlyBtn();
   if (!list.length) {
-    el.innerHTML = '<div class="empty">' + (q ? '「' + escapeHtml(q) + '」に一致する' + (noteFilterOn() ? 'ノートからの' : '') + '単語はありません。' : 'まだ保存済み単語がありません。') + '</div>';
+    el.innerHTML = '<div class="empty">' + (q ? '「' + escapeHtml(q) + '」に一致する' + (noteFilterOn() ? 'ノートからの' : webFilterOn() ? '調べて取り込んだ' : '') + '単語はありません。' : 'まだ保存済み単語がありません。') + '</div>';
     return;
   }
   if (PREFS.view === 'flat') {
@@ -14287,6 +14326,7 @@ function renderWeeks() {
         + '<button class="play-btn sm" data-icon="🔊" onclick="playAudio(this,\'' + wordAudio(w.id) + '\')">🔊</button>'
         + '<span class="mw">' + escapeHtml(w.word) + '</span>'
         + (isNoteWord(w) ? '<span class="mnote" title="ノートから">📓 ノート</span>' : '')
+        + (isWebWord(w) ? '<span class="mnote web" title="調べて">🌐 調べて</span>' : '')
         + '<span class="mj hid" onclick="this.classList.remove(\'hid\')">' + escapeHtml((w.senses[0] || {}).ja || '') + '</span>'
         + favBtnHtml(w.id) + '</div>').join('')
     ).join('');
@@ -14542,6 +14582,7 @@ function sourceWords(week) {
   if (week === 'due') return dueWords();
   if (week === 'weak') return weakWords();
   if (week === 'note') return noteWords();
+  if (week === 'web') return webWords();
   return WORDS.filter(w => weekKeyOf(w.savedAt) === week);
 }
 function makeQuestion(w, kind, pool) {
@@ -14607,6 +14648,7 @@ function renderTestSetup() {
     + '<option value="favs">⭐ お気に入り（' + favWords().length + '語）</option>'
     + '<option value="weak">⚠️ 苦手な単語（' + weakWords().length + '語）</option>'
     + (noteWords().length ? '<option value="note">📓 ノートから（' + noteWords().length + '語）</option>' : '')
+    + (webWords().length ? '<option value="web">🌐 調べて（' + webWords().length + '語）</option>' : '')
     + gs.map(g => '<option value="' + g.key + '">📅 ' + g.label + (g.key === THIS_WEEK_KEY ? '（今週）' : '') + ' — ' + g.items.length + '語</option>').join('');
   if (cur) sel.value = cur;
   document.getElementById('testSetupInfo').innerHTML =
@@ -14618,7 +14660,7 @@ function renderTestHistory() {
   const h = (U.hist || []).slice(0, 12);
   if (!h.length) { el.innerHTML = '<div class="empty">まだテスト履歴がありません。</div>'; return; }
   el.innerHTML = h.map(x => {
-    const label = x.week === 'all' ? '全期間' : x.week === 'favs' ? '⭐お気に入り' : x.week === 'due' ? '🔁今日の復習' : x.week === 'note' ? '📓ノートから' : x.week === 'weak' ? '⚠️苦手' : weekRangeLabel(x.week);
+    const label = x.week === 'all' ? '全期間' : x.week === 'favs' ? '⭐お気に入り' : x.week === 'due' ? '🔁今日の復習' : x.week === 'note' ? '📓ノートから' : x.week === 'web' ? '🌐調べて' : x.week === 'weak' ? '⚠️苦手' : weekRangeLabel(x.week);
     return '<div class="hist-row"><span>' + fmtDateShort(x.at) + ' ' + label + '<span style="color:var(--sub);font-size:0.76rem"> / ' + (KIND_LABEL[x.kind] || 'ミックス') + '</span></span>'
       + '<span class="hs">' + x.correct + '/' + x.n + '（' + Math.round(x.correct / x.n * 100) + '%）</span></div>';
   }).join('');
@@ -14949,7 +14991,15 @@ function bind() {
   document.getElementById('favSearch').addEventListener('input', renderFavs);
   document.getElementById('wkExpandBtn').addEventListener('click', toggleAllWeeks);
   document.getElementById('noteOnlyBtn').addEventListener('click', () => {
-    PREFS.noteOnly = !noteFilterOn(); savePrefs();
+    PREFS.noteOnly = !noteFilterOn();
+    if (PREFS.noteOnly) PREFS.webOnly = false;
+    savePrefs();
+    renderPolished();
+  });
+  document.getElementById('webOnlyBtn').addEventListener('click', () => {
+    PREFS.webOnly = !webFilterOn();
+    if (PREFS.webOnly) PREFS.noteOnly = false;
+    savePrefs();
     renderPolished();
   });
   document.getElementById('hideModeBtn').addEventListener('click', () => {
