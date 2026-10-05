@@ -34,6 +34,8 @@
     --web: #0f766e;
     --web-bg: #e6f4f1;
     --note-bg: #fbf1e6;
+    --photo: #9d174d;
+    --photo-bg: #fce7f3;
   }
   * { box-sizing: border-box; }
   body {
@@ -157,11 +159,14 @@
   .tag.st-known { background: var(--green-bg); color: var(--green); }
   .tag.src-note { background: var(--note-bg); color: var(--note); }
   .tag.src-web { background: var(--web-bg); color: var(--web); }
+  .tag.src-photo { background: var(--photo-bg); color: var(--photo); }
   .w-src { font-size: 0.72rem; color: var(--note); margin-top: 5px; }
   .w-src.web { color: var(--web); }
   .w-src.web a { color: inherit; text-decoration: underline; }
+  .w-src.photo { color: var(--photo); }
   .mini .mnote { font-size: 0.7rem; color: var(--note); font-weight: 600; white-space: nowrap; }
   .mini .mnote.web { color: var(--web); }
+  .mini .mnote.photo { color: var(--photo); }
   .toolbar-right { display: flex; gap: 6px; align-items: center; margin-left: auto; }
   .list-toolbar .seg { flex: 0 0 auto; }
   .sense { border-left: 3px solid var(--teal); padding: 2px 0 2px 10px; margin: 12px 0; }
@@ -607,6 +612,7 @@
       <li><b>🌳 語根マップ</b>は語根・接頭辞ごとに単語をまとめる。1語おぼえると芋づる式に増える</li>
       <li><b>📓 ノートから</b>… 手書きノートの写真から <code>/note-phrase-add</code> で取り込んだ単語。カードに「📓 ノートから」と出典（ノート名・画像名）が付く。一覧の「📓 ノートから」ボタンで絞り込めて、テストの出題範囲でも選べる</li>
       <li><b>🌐 調べて</b>… テーマを決めて複数のサイトを調べ、<code>/phrase-research</code> で取り込んだ単語。カードにテーマと調べたサイトのリンクが付く。こちらも一覧のボタンで絞り込めて、テストの出題範囲で選べる</li>
+      <li><b>📷 写真から</b>… SNS・アプリのスクショなど、英語と日本語訳が載った写真から <code>/photo-phrase-add</code> で取り込んだ単語。カードに「📷 写真から」と出典（投稿者・フォルダ名・画像名）が付く。こちらも一覧のボタンで絞り込めて、テストの出題範囲で選べる</li>
     </ol>
   </details>
 
@@ -636,6 +642,7 @@
     <div class="toolbar-right">
       <button class="btn-mini" id="noteOnlyBtn" hidden>📓 ノートから</button>
       <button class="btn-mini" id="webOnlyBtn" hidden>🌐 調べて</button>
+      <button class="btn-mini" id="photoOnlyBtn" hidden>📷 写真から</button>
       <button class="btn-mini" id="wkExpandBtn">全て開く</button>
     </div>
   </div>
@@ -836,6 +843,8 @@
 <script>
 /* ================= 保存済み単語（/vocab-note-add が追記する） =================
    ノートの写真から取り込んだもの（/note-phrase-add）は src: "note", srcRef: "ノート名/画像名" が付く。
+   英語と日本語訳が載った写真（SNSのスクショなど）から取り込んだもの（/photo-phrase-add）は src: "photo",
+   srcRef: "フォルダ名/画像名"、読めたときは srcFrom: "@投稿者" が付く。
    テーマで調べて取り込んだもの（/phrase-research）は src: "web", srcRef: "テーマ名",
    srcUrl: [{name, url}]（載っていたサイト）が付く */
 const WORDS = [
@@ -17150,6 +17159,877 @@ const WORDS = [
     { name: "English Lessons via Skype — 38 Idioms Describing Character and Personality", url: "https://www.englishlessonviaskype.com/idioms-describing-character-and-personality/" }
   ],
   savedAt: "2026-09-22T00:31:32.230Z"
+},
+{
+  id: 1791181941150,
+  word: "pastries",
+  ipa: "/ˈpeɪstriz/（単数 pastry /ˈpeɪstri/）",
+  tags: ["日常会話", "カフェ"],
+  senses: [
+    {
+      pos: "名詞",
+      ja: "（クロワッサン・マフィンなどの）焼き菓子・パン類",
+      def: "sweet baked foods made from dough, such as croissants and muffins",
+      ex: "The café on campus sells fresh pastries and coffee every morning.",
+      target: "pastries",
+      exJa: "キャンパスのカフェでは毎朝、焼きたてのパン類とコーヒーを売っている。",
+      colloc: ["fresh pastries", "a pastry shop", "What pastries do you have?"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "paste", type: "語根", mean: "練った生地（ラテン語 pasta）" },
+      { p: "-ry", type: "接尾辞", mean: "〜の類・〜の品" }
+    ],
+    note: "<b>paste（練った生地）</b>に「〜の類」を表す -ry が付いて「生地で作った焼き物の類」。pasta（パスタ）も同じ語根。"
+  },
+  family: [
+    { w: "pastry", pos: "名", ja: "焼き菓子（単数）" },
+    { w: "pastry chef", pos: "名", ja: "パティシエ" },
+    { w: "paste", pos: "名", ja: "練り物・のり" }
+  ],
+  mates: [
+    { w: "pasta", ja: "練った生地 past- で作る麺" },
+    { w: "paste", ja: "練った past- もの" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_0627.png",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.150Z"
+},
+{
+  id: 1791181941151,
+  word: "conference",
+  ipa: "/ˈkɑːnfərəns/",
+  tags: ["TOEFL", "アカデミック"],
+  senses: [
+    {
+      pos: "名詞",
+      ja: "（専門家が集まる大規模な）会議・学会",
+      def: "a large formal meeting where people discuss a subject",
+      ex: "The professor is presenting her research at an international conference in Boston.",
+      target: "conference",
+      exJa: "教授はボストンの国際会議で研究を発表する予定だ。",
+      colloc: ["attend a conference", "an international conference", "a press conference"]
+    },
+    {
+      pos: "名詞",
+      ja: "（少人数の）話し合い・面談",
+      def: "a private meeting for discussion",
+      ex: "The student had a conference with his advisor about changing his major.",
+      target: "conference",
+      exJa: "その学生は専攻を変えることについて指導教員と面談した。",
+      colloc: ["a parent-teacher conference", "have a conference with"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "con-", type: "接頭辞", mean: "共に" },
+      { p: "fer", type: "語根", mean: "運ぶ（ラテン語 ferre）" },
+      { p: "-ence", type: "接尾辞", mean: "名詞を作る" }
+    ],
+    note: "<b>共に（con-）意見を運び（fer）合う</b>こと＝人が集まって話し合う会議。"
+  },
+  family: [
+    { w: "confer", pos: "動", ja: "協議する・（賞などを）授与する" },
+    { w: "conferencing", pos: "名", ja: "会議を行うこと（video conferencing）" }
+  ],
+  mates: [
+    { w: "transfer", ja: "向こうへ trans- 運ぶ＝移す" },
+    { w: "refer", ja: "元へ re- 運ぶ＝言及する" },
+    { w: "prefer", ja: "前に pre- 運ぶ＝より好む" },
+    { w: "offer", ja: "〜へ of- 運ぶ＝提供する" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_0630.png",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.151Z"
+},
+{
+  id: 1791181941152,
+  word: "carry-on",
+  ipa: "/ˈkæri ɑːn/",
+  tags: ["旅行", "日常会話"],
+  senses: [
+    {
+      pos: "名詞",
+      ja: "機内持ち込みの手荷物",
+      def: "a small bag that you are allowed to take with you onto a plane",
+      ex: "Passengers may bring one carry-on and one personal item onto the plane.",
+      target: "carry-on",
+      exJa: "乗客は機内持ち込みの手荷物1つと身の回り品1つを持ち込める。",
+      colloc: ["a carry-on bag", "carry-on luggage", "My carry-on is missing."]
+    },
+    {
+      pos: "形容詞",
+      ja: "機内持ち込みサイズの",
+      def: "small enough to take onto a plane",
+      ex: "I only packed a carry-on suitcase for the three-day trip.",
+      target: "carry-on",
+      exJa: "3日間の旅行には機内持ち込みサイズのスーツケースだけを詰めた。",
+      colloc: ["carry-on size", "a carry-on suitcase"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "carry", type: "語根", mean: "運ぶ（古フランス語 carier ＜ ラテン語 carrus 荷車）" },
+      { p: "on", type: "接尾辞", mean: "（機内へ）乗せて" }
+    ],
+    note: "<b>自分で運んで（carry）機内に乗せる（on）</b>荷物。預ける荷物は checked bag。"
+  },
+  family: [
+    { w: "carry", pos: "動", ja: "運ぶ" },
+    { w: "carrier", pos: "名", ja: "運ぶもの・航空会社" }
+  ],
+  mates: [
+    { w: "cargo", ja: "荷車 car- で運ぶ荷物" },
+    { w: "career", ja: "荷車の走る道＝経歴" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_0630.png",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.152Z"
+},
+{
+  id: 1791181941153,
+  word: "currency",
+  ipa: "/ˈkɜːrənsi/",
+  tags: ["TOEFL", "経済"],
+  senses: [
+    {
+      pos: "名詞",
+      ja: "通貨",
+      def: "the system of money used in a country",
+      ex: "Travelers should exchange some currency before they arrive in a new country.",
+      target: "currency",
+      exJa: "旅行者は新しい国に着く前にいくらか両替しておいたほうがよい。",
+      colloc: ["exchange currency", "foreign currency", "a digital currency"]
+    },
+    {
+      pos: "名詞",
+      ja: "（考えなどの）流通・広く受け入れられていること",
+      def: "the state of being generally accepted or used",
+      ex: "The idea gained currency among scientists in the 1990s.",
+      target: "currency",
+      exJa: "その考えは1990年代に科学者の間で広まった。",
+      colloc: ["gain currency", "have wide currency"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "curr", type: "語根", mean: "走る・流れる（ラテン語 currere）" },
+      { p: "-ency", type: "接尾辞", mean: "状態を表す名詞" }
+    ],
+    note: "<b>世の中を流れて（curr）回っている状態</b>＝流通しているお金。考えが「広まる」意味もここから。"
+  },
+  family: [
+    { w: "current", pos: "形", ja: "現在の・流通している" },
+    { w: "currently", pos: "副", ja: "現在は" },
+    { w: "current", pos: "名", ja: "流れ・電流" }
+  ],
+  mates: [
+    { w: "occur", ja: "〜に向かって oc- 走る＝起こる" },
+    { w: "curriculum", ja: "走るコース＝教育課程" },
+    { w: "concurrent", ja: "共に con- 走る＝同時の" },
+    { w: "recur", ja: "再び re- 走る＝再発する" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_0630.png",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.153Z"
+},
+{
+  id: 1791181941154,
+  word: "sophomore",
+  ipa: "/ˈsɑːfəmɔːr/",
+  tags: ["大学生活", "リスニング頻出"],
+  senses: [
+    {
+      pos: "名詞",
+      ja: "（4年制大学・高校の）2年生",
+      def: "a student in the second year of a four-year course at a high school or university",
+      ex: "As a sophomore, she started taking more advanced courses in biology.",
+      target: "sophomore",
+      exJa: "2年生になって、彼女は生物学のより上級の授業を取り始めた。",
+      colloc: ["a college sophomore", "sophomore year"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "soph", type: "語根", mean: "賢い（ギリシャ語 sophos）" },
+      { p: "mor", type: "語根", mean: "愚かな（ギリシャ語 mōros）" }
+    ],
+    note: "<b>賢い（soph）けれど愚か（mor）</b>＝少しわかってきたが、まだ未熟な2年生。freshman（1年）→ sophomore → junior → senior。"
+  },
+  family: [
+    { w: "sophomoric", pos: "形", ja: "未熟な・生意気な" }
+  ],
+  mates: [
+    { w: "philosophy", ja: "知恵 soph を愛する phil-" },
+    { w: "sophisticated", ja: "知恵 soph で磨かれた＝洗練された" },
+    { w: "moron", ja: "愚かな mor 人" }
+  ],
+  confuse: [
+    { w: "freshman / junior / senior", ja: "1年＝freshman、3年＝junior、4年＝senior。<b>sophomore だけ数字のイメージがない</b>ので語源で覚える。" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_0632.png",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.154Z"
+},
+{
+  id: 1791181941155,
+  word: "undergrad",
+  ipa: "/ˈʌndərɡræd/",
+  tags: ["大学生活", "リスニング頻出"],
+  senses: [
+    {
+      pos: "名詞",
+      ja: "学部生（大学院生ではない大学生）",
+      def: "an informal word for a university student who has not yet received a first degree",
+      ex: "Most undergrads live in the dorms during their first year.",
+      target: "undergrads",
+      exJa: "ほとんどの学部生は1年目は寮に住む。",
+      colloc: ["an undergrad student", "undergrad courses"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "under-", type: "接頭辞", mean: "下の・〜に達していない" },
+      { p: "grad", type: "語根", mean: "段階・卒業（ラテン語 gradus 一歩）" }
+    ],
+    note: "undergraduate の略。<b>まだ卒業（grad）に達していない（under）</b>学生。卒業後に進む大学院生は grad student。"
+  },
+  family: [
+    { w: "undergraduate", pos: "名", ja: "学部生（正式）" },
+    { w: "graduate", pos: "動", ja: "卒業する" },
+    { w: "grad student", pos: "名", ja: "大学院生" }
+  ],
+  mates: [
+    { w: "gradual", ja: "一歩 grad ずつの＝徐々の" },
+    { w: "upgrade", ja: "段階 grade を上げる" },
+    { w: "degree", ja: "段階＝学位・程度" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_0632.png",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.155Z"
+},
+{
+  id: 1791181941156,
+  word: "relatives",
+  ipa: "/ˈrelətɪvz/（単数 relative）",
+  tags: ["日常会話", "TOEFL"],
+  senses: [
+    {
+      pos: "名詞",
+      ja: "親戚・親類",
+      def: "members of your family",
+      ex: "Many students go home to visit their relatives during the winter break.",
+      target: "relatives",
+      exJa: "多くの学生は冬休みに帰省して親戚を訪ねる。",
+      colloc: ["close relatives", "distant relatives", "visit relatives"]
+    },
+    {
+      pos: "形容詞",
+      ja: "相対的な・比較上の（relative の形で）",
+      def: "considered in comparison with something else",
+      ex: "The relative cost of living in small towns is much lower.",
+      target: "relative",
+      exJa: "小さな町の生活費は比較的ずっと安い。",
+      colloc: ["relative to", "relative importance"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "re-", type: "接頭辞", mean: "元へ" },
+      { p: "lat", type: "語根", mean: "運ぶ（ラテン語 latus＝ferre の過去分詞）" },
+      { p: "-ive", type: "接尾辞", mean: "〜の性質の" }
+    ],
+    note: "<b>元へ運ばれる＝結びついている</b>ものから、「関係がある人＝親戚」、「他と結びつけて見る＝相対的な」の意味になった。"
+  },
+  family: [
+    { w: "relate", pos: "動", ja: "関連づける" },
+    { w: "relation", pos: "名", ja: "関係" },
+    { w: "relatively", pos: "副", ja: "比較的" },
+    { w: "relationship", pos: "名", ja: "関係・間柄" }
+  ],
+  mates: [
+    { w: "translate", ja: "向こうへ trans- 運ぶ＝訳す" },
+    { w: "legislate", ja: "法を運ぶ＝法律を制定する" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_0633.png",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.156Z"
+},
+{
+  id: 1791181941157,
+  word: "annual",
+  ipa: "/ˈænjuəl/",
+  tags: ["TOEFL", "アカデミック"],
+  senses: [
+    {
+      pos: "形容詞",
+      ja: "毎年恒例の・年1回の",
+      def: "happening once every year",
+      ex: "The university holds an annual festival to celebrate different cultures.",
+      target: "annual",
+      exJa: "その大学は多様な文化を祝う毎年恒例の祭りを開いている。",
+      colloc: ["an annual event", "an annual festival", "annual meeting"]
+    },
+    {
+      pos: "形容詞",
+      ja: "1年間の・年間の",
+      def: "calculated over a period of one year",
+      ex: "The company's annual income rose by ten percent last year.",
+      target: "annual",
+      exJa: "その会社の年間収入は昨年10%増えた。",
+      colloc: ["annual income", "annual rainfall", "annual budget"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "ann", type: "語根", mean: "年（ラテン語 annus）" },
+      { p: "-ual", type: "接尾辞", mean: "〜の" }
+    ],
+    note: "<b>年（ann）の</b>＝1年ごとの・1年間の。"
+  },
+  family: [
+    { w: "annually", pos: "副", ja: "毎年・年1回" }
+  ],
+  mates: [
+    { w: "anniversary", ja: "年 ann が回ってくる日＝記念日" },
+    { w: "biannual", ja: "年に2回 bi- の" },
+    { w: "millennium", ja: "千 mill の年＝千年紀" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_0634.png",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.157Z"
+},
+{
+  id: 1791181941158,
+  word: "nationwide",
+  ipa: "/ˌneɪʃənˈwaɪd/",
+  tags: ["TOEFL", "ニュース"],
+  senses: [
+    {
+      pos: "副詞",
+      ja: "全国的に",
+      def: "across the whole of a country",
+      ex: "The new policy will be introduced nationwide next spring.",
+      target: "nationwide",
+      exJa: "その新しい政策は来春、全国で導入される。",
+      colloc: ["spread nationwide", "be sold nationwide"]
+    },
+    {
+      pos: "形容詞",
+      ja: "全国的な",
+      def: "happening or existing in all parts of a country",
+      ex: "A nationwide survey found that young people read fewer newspapers.",
+      target: "nationwide",
+      exJa: "全国調査で若者は新聞を読む量が減っていることがわかった。",
+      colloc: ["a nationwide survey", "a nationwide campaign"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "nation", type: "語根", mean: "国（ラテン語 natio 生まれ）" },
+      { p: "-wide", type: "接尾辞", mean: "〜全体にわたる" }
+    ],
+    note: "<b>国（nation）全体に広がる（-wide）</b>。worldwide（世界中で）・campus-wide も同じ作り。"
+  },
+  family: [
+    { w: "nation", pos: "名", ja: "国・国民" },
+    { w: "national", pos: "形", ja: "国の・全国的な" }
+  ],
+  mates: [
+    { w: "native", ja: "生まれ nat の＝その土地生まれの" },
+    { w: "nature", ja: "生まれ nat たままのもの＝自然" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_0634.png",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.158Z"
+},
+{
+  id: 1791181941159,
+  word: "lawmakers",
+  ipa: "/ˈlɔːmeɪkərz/（単数 lawmaker）",
+  tags: ["TOEFL", "ニュース"],
+  senses: [
+    {
+      pos: "名詞",
+      ja: "立法者・国会議員",
+      def: "people, such as politicians, who make laws",
+      ex: "Lawmakers are debating a bill to reduce plastic waste.",
+      target: "Lawmakers",
+      exJa: "議員たちはプラスチックごみを減らす法案を議論している。",
+      colloc: ["state lawmakers", "lawmakers pass a bill"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "law", type: "語根", mean: "法（古英語 lagu 定められたもの）" },
+      { p: "make", type: "語根", mean: "作る" },
+      { p: "-er", type: "接尾辞", mean: "〜する人" }
+    ],
+    note: "<b>法（law）を作る（make）人（-er）</b>。ニュースでは legislators とほぼ同じ意味で使う。"
+  },
+  family: [
+    { w: "law", pos: "名", ja: "法律" },
+    { w: "lawyer", pos: "名", ja: "弁護士" },
+    { w: "lawful", pos: "形", ja: "合法の" }
+  ],
+  mates: [
+    { w: "legislator", ja: "法 leg を運ぶ人＝立法者" },
+    { w: "policymaker", ja: "政策を作る人" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_0634.png",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.159Z"
+},
+{
+  id: 1791181941160,
+  word: "retire",
+  ipa: "/rɪˈtaɪər/",
+  tags: ["TOEFL", "日常会話"],
+  senses: [
+    {
+      pos: "動詞",
+      ja: "（定年などで）退職する・引退する",
+      def: "to stop working because you have reached a certain age",
+      ex: "My grandfather retired at sixty-five and started volunteering at a library.",
+      target: "retired",
+      exJa: "祖父は65歳で退職し、図書館でボランティアを始めた。",
+      colloc: ["retire from", "retire early", "retired teacher"]
+    },
+    {
+      pos: "動詞",
+      ja: "（休むために）引き下がる・床につく",
+      def: "to go to a quiet place or to bed",
+      ex: "After dinner, the guests retired to the living room.",
+      target: "retired",
+      exJa: "夕食後、客たちは居間へ移った。",
+      colloc: ["retire to", "retire for the night"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "re-", type: "接頭辞", mean: "後ろへ" },
+      { p: "tire", type: "語根", mean: "引く（古フランス語 tirer）" }
+    ],
+    note: "<b>後ろへ（re-）引く（tire）</b>＝仕事から身を引く・部屋へ引き下がる。疲れる tired とは別の語。"
+  },
+  family: [
+    { w: "retirement", pos: "名", ja: "退職・引退" },
+    { w: "retired", pos: "形", ja: "退職した" },
+    { w: "retiree", pos: "名", ja: "退職者" }
+  ],
+  mates: [
+    { w: "tirade", ja: "長く引っぱる tir 演説＝長い非難" }
+  ],
+  confuse: [
+    { w: "resign", ja: "<b>retire</b> は年齢などで仕事人生を終えること、<b>resign</b> は自分の意思で特定の職を辞めること。" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_0634.png",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.160Z"
+},
+{
+  id: 1791181941161,
+  word: "eye-opening",
+  ipa: "/ˈaɪ ˌoʊpənɪŋ/",
+  tags: ["スピーキング", "アカデミック"],
+  senses: [
+    {
+      pos: "形容詞",
+      ja: "目を見張るような・目からうろこの",
+      def: "teaching you something surprising that you did not know before",
+      ex: "The lecture on climate data was eye-opening for many first-year students.",
+      target: "eye-opening",
+      exJa: "気候データについての講義は多くの1年生にとって目からうろこだった。",
+      colloc: ["an eye-opening experience", "truly eye-opening"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "eye", type: "語根", mean: "目" },
+      { p: "open", type: "語根", mean: "開く" },
+      { p: "-ing", type: "接尾辞", mean: "〜させるような" }
+    ],
+    note: "<b>目（eye）を開かせる（opening）</b>＝それまで見えていなかったことに気づかせる。名詞 eye-opener（目を開かせるもの）もある。"
+  },
+  family: [
+    { w: "eye-opener", pos: "名", ja: "目を開かせる出来事・驚くべき新事実" }
+  ],
+  mates: [
+    { w: "mind-blowing", ja: "頭 mind が吹き飛ぶほど驚きの" },
+    { w: "jaw-dropping", ja: "あごが落ちるほど驚きの" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_2028.PNG",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.161Z"
+},
+{
+  id: 1791181941162,
+  word: "crucial",
+  ipa: "/ˈkruːʃəl/",
+  tags: ["TOEFL", "ライティング頻出"],
+  senses: [
+    {
+      pos: "形容詞",
+      ja: "極めて重要な・決定的な",
+      def: "extremely important because other things depend on it",
+      ex: "Sleep is crucial for students who want to remember what they learn.",
+      target: "crucial",
+      exJa: "学んだことを覚えておきたい学生にとって、睡眠は極めて重要だ。",
+      colloc: ["play a crucial role", "crucial for", "a crucial decision"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "cruc", type: "語根", mean: "十字（ラテン語 crux）" },
+      { p: "-ial", type: "接尾辞", mean: "〜の" }
+    ],
+    note: "<b>十字路（cruc）</b>＝道が分かれる決定的な地点から「結果を左右するほど重要な」。"
+  },
+  family: [
+    { w: "crucially", pos: "副", ja: "決定的に・重要なことに" },
+    { w: "crux", pos: "名", ja: "核心・最重要点" }
+  ],
+  mates: [
+    { w: "cross", ja: "十字 cruc" },
+    { w: "crusade", ja: "十字 cruc を掲げた遠征＝改革運動" }
+  ],
+  confuse: [
+    { w: "important / essential", ja: "<b>crucial</b> は「それ次第で結果が決まる」ほど重要。important より強く、essential（不可欠な）に近い。" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_2028.PNG",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.162Z"
+},
+{
+  id: 1791181941163,
+  word: "vague",
+  ipa: "/veɪɡ/",
+  tags: ["TOEFL", "アカデミック"],
+  senses: [
+    {
+      pos: "形容詞",
+      ja: "（説明・考えが）曖昧な・はっきりしない",
+      def: "not clear or detailed enough",
+      ex: "The instructions for the assignment were so vague that many students got confused.",
+      target: "vague",
+      exJa: "課題の指示があまりに曖昧で、多くの学生が混乱した。",
+      colloc: ["a vague answer", "vague about", "vague instructions"]
+    },
+    {
+      pos: "形容詞",
+      ja: "（記憶・形が）ぼんやりした",
+      def: "not clearly remembered or seen",
+      ex: "I only have a vague memory of my first day of school.",
+      target: "vague",
+      exJa: "学校初日のことはぼんやりとしか覚えていない。",
+      colloc: ["a vague memory", "a vague idea"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "vag", type: "語根", mean: "さまよう（ラテン語 vagari）" },
+      { p: "-ue", type: "接尾辞", mean: "形容詞の語尾" }
+    ],
+    note: "<b>さまよって（vag）定まらない</b>＝焦点がはっきりしない。"
+  },
+  family: [
+    { w: "vaguely", pos: "副", ja: "ぼんやりと" },
+    { w: "vagueness", pos: "名", ja: "曖昧さ" }
+  ],
+  mates: [
+    { w: "vagabond", ja: "さまよう vag 人＝放浪者" },
+    { w: "extravagant", ja: "外へ extra- さまよい出る＝度を越した" }
+  ],
+  confuse: [
+    { w: "ambiguous", ja: "<b>vague</b> は情報が足りずぼんやりしていること、<b>ambiguous</b> は2通り以上に解釈できること。" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_2028.PNG",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.163Z"
+},
+{
+  id: 1791181941164,
+  word: "solid",
+  ipa: "/ˈsɑːlɪd/",
+  tags: ["TOEFL", "スピーキング"],
+  senses: [
+    {
+      pos: "形容詞",
+      ja: "（議論・証拠が）しっかりした・信頼できる",
+      def: "strong and reliable; based on good reasons or facts",
+      ex: "His argument is solid because it is supported by clear data.",
+      target: "solid",
+      exJa: "彼の主張ははっきりしたデータに裏づけられているので信頼できる。",
+      colloc: ["solid evidence", "a solid argument", "a solid plan"]
+    },
+    {
+      pos: "形容詞",
+      ja: "固体の・固い",
+      def: "hard or firm, not liquid or gas",
+      ex: "Water becomes solid when the temperature drops below zero.",
+      target: "solid",
+      exJa: "気温が0度を下回ると水は固体になる。",
+      colloc: ["solid food", "solid ground"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "sol", type: "語根", mean: "まるごとの・しっかりした（ラテン語 solidus）" },
+      { p: "-id", type: "接尾辞", mean: "〜の状態の" }
+    ],
+    note: "<b>中身が詰まってしっかりした（sol）</b>状態から、物なら「固体の」、話なら「根拠がしっかりした」。"
+  },
+  family: [
+    { w: "solidly", pos: "副", ja: "しっかりと" },
+    { w: "solidify", pos: "動", ja: "固める・強固にする" },
+    { w: "solidarity", pos: "名", ja: "団結・連帯" }
+  ],
+  mates: [
+    { w: "consolidate", ja: "共に con- しっかりさせる＝強化する・統合する" },
+    { w: "soldier", ja: "給料（solidus 金貨）をもらう兵" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_2028.PNG",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.164Z"
+},
+{
+  id: 1791181941165,
+  word: "disorganized",
+  ipa: "/dɪsˈɔːrɡənaɪzd/",
+  tags: ["TOEFL", "ライティング"],
+  senses: [
+    {
+      pos: "形容詞",
+      ja: "（文章・計画が）整理されていない・まとまりがない",
+      def: "not arranged in a clear order",
+      ex: "The essay was disorganized, so the main idea was hard to follow.",
+      target: "disorganized",
+      exJa: "そのエッセイはまとまりがなく、主張がわかりにくかった。",
+      colloc: ["a disorganized essay", "feel disorganized"]
+    },
+    {
+      pos: "形容詞",
+      ja: "（人が）段取りが悪い・だらしない",
+      def: "not good at planning or arranging things",
+      ex: "He is so disorganized that he often forgets his deadlines.",
+      target: "disorganized",
+      exJa: "彼は段取りが悪くて、よく締め切りを忘れる。",
+      colloc: ["a disorganized person"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "dis-", type: "接頭辞", mean: "反対・否定" },
+      { p: "organ", type: "語根", mean: "道具・器官（ギリシャ語 organon）" },
+      { p: "-ized", type: "接尾辞", mean: "〜化された" }
+    ],
+    note: "<b>組織立てられて（organized）いない（dis-）</b>。organ は「それぞれの役割を持つ部品」で、部品が正しく並んでいない状態。"
+  },
+  family: [
+    { w: "organize", pos: "動", ja: "整理する・組織する" },
+    { w: "organized", pos: "形", ja: "整理された・きちんとした" },
+    { w: "organization", pos: "名", ja: "組織・構成" }
+  ],
+  mates: [
+    { w: "organism", ja: "器官 organ を持つもの＝生物" },
+    { w: "organic", ja: "器官 organ の＝有機の" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_2028.PNG",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.165Z"
+},
+{
+  id: 1791181941166,
+  word: "convincing",
+  ipa: "/kənˈvɪnsɪŋ/",
+  tags: ["TOEFL", "ライティング頻出"],
+  senses: [
+    {
+      pos: "形容詞",
+      ja: "説得力のある・納得させる",
+      def: "able to make you believe that something is true",
+      ex: "The researcher gave convincing evidence that the new method works.",
+      target: "convincing",
+      exJa: "研究者はその新しい方法が有効だという説得力のある証拠を示した。",
+      colloc: ["convincing evidence", "a convincing argument", "not very convincing"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "con-", type: "接頭辞", mean: "完全に" },
+      { p: "vinc", type: "語根", mean: "打ち負かす（ラテン語 vincere）" },
+      { p: "-ing", type: "接尾辞", mean: "〜させるような" }
+    ],
+    note: "<b>完全に（con-）打ち負かす（vinc）</b>＝反論できなくさせる、から「納得させる」。"
+  },
+  family: [
+    { w: "convince", pos: "動", ja: "納得させる・確信させる" },
+    { w: "convinced", pos: "形", ja: "確信している" },
+    { w: "conviction", pos: "名", ja: "確信・有罪判決" }
+  ],
+  mates: [
+    { w: "invincible", ja: "打ち負かせ vinc ない in-＝無敵の" },
+    { w: "victory", ja: "打ち負かすこと＝勝利" },
+    { w: "province", ja: "打ち負かして得た土地＝州" }
+  ],
+  confuse: [
+    { w: "convinced", ja: "<b>convincing</b> は話や証拠が「人を納得させる」、<b>convinced</b> は人が「納得している」。" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_2028.PNG",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.166Z"
+},
+{
+  id: 1791181941167,
+  word: "thought-provoking",
+  ipa: "/ˈθɔːt prəˌvoʊkɪŋ/",
+  tags: ["スピーキング", "アカデミック"],
+  senses: [
+    {
+      pos: "形容詞",
+      ja: "考えさせられる・示唆に富む",
+      def: "making you think seriously about a subject",
+      ex: "The documentary was thought-provoking and led to a long class discussion.",
+      target: "thought-provoking",
+      exJa: "そのドキュメンタリーは考えさせられるもので、授業で長い議論になった。",
+      colloc: ["a thought-provoking book", "thought-provoking questions"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "thought", type: "語根", mean: "考え" },
+      { p: "pro-", type: "接頭辞", mean: "前へ" },
+      { p: "vok", type: "語根", mean: "呼ぶ（ラテン語 vocare）" },
+      { p: "-ing", type: "接尾辞", mean: "〜させるような" }
+    ],
+    note: "<b>考え（thought）を前へ呼び出す（provoke）</b>＝自然と考えを引き出す。"
+  },
+  family: [
+    { w: "provoke", pos: "動", ja: "引き起こす・挑発する" },
+    { w: "provocative", pos: "形", ja: "挑発的な・刺激的な" }
+  ],
+  mates: [
+    { w: "advocate", ja: "〜へ ad- 呼びかける＝支持する" },
+    { w: "vocal", ja: "声 voc の" },
+    { w: "evoke", ja: "外へ e- 呼び出す＝呼び起こす" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_2029.PNG",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.167Z"
+},
+{
+  id: 1791181941168,
+  word: "fundamental",
+  ipa: "/ˌfʌndəˈmentəl/",
+  tags: ["TOEFL", "アカデミック"],
+  senses: [
+    {
+      pos: "形容詞",
+      ja: "基礎的な・根本的な",
+      def: "forming the basic and most important part of something",
+      ex: "This introductory class covers the fundamental ideas of economics.",
+      target: "fundamental",
+      exJa: "この入門の授業は経済学の基礎的な考え方を扱う。",
+      colloc: ["fundamental principles", "a fundamental change", "fundamental to"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "fund", type: "語根", mean: "底・土台（ラテン語 fundus）" },
+      { p: "-ment", type: "接尾辞", mean: "名詞を作る" },
+      { p: "-al", type: "接尾辞", mean: "〜の" }
+    ],
+    note: "<b>土台（fund）の</b>＝建物を支える一番下の部分のように、すべての元になる。"
+  },
+  family: [
+    { w: "fundamentally", pos: "副", ja: "根本的に" },
+    { w: "fundamentals", pos: "名", ja: "基本・基礎" }
+  ],
+  mates: [
+    { w: "foundation", ja: "土台 found を据えること＝基礎" },
+    { w: "profound", ja: "底 fund の前まで pro-＝深い" },
+    { w: "fund", ja: "土台となるお金＝資金" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_2029.PNG",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.168Z"
+},
+{
+  id: 1791181941169,
+  word: "FOMO",
+  ipa: "/ˈfoʊmoʊ/",
+  tags: ["スラング", "SNS"],
+  senses: [
+    {
+      pos: "名詞",
+      ja: "取り残される不安（見逃すことへの恐れ）",
+      def: "a worried feeling that other people are having fun or doing interesting things without you",
+      ex: "Using social media can lead to FOMO when you see friends at parties.",
+      target: "FOMO",
+      exJa: "友達がパーティーにいるのを見ると、SNSの利用は取り残される不安につながりうる。",
+      colloc: ["have FOMO", "get FOMO", "FOMO from social media"]
+    }
+  ],
+  origin: {
+    parts: [
+      { p: "F(ear)", type: "語根", mean: "恐れ" },
+      { p: "O(f)", type: "語根", mean: "〜の" },
+      { p: "M(issing)", type: "語根", mean: "逃すこと" },
+      { p: "O(ut)", type: "語根", mean: "外に・すっかり" }
+    ],
+    note: "<b>Fear Of Missing Out</b> の頭文字。miss out（いい機会を逃す）への恐れ。2000年代にSNSとともに広まった。"
+  },
+  family: [
+    { w: "miss out", pos: "動", ja: "（いい機会を）逃す" }
+  ],
+  mates: [
+    { w: "YOLO", ja: "You Only Live Once＝人生一度きり" },
+    { w: "JOMO", ja: "Joy Of Missing Out＝逃すことを楽しむ" }
+  ],
+  memo: "",
+  src: "photo",
+  srcRef: "speak_exploit/IMG_2030.PNG",
+  srcFrom: "アプリspeak",
+  savedAt: "2026-10-05T06:32:21.169Z"
 }
 ];
 
@@ -18274,7 +19154,7 @@ function noteWords() { return WORDS.filter(isNoteWord); }
 function noteFilterOn() { return !!PREFS.noteOnly && noteWords().length > 0; }
 /* 📚 保存済み単語の一覧に出す元の集合（検索語 q で絞る） */
 function polishedBase(q) {
-  const base = noteFilterOn() ? noteWords() : webFilterOn() ? webWords() : WORDS;
+  const base = noteFilterOn() ? noteWords() : webFilterOn() ? webWords() : photoFilterOn() ? photoWords() : WORDS;
   return base.filter(w => matchWord(w, q));
 }
 function noteSrcLabel(w) { return String(w.srcRef || '').split('/').filter(Boolean).join(' ・ '); }
@@ -18310,6 +19190,32 @@ function updateWebOnlyBtn() {
   btn.classList.toggle('on', webFilterOn());
 }
 
+/* ================= 📷 写真から =================
+   /photo-phrase-add が英語と日本語訳の載った写真（SNS・アプリのスクショなど）から
+   取り込んだ単語には src: "photo"、srcRef（"フォルダ名/画像名"）、
+   読めたときは srcFrom（"@投稿者" やアプリ名）が付く。 */
+function isPhotoWord(w) { return !!(w && w.src === 'photo'); }
+/* アプリ名が出典（srcFrom が「アプリ〜」）のものは「📱 アプリ〜から」と出す */
+function isAppPhotoWord(w) { return isPhotoWord(w) && /^アプリ/.test(String(w.srcFrom || '')); }
+function photoWords() { return WORDS.filter(isPhotoWord); }
+function photoFilterOn() { return !!PREFS.photoOnly && photoWords().length > 0; }
+function photoSrcLabel(w) {
+  return [w.srcFrom, ...String(w.srcRef || '').split('/')].map(s => String(s || '').trim()).filter(Boolean).join(' ・ ');
+}
+function photoSrcHtml(w) {
+  if (!isPhotoWord(w)) return '';
+  const label = photoSrcLabel(w);
+  return label ? '<div class="w-src photo">出典: ' + escapeHtml(label) + '</div>' : '';
+}
+function updatePhotoOnlyBtn() {
+  const btn = document.getElementById('photoOnlyBtn');
+  if (!btn) return;
+  const n = photoWords().length;
+  btn.hidden = !n;
+  btn.textContent = '📷 写真から（' + n + '）';
+  btn.classList.toggle('on', photoFilterOn());
+}
+
 function wordCardHtml(w, opts) {
   opts = opts || {};
   const st = statusOf(w.id);
@@ -18323,10 +19229,12 @@ function wordCardHtml(w, opts) {
   h += '<div class="w-tags"><span class="tag st-' + st.k + '">' + st.label + '</span>'
     + (isNoteWord(w) ? '<span class="tag src-note">📓 ノートから</span>' : '')
     + (isWebWord(w) ? '<span class="tag src-web">🌐 調べて</span>' : '')
+    + (isPhotoWord(w) ? '<span class="tag src-photo">' + (isAppPhotoWord(w) ? '📱 ' + escapeHtml(w.srcFrom) + 'から' : '📷 写真から') + '</span>' : '')
     + (s.ok + s.ng ? '<span class="tag">正答 ' + s.ok + '/' + (s.ok + s.ng) + '</span>' : '')
     + (w.tags || []).map(t => '<span class="tag">' + escapeHtml(t) + '</span>').join('') + '</div>';
   if (isNoteWord(w) && w.srcRef) h += '<div class="w-src">出典: ' + escapeHtml(noteSrcLabel(w)) + '</div>';
   h += webSrcHtml(w);
+  h += photoSrcHtml(w);
   (w.senses || []).forEach((sn, i) => { h += senseHtml(w, sn, i); });
   const detail = originHtml(w) + familyHtml(w) + matesHtml(w) + confuseHtml(w);
   if (detail) {
@@ -18473,7 +19381,7 @@ function renderPending() {
 function matchWord(w, q) {
   if (!q) return true;
   const s = q.toLowerCase();
-  const hay = [w.word, w.ipa || '', memoOf(w), (w.tags || []).join(' '), w.srcRef || '',
+  const hay = [w.word, w.ipa || '', memoOf(w), (w.tags || []).join(' '), w.srcRef || '', w.srcFrom || '',
     (w.senses || []).map(x => [x.ja, x.def, x.ex, x.exJa, (x.colloc || []).join(' ')].join(' ')).join(' '),
     (w.family || []).map(f => f.w + f.ja).join(' '),
     (w.mates || []).map(f => f.w + f.ja).join(' '),
@@ -18518,8 +19426,9 @@ function renderPolished() {
   tb.hidden = PREFS.view !== 'week';
   updateNoteOnlyBtn();
   updateWebOnlyBtn();
+  updatePhotoOnlyBtn();
   if (!list.length) {
-    el.innerHTML = '<div class="empty">' + (q ? '「' + escapeHtml(q) + '」に一致する' + (noteFilterOn() ? 'ノートからの' : webFilterOn() ? '調べて取り込んだ' : '') + '単語はありません。' : 'まだ保存済み単語がありません。') + '</div>';
+    el.innerHTML = '<div class="empty">' + (q ? '「' + escapeHtml(q) + '」に一致する' + (noteFilterOn() ? 'ノートからの' : webFilterOn() ? '調べて取り込んだ' : photoFilterOn() ? '写真から取り込んだ' : '') + '単語はありません。' : 'まだ保存済み単語がありません。') + '</div>';
     return;
   }
   if (PREFS.view === 'flat') {
@@ -18575,6 +19484,7 @@ function renderWeeks() {
         + '<span class="mw">' + escapeHtml(w.word) + '</span>'
         + (isNoteWord(w) ? '<span class="mnote" title="ノートから">📓 ノート</span>' : '')
         + (isWebWord(w) ? '<span class="mnote web" title="調べて">🌐 調べて</span>' : '')
+        + (isPhotoWord(w) ? '<span class="mnote photo" title="写真から">' + (isAppPhotoWord(w) ? '📱 ' + escapeHtml(w.srcFrom) : '📷 写真') + '</span>' : '')
         + '<span class="mj hid" onclick="this.classList.remove(\'hid\')">' + escapeHtml((w.senses[0] || {}).ja || '') + '</span>'
         + favBtnHtml(w.id) + '</div>').join('')
     ).join('');
@@ -18831,6 +19741,7 @@ function sourceWords(week) {
   if (week === 'weak') return weakWords();
   if (week === 'note') return noteWords();
   if (week === 'web') return webWords();
+  if (week === 'photo') return photoWords();
   return WORDS.filter(w => weekKeyOf(w.savedAt) === week);
 }
 function makeQuestion(w, kind, pool) {
@@ -18897,6 +19808,7 @@ function renderTestSetup() {
     + '<option value="weak">⚠️ 苦手な単語（' + weakWords().length + '語）</option>'
     + (noteWords().length ? '<option value="note">📓 ノートから（' + noteWords().length + '語）</option>' : '')
     + (webWords().length ? '<option value="web">🌐 調べて（' + webWords().length + '語）</option>' : '')
+    + (photoWords().length ? '<option value="photo">📷 写真から（' + photoWords().length + '語）</option>' : '')
     + gs.map(g => '<option value="' + g.key + '">📅 ' + g.label + (g.key === THIS_WEEK_KEY ? '（今週）' : '') + ' — ' + g.items.length + '語</option>').join('');
   if (cur) sel.value = cur;
   document.getElementById('testSetupInfo').innerHTML =
@@ -18908,7 +19820,7 @@ function renderTestHistory() {
   const h = (U.hist || []).slice(0, 12);
   if (!h.length) { el.innerHTML = '<div class="empty">まだテスト履歴がありません。</div>'; return; }
   el.innerHTML = h.map(x => {
-    const label = x.week === 'all' ? '全期間' : x.week === 'favs' ? '⭐お気に入り' : x.week === 'due' ? '🔁今日の復習' : x.week === 'note' ? '📓ノートから' : x.week === 'web' ? '🌐調べて' : x.week === 'weak' ? '⚠️苦手' : weekRangeLabel(x.week);
+    const label = x.week === 'all' ? '全期間' : x.week === 'favs' ? '⭐お気に入り' : x.week === 'due' ? '🔁今日の復習' : x.week === 'note' ? '📓ノートから' : x.week === 'web' ? '🌐調べて' : x.week === 'photo' ? '📷写真から' : x.week === 'weak' ? '⚠️苦手' : weekRangeLabel(x.week);
     return '<div class="hist-row"><span>' + fmtDateShort(x.at) + ' ' + label + '<span style="color:var(--sub);font-size:0.76rem"> / ' + (KIND_LABEL[x.kind] || 'ミックス') + '</span></span>'
       + '<span class="hs">' + x.correct + '/' + x.n + '（' + Math.round(x.correct / x.n * 100) + '%）</span></div>';
   }).join('');
@@ -19240,13 +20152,19 @@ function bind() {
   document.getElementById('wkExpandBtn').addEventListener('click', toggleAllWeeks);
   document.getElementById('noteOnlyBtn').addEventListener('click', () => {
     PREFS.noteOnly = !noteFilterOn();
-    if (PREFS.noteOnly) PREFS.webOnly = false;
+    if (PREFS.noteOnly) { PREFS.webOnly = false; PREFS.photoOnly = false; }
     savePrefs();
     renderPolished();
   });
   document.getElementById('webOnlyBtn').addEventListener('click', () => {
     PREFS.webOnly = !webFilterOn();
-    if (PREFS.webOnly) PREFS.noteOnly = false;
+    if (PREFS.webOnly) { PREFS.noteOnly = false; PREFS.photoOnly = false; }
+    savePrefs();
+    renderPolished();
+  });
+  document.getElementById('photoOnlyBtn').addEventListener('click', () => {
+    PREFS.photoOnly = !photoFilterOn();
+    if (PREFS.photoOnly) { PREFS.noteOnly = false; PREFS.webOnly = false; }
     savePrefs();
     renderPolished();
   });
