@@ -322,6 +322,20 @@
   .self-btns { display: flex; gap: 8px; margin-top: 12px; }
   .self-btns button { flex: 1; padding: 13px; border-radius: 10px; font-size: 0.92rem; font-weight: 700; border: none; }
   .self-ok { background: var(--green-bg); color: var(--green); }
+  /* 空欄で答え合わせしたときの自己採点（100〜0%の6段階。3×2で並ぶ） */
+  .self-label { font-size: 0.8rem; color: var(--sub); font-weight: 700; margin-top: 12px; }
+  .self-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 6px; }
+  .self-grid button { border-radius: 10px; padding: 11px 4px; font-size: 0.95rem; font-weight: 700; border: 1px solid; }
+  .self-grid .s-ok { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+  .self-grid .s-mid { background: var(--orange-bg); border-color: var(--orange); color: var(--orange); }
+  .self-grid .s-ng { background: var(--red-bg); border-color: var(--red); color: var(--red); }
+  /* 削除 */
+  .del-btn { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 3px 9px; font-size: 0.78rem; color: var(--sub); }
+  .del-box { margin-top: 14px; }
+  .del-box summary { font-size: 0.85rem; color: var(--sub); cursor: pointer; padding: 6px 0; }
+  .del-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+  .del-row .dw { font-weight: 700; }
+  .del-row .dj { flex: 1; color: var(--sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .self-ng { background: var(--red-bg); color: var(--red); }
   .score-big { font-size: 2.1rem; font-weight: 800; text-align: center; color: var(--teal-dark); }
   .score-sub { text-align: center; font-size: 0.85rem; color: var(--sub); margin-top: 4px; }
@@ -657,6 +671,7 @@
     </div>
   </div>
   <div id="polishedList"></div>
+  <div id="delBox"></div>
   <div class="sync-line">端末間の共有（メモ・お気に入り・成績）: <span id="syncLabel">確認中…</span> ／ <a id="syncChange">合言葉を変更</a></div>
 
 </section>
@@ -32592,7 +32607,7 @@ const PREF_KEY = 'vocabNote_prefs';
 const PENDING_KEY = 'vocabNote_pending';
 
 function blankUser() {
-  return { memos: {}, favs: {}, srs: {}, stats: {}, hist: [], qhist: [], days: {}, motiv: null, updatedAt: 0 };
+  return { memos: {}, favs: {}, dels: {}, srs: {}, stats: {}, hist: [], qhist: [], days: {}, motiv: null, updatedAt: 0 };
 }
 let U = blankUser();
 function loadUser() {
@@ -32601,7 +32616,7 @@ function loadUser() {
     if (raw) {
       const o = JSON.parse(raw);
       U = Object.assign(blankUser(), o || {});
-      ['memos', 'favs', 'srs', 'stats', 'days'].forEach(k => { if (!U[k] || typeof U[k] !== 'object') U[k] = {}; });
+      ['memos', 'favs', 'dels', 'srs', 'stats', 'days'].forEach(k => { if (!U[k] || typeof U[k] !== 'object') U[k] = {}; });
       if (!Array.isArray(U.hist)) U.hist = [];
       if (!Array.isArray(U.qhist)) U.qhist = [];   /* 1問ごとの学習の履歴 */
     }
@@ -32680,7 +32695,7 @@ function initSync() {
 }
 function mergeRemote(r) {
   let changed = false;
-  ['memos', 'favs'].forEach(k => {
+  ['memos', 'favs', 'dels'].forEach(k => {
     const rm = r[k] || {};
     Object.keys(rm).forEach(id => {
       const a = U[k][id], b = rm[id];
@@ -32833,6 +32848,50 @@ function favWords() {
     .sort((a, b) => (U.favs[String(b.id)].t || 0) - (U.favs[String(a.id)].t || 0));
 }
 function statOf(id) { return U.stats[String(id)] || { ok: 0, ng: 0, last: 0 }; }
+
+/* ================= 削除（2026-10-06） =================
+   埋め込みデータ(WORDS)は書き換えず、削除した語を U.dels に {t, on} で持って画面から外す。
+   合言葉で同期（お気に入りと同じ項目ごとの新しい方採用）。「削除した単語」から元に戻せる。
+   ALL_WORDS が元の全件、WORDS は削除を除いた残り（同じ配列を詰め直すので他の処理はそのまま） */
+const ALL_WORDS = WORDS.slice();
+function isDel(id) { const d = U.dels[String(id)]; return !!(d && d.on); }
+function applyDels() {
+  const keep = ALL_WORDS.filter(w => !isDel(w.id));
+  WORDS.length = 0;
+  keep.forEach(w => WORDS.push(w));
+}
+function delWords() {
+  return ALL_WORDS.filter(w => isDel(w.id))
+    .sort((a, b) => (U.dels[String(b.id)].t || 0) - (U.dels[String(a.id)].t || 0));
+}
+function deleteWord(id) {
+  const w = ALL_WORDS.find(x => String(x.id) === String(id));
+  if (!w) return;
+  if (!confirm('「' + w.word + '」を削除しますか？\n（一覧・復習・テストに出なくなります。下の「🗑 削除した単語」から元に戻せます）')) return;
+  U.dels[String(id)] = { t: Date.now(), on: true };
+  saveUser();
+  applyDels();
+  refreshAll();
+  showToast('🗑 「' + w.word + '」を削除しました');
+}
+function restoreWord(id) {
+  U.dels[String(id)] = { t: Date.now(), on: false };
+  saveUser();
+  applyDels();
+  refreshAll();
+  showToast('↩ 元に戻しました');
+}
+function renderDelBox() {
+  const el = document.getElementById('delBox');
+  if (!el) return;
+  const ds = delWords();
+  if (!ds.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<details class="del-box"><summary>🗑 削除した単語（' + ds.length + '語）</summary>'
+    + ds.map(w => '<div class="del-row"><span class="dw">' + escapeHtml(w.word) + '</span>'
+      + '<span class="dj">' + escapeHtml(((w.senses || [])[0] || {}).ja || '') + '</span>'
+      + '<button class="btn-mini" onclick="restoreWord(' + w.id + ')">↩ 元に戻す</button></div>').join('')
+    + '</details>';
+}
 function statusOf(id) {
   const s = statOf(id), sr = U.srs[String(id)];
   const n = s.ok + s.ng;
@@ -33868,7 +33927,7 @@ function wordCardHtml(w, opts) {
   }
   h += memoHtml(w);
   h += '<div class="card-foot"><span>追加: ' + fmtDateFull(w.savedAt) + '</span>'
-    + '<span>' + (w.senses || []).length + 'つの意味</span></div>';
+    + '<span>' + (w.senses || []).length + 'つの意味　<button class="del-btn" onclick="deleteWord(' + w.id + ')">🗑 削除</button></span></div>';
   return h + '</div>';
 }
 
@@ -34044,6 +34103,7 @@ function toggleAllWeeks() {
   renderPolished();
 }
 function renderPolished() {
+  renderDelBox();
   const q = document.getElementById('searchBox').value.trim();
   let list = polishedBase(q);
   const el = document.getElementById('polishedList');
@@ -34507,7 +34567,7 @@ function renderQuestion() {
   } else if (q.kind === 'oral') {
     h += '<div class="row-btns"><button class="btn-primary" onclick="revealOral()">答えを表示</button></div>';
   } else {
-    h += '<input type="text" class="ans-input" id="ansInput" style="margin-top:14px" placeholder="英語で入力" autocomplete="off" autocapitalize="none" spellcheck="false">'
+    h += '<input type="text" class="ans-input" id="ansInput" style="margin-top:14px" placeholder="英語で入力（空欄なら答えを見て自己採点）" autocomplete="off" autocapitalize="none" spellcheck="false">'
       + '<button class="btn-save" onclick="answerTyped()">答え合わせ</button>';
   }
   h += '<div id="judgeBox"></div></div>';
@@ -34528,12 +34588,12 @@ function queueAgain(q, correct) {
   if (T.qs.some(x => x.again && x.w.id === q.w.id)) return;
   T.qs.push(Object.assign({}, q, { again: true }));
 }
-function recordAnswer(q, correct, userAns) {
+function recordAnswer(q, correct, userAns, selfPct) {
   if (q.again) return;   // おかわりは記録に入れない（箱も成績も1回目のまま）
   srsUpdate(q.w.id, correct);
   mvGain(correct);   /* やる気の記録（連続日数・XP・バッジ） */
-  hsAdd({ q: histQ(q), a: q.answer, p: correct ? 100 : 0,
-          k: (KIND_LABEL[q.kind] || '') + '（' + q.w.word + '）' });   /* 学習の履歴 */
+  hsAdd({ q: histQ(q), a: q.answer, p: selfPct != null ? selfPct : (correct ? 100 : 0),
+          k: (KIND_LABEL[q.kind] || '') + (selfPct != null ? '・自己採点' : '') + '（' + q.w.word + '）' });   /* 学習の履歴 */
   T.res.push({ q: q, ok: correct, user: userAns || '' });
   queueAgain(q, correct);
 }
@@ -34571,7 +34631,7 @@ function answerTyped() {
   const q = T.qs[T.i];
   const inp = document.getElementById('ansInput');
   const val = inp ? inp.value : '';
-  if (!normAns(val)) { showToast('答えを入力してください'); return; }
+  if (!normAns(val)) { revealTypedSelf(); return; }   // 空欄でも提出できる → 答えを見て自己採点
   T.answered = true;
   if (inp) inp.disabled = true;
   const accept = (q.accept || [q.answer]).map(normAns);
@@ -34593,6 +34653,34 @@ function revealOral() {
   h += '<div class="self-btns"><button class="self-ok" onclick="selfJudge(true)">⭕️ 言えた</button>'
     + '<button class="self-ng" onclick="selfJudge(false)">❌ 言えなかった</button></div>';
   document.getElementById('judgeBox').innerHTML = h;
+}
+/* ---- 空欄で答え合わせ → 自己採点（2026-10-06） ----
+   書く形式（英単語を書く・例文穴埋め・語族）で何も入れずに答え合わせしたら、答えを見せて
+   100/80/60/40/20/0% の6段階で自分で付ける。80%以上＝正解（箱が上がる）、それ未満＝不正解。
+   押した瞬間が答え合わせ（表現メモの自己採点と同じ区切り） */
+const SELF_SCORES = [100, 80, 60, 40, 20, 0];
+function selfCls(v) { return v >= 80 ? 's-ok' : (v >= 40 ? 's-mid' : 's-ng'); }
+function revealTypedSelf() {
+  if (T.answered) return;
+  T.answered = true;
+  const q = T.qs[T.i];
+  const inp = document.getElementById('ansInput');
+  if (inp) inp.disabled = true;
+  document.querySelectorAll('#testRun .btn-save').forEach(b => { b.hidden = true; });
+  document.getElementById('judgeBox').innerHTML =
+    '<div class="ans-line" style="margin-top:12px">' + escapeHtml(q.answer) + '</div>'
+    + '<div style="text-align:center;margin-top:6px"><button class="play-btn" data-icon="🔊" onclick="playAudio(this,\'' + wordAudio(q.w.id) + '\')">🔊</button></div>'
+    + '<div class="self-label">答えを見て、どれくらい分かっていた？（押すと採点）</div>'
+    + '<div class="self-grid">' + SELF_SCORES.map(v =>
+      '<button class="' + selfCls(v) + '" onclick="selfScore(' + v + ')">' + v + '%</button>').join('') + '</div>'
+    + '<div class="q-sub" style="margin-top:6px">80%以上＝正解（次に出るまでの間隔が延びる）／それ未満＝不正解</div>';
+}
+function selfScore(v) {
+  const q = T.qs[T.i];
+  const ok = v >= 80;
+  recordAnswer(q, ok, '', v);
+  document.getElementById('judgeBox').innerHTML =
+    '<div class="q-sub" style="margin-top:12px">自己採点 ' + v + '%</div>' + judgeBoxHtml(q, ok, '', false);
 }
 function selfJudge(ok) {
   const q = T.qs[T.i];
@@ -34887,6 +34975,7 @@ function refreshAll() {
 }
 function init() {
   loadUser();
+  applyDels();
   loadPrefs();
   loadSeqPrefs();
   document.querySelectorAll('#viewSeg .seg-btn').forEach(x => x.classList.toggle('active', x.dataset.pview === PREFS.view));
@@ -34900,7 +34989,7 @@ function init() {
   renderPolished();
   updateCounts();
   paintSync();
-  initSync().then(changed => { if (changed) refreshAll(); paintSync(); });
+  initSync().then(changed => { if (changed) { applyDels(); refreshAll(); } paintSync(); });
 }
 init();
 </script>
