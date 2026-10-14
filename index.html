@@ -39236,10 +39236,12 @@ init();
   var N = 30, CK = 'sns_gate_cache2', PK = 'sns_gate_pend';   /* PK = まだクラウドへ送れていない問数 */
   var DAILY = 'https://andou0902haruka-code.github.io/ai-english-test/daily/';
   var APPS = [
-    { k: 'youtube', nm: 'YouTube', url: 'youtube://', min: 30 },
-    { k: 'x', nm: 'X', url: 'twitter://', min: 5 },
-    { k: 'instagram', nm: 'Instagram', url: 'instagram://', min: 5 }
+    { k: 'youtube', nm: 'YouTube', url: 'youtube://', web: 'https://www.youtube.com/', min: 30 },
+    { k: 'x', nm: 'X', url: 'twitter://', web: 'https://x.com/', min: 5 },
+    { k: 'instagram', nm: 'Instagram', url: 'instagram://', web: 'https://www.instagram.com/', min: 5 }
   ];
+  /* iPhone はアプリを開く。Mac などはブラウザで開く（Chrome拡張「SNSゲート」が時間を見張る） */
+  var MOBILE = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/.test(navigator.userAgent || '');
   var FB = 'https://www.gstatic.com/firebasejs/10.14.1/';
   var st = load(), ref = null, db = null, pend = loadPend(), subs = [], lastHave = null;
 
@@ -39438,7 +39440,7 @@ init();
       return '<div class="sg-app-row' + (left ? ' on' : '') + '">'
         + '<div class="sg-app-nm"><b>' + a.nm + ' <small>今日 ' + usedToday(a.k) + '/' + MAX_DAY + '回</small></b><span>'
         + (left ? '🔓 あと' + left + '分（' + hhmm(st.u[a.k]) + 'まで）' : (rest ? '🔒 1回で' + m + '分' : '🔒 今日はおしまい（0時に戻ります）')) + '</span></div>'
-        + (left ? '<a class="sg-mini open" href="' + a.url + '">開く</a>' : '')
+        + (left ? '<a class="sg-mini open" href="' + (MOBILE ? a.url : a.web) + '"' + (MOBILE ? '' : ' target="_blank" rel="noopener"') + '>開く</a>' : '')
         + (rest ? '<button class="sg-mini" onclick="SNSGate.useApp(\'' + a.k + '\')"' + (have ? '' : ' disabled') + '>'
         + (left ? '+' + m + '分' : m + '分 使う') + '</button>' : '')
         + '</div>';
