@@ -39216,9 +39216,10 @@ init();
 
 /* SNSGATE:JS:BEGIN */
 /* SNSゲート（5サイト共通）。正本は .claude/skills_assets/sns-gate/gate.js → inject.py で配る。
-   どのサイトでも答え合わせ1問ごとに SNSGate.count() を呼ぶ。30問ごとに「30分」が1回ぶんたまり、
-   使うと reviewLists/{合言葉}__sns_gate に解除時刻(until)を書く。iPhoneのショートカットがそれを読んで
-   Instagram・X・YouTube を開かせるか、日替わり学習ページへ飛ばすかを決める。
+   どのサイトでも答え合わせ1問ごとに SNSGate.count() を呼ぶ。30問ごとに1回ぶんたまり、
+   使うときにアプリを1つ選ぶと、そのアプリの分数（既定 YouTube 30分・X 5分・Instagram 5分）だけ開く。
+   解除時刻はアプリごとに reviewLists/{合言葉}__sns_gate の until_<アプリ> へ書き、
+   iPhoneのショートカット（アプリごとに1本）がそれを読んで、開かせるか日替わり学習ページへ飛ばすかを決める。
    問数は Firestore の increment で足すので、どのサイト・どの端末で解いても1か所に合流する。 */
 (function (G) {
   if (G.SNSGate) return;
@@ -39230,19 +39231,37 @@ init();
     messagingSenderId: '146537476580',
     appId: '1:146537476580:web:4ef3dfdf9c0969f25b17f1'
   };
-  var N = 30, MIN = 30, CK = 'sns_gate_cache', PK = 'sns_gate_pend';   /* PK = まだクラウドへ送れていない問数 */
+  var N = 30, CK = 'sns_gate_cache2', PK = 'sns_gate_pend';   /* PK = まだクラウドへ送れていない問数 */
   var DAILY = 'https://andou0902haruka-code.github.io/ai-english-test/daily/';
   var APPS = [
-    { nm: 'Instagram', url: 'instagram://' },
-    { nm: 'X', url: 'twitter://' },
-    { nm: 'YouTube', url: 'youtube://' }
+    { k: 'youtube', nm: 'YouTube', url: 'youtube://', min: 30 },
+    { k: 'x', nm: 'X', url: 'twitter://', min: 5 },
+    { k: 'instagram', nm: 'Instagram', url: 'instagram://', min: 5 }
   ];
   var FB = 'https://www.gstatic.com/firebasejs/10.14.1/';
   var st = load(), ref = null, db = null, pend = loadPend(), subs = [], lastHave = null;
 
+  function blank() {
+    var s = { n: 0, u: {}, mins: {} };
+    APPS.forEach(function (a) { s.u[a.k] = 0; s.mins[a.k] = a.min; });
+    return s;
+  }
   function load() {
-    try { var v = JSON.parse(localStorage.getItem(CK)); if (v && typeof v === 'object') return { n: Math.max(0, v.n | 0), until: +v.until || 0 }; } catch (e) {}
-    return { n: 0, until: 0 };
+    var s = blank();
+    try {
+      var v = JSON.parse(localStorage.getItem(CK));
+      if (v && typeof v === 'object') {
+        s.n = Math.max(0, v.n | 0);
+        APPS.forEach(function (a) {
+          if (v.u && v.u[a.k]) s.u[a.k] = +v.u[a.k] || 0;
+          if (v.mins && v.mins[a.k] > 0) s.mins[a.k] = v.mins[a.k] | 0;
+        });
+      } else {
+        var old = JSON.parse(localStorage.getItem('sns_gate_cache'));   /* 旧版（全アプリ共通の30分）の問数を引き継ぐ */
+        if (old && typeof old === 'object') s.n = Math.max(0, old.n | 0);
+      }
+    } catch (e) {}
+    return s;
   }
   function loadPend() { try { return Math.max(0, parseInt(localStorage.getItem(PK), 10) || 0); } catch (e) { return 0; } }
   function savePend() { try { localStorage.setItem(PK, String(pend)); } catch (e) {} }
@@ -39255,15 +39274,21 @@ init();
   function iso(ms) {   /* ショートカットの「入力から日付を取得」が読めるよう +09:00 つきにする */
     return new Date(ms + 9 * 3600000).toISOString().slice(0, 19) + '+09:00';
   }
+  function app(k) { for (var i = 0; i < APPS.length; i++) if (APPS[i].k === k) return APPS[i]; return null; }
   function unlocks() { return Math.floor(st.n / N); }
   function part() { return st.n % N; }
-  function leftMin() { return Math.max(0, Math.ceil((st.until - Date.now()) / 60000)); }
+  function leftMin(k) {
+    if (!k) return Math.max.apply(null, APPS.map(function (a) { return leftMin(a.k); }));
+    return Math.max(0, Math.ceil(((st.u[k] || 0) - Date.now()) / 60000));
+  }
+  function minsOf(k) { return st.mins[k] || (app(k) || {}).min || 5; }
   function notify() {
     var have = unlocks();
-    if (lastHave !== null && have > lastHave) toast('📵 ' + N + '問たまりました！ SNSを' + MIN + '分使えます');
+    if (lastHave !== null && have > lastHave) toast('📵 ' + N + '問たまりました！ SNSを1つ開けます');
     lastHave = have;
     subs.forEach(function (f) { try { f(st); } catch (e) {} });
     badge();
+    if (typeof document !== 'undefined' && document.getElementById && document.getElementById('sg-mask')) panel();
   }
   function stamp() { return G.firebase.firestore.FieldValue.serverTimestamp(); }
 
@@ -39283,18 +39308,23 @@ init();
     var id = sid();
     if (!id || typeof document === 'undefined') return;
     ensureFirebase().then(function () {
-      var fb = G.firebase, app = null;
-      (fb.apps || []).forEach(function (a) { if (a.name === 'snsgate') app = a; });
-      app = app || fb.initializeApp(CFG, 'snsgate');
-      db = app.firestore();
+      var fb = G.firebase, a = null;
+      (fb.apps || []).forEach(function (x) { if (x.name === 'snsgate') a = x; });
+      a = a || fb.initializeApp(CFG, 'snsgate');
+      db = a.firestore();
       ref = db.collection('reviewLists').doc(id + '__sns_gate');
       ref.onSnapshot(function (s) {
-        if (!s.exists) {   /* ショートカットが読みにいく先を先に作っておく（無いと判定できない） */
-          ref.set({ n: 0, until: iso(0), untilMs: 0, updatedAt: stamp() }, { merge: true });
-          return;
-        }
-        var d = s.data();
-        st = { n: Math.max(0, d.n | 0) + pend, until: +d.untilMs || 0 };   /* pend = まだ送れていないぶん */
+        var d = s.exists ? s.data() : {};
+        /* ショートカットが読みにいく先（until_<アプリ>）を先に作っておく（無いと判定できない） */
+        var miss = {};
+        APPS.forEach(function (x) { if (!d['until_' + x.k]) { miss['until_' + x.k] = iso(0); miss['untilMs_' + x.k] = 0; } });
+        if (Object.keys(miss).length) { miss.updatedAt = stamp(); ref.set(miss, { merge: true }); }
+        if (!s.exists) return;
+        st.n = Math.max(0, d.n | 0) + pend;   /* pend = まだ送れていないぶん */
+        APPS.forEach(function (x) {
+          st.u[x.k] = +d['untilMs_' + x.k] || 0;
+          if (d['mins_' + x.k] > 0) st.mins[x.k] = d['mins_' + x.k] | 0;
+        });
         save(); notify();
       }, function (e) { console.warn('SNSゲートの同期に失敗しました', e); });
       if (pend) flush();
@@ -39312,23 +39342,53 @@ init();
     st.n++; save(); pend++; savePend();
     try { flush(); notify(); } catch (e) {}
   }
-  function use() {
+  /* 1回ぶん（N問）を使って、選んだアプリだけを分数ぶん開く */
+  function useApp(k) {
+    var a = app(k);
+    if (!a) return Promise.resolve(false);
     if (unlocks() < 1) { alert('あと ' + (N - part()) + '問 解くと使えます。'); return Promise.resolve(false); }
     if (!ref) { alert('ゲートを使うには合言葉の共有をONにしてください。\nショートカットがクラウドの記録を読みにいくためです。'); return Promise.resolve(false); }
-    return db.runTransaction(function (tx) {
+    var mins = minsOf(k);
+    if (!confirm(N + '問ぶん（1回）を使って、' + a.nm + ' を ' + mins + '分 開けます。')) return Promise.resolve(false);
+    flush();
+    /* 答えた直後に押しても足りなくならないよう、まだ届いていない問数の送信を待ってから数える */
+    var wait = db.waitForPendingWrites ? Promise.race([db.waitForPendingWrites(), new Promise(function (r) { setTimeout(r, 8000); })]) : Promise.resolve();
+    var tries = 0;
+    function attempt() { return db.runTransaction(function (tx) {
       return tx.get(ref).then(function (s) {
         var d = s.exists ? s.data() : {}, n = d.n | 0;
         if (n < N) throw new Error('short');
-        var until = Math.max(Date.now(), +d.untilMs || 0) + MIN * 60000;   /* 残りがあれば足し算 */
-        tx.set(ref, { n: n - N, until: iso(until), untilMs: until, updatedAt: stamp() }, { merge: true });
+        var until = Math.max(Date.now(), +d['untilMs_' + k] || 0) + mins * 60000;   /* 残りがあれば足し算 */
+        var w = { n: n - N, updatedAt: stamp() };
+        w['until_' + k] = iso(until); w['untilMs_' + k] = until;
+        tx.set(ref, w, { merge: true });
         return { n: n - N, until: until };
       });
-    }).then(function (r) { st = r; save(); notify(); return true; })
+    }).catch(function (e) {   /* 送ったばかりの問数がまだ数えられていないときは、少し待って数え直す */
+      if (e && e.message === 'short' && ++tries < 4) return new Promise(function (r) { setTimeout(r, 1500); }).then(attempt);
+      throw e;
+    }); }
+    return wait.then(attempt).then(function (r) { st.n = r.n + pend; st.u[k] = r.until; save(); notify(); return true; })
       .catch(function (e) {
         alert(e && e.message === 'short' ? '問数が足りませんでした（別の端末で使った可能性があります）。'
                                          : '送信できませんでした。通信状況を確かめてからもう一度押してください。');
         return false;
       });
+  }
+  function editMins() {
+    var next = {};
+    for (var i = 0; i < APPS.length; i++) {
+      var a = APPS[i];
+      var v = prompt(a.nm + ' を1回で何分開けますか？（1〜180）', String(minsOf(a.k)));
+      if (v === null) return;
+      var m = parseInt(v, 10);
+      if (!(m >= 1 && m <= 180)) { alert('1〜180の数字で入れてください。'); return; }
+      next[a.k] = m;
+    }
+    var w = { updatedAt: null };
+    APPS.forEach(function (a) { st.mins[a.k] = next[a.k]; w['mins_' + a.k] = next[a.k]; });
+    save(); notify();
+    if (ref) { w.updatedAt = stamp(); ref.set(w, { merge: true }); }
   }
   function setSyncId() {
     var cur = sid() || '';
@@ -39350,12 +39410,21 @@ init();
     if (G.navigator && navigator.clipboard) navigator.clipboard.writeText(u).then(done, function () { prompt('このURLをコピーしてください', u); });
     else prompt('このURLをコピーしてください', u);
   }
-  function appsHtml() {
-    return APPS.map(function (a) {
-      return '<a class="sg-app" href="' + a.url + '">' + a.nm + '</a>';
-    }).join('');
-  }
   function hhmm(ms) { return new Date(ms).toTimeString().slice(0, 5); }
+  /* アプリごとの行（この札の板と、日替わり学習ページのカードで共用） */
+  function appsHtml() {
+    var have = unlocks();
+    return '<div class="sg-apps">' + APPS.map(function (a) {
+      var left = leftMin(a.k), m = minsOf(a.k);
+      return '<div class="sg-app-row' + (left ? ' on' : '') + '">'
+        + '<div class="sg-app-nm"><b>' + a.nm + '</b><span>' + (left ? '🔓 あと' + left + '分（' + hhmm(st.u[a.k]) + 'まで）' : '🔒 1回で' + m + '分') + '</span></div>'
+        + (left ? '<a class="sg-mini open" href="' + a.url + '">開く</a>' : '')
+        + '<button class="sg-mini" onclick="SNSGate.useApp(\'' + a.k + '\')"' + (have ? '' : ' disabled') + '>'
+        + (left ? '+' + m + '分' : m + '分 使う') + '</button>'
+        + '</div>';
+    }).join('') + '</div>'
+      + '<span class="sg-link" onclick="SNSGate.editMins()">⚙️ 分数を変える</span>';
+  }
 
   /* ---- 画面（右下の小さな札＋開くと出る板）。日替わり学習ページは自前のカードがあるので札を出さない ---- */
   var CSS = '.sg-badge{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:9998;'
@@ -39364,45 +39433,51 @@ init();
     + '.sg-badge.full{background:#1fa971}'
     + '.sg-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9999;display:flex;align-items:flex-end;justify-content:center}'
     + '.sg-panel{background:#fff;color:#222;width:100%;max-width:480px;border-radius:16px 16px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));'
-    + 'font:14px/1.6 system-ui,sans-serif}'
+    + 'font:14px/1.6 system-ui,sans-serif;max-height:90vh;overflow:auto}'
     + '.sg-panel h3{margin:0 0 6px;font-size:16px}.sg-sub{color:#666;font-size:12.5px}'
     + '.sg-bar{height:10px;background:#eef0f6;border-radius:6px;overflow:hidden;margin:8px 0}.sg-bar i{display:block;height:100%;background:#8a5cf6}'
-    + '.sg-open{background:#eafaf2;border-radius:10px;padding:9px 11px;margin:8px 0}'
     + '.sg-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}'
-    + '.sg-app,.sg-btn{flex:1;text-align:center;border-radius:10px;padding:9px 8px;font-weight:600;text-decoration:none;border:none;font-size:14px;cursor:pointer}'
-    + '.sg-app{background:#8a5cf6;color:#fff}.sg-btn{background:#8a5cf6;color:#fff}.sg-btn[disabled]{opacity:.45}'
-    + '.sg-btn.ghost{background:#f1f2f6;color:#555}.sg-link{color:#666;font-size:12px;text-decoration:underline;cursor:pointer;margin-top:10px;display:inline-block}'
+    + '.sg-btn{flex:1;text-align:center;border-radius:10px;padding:9px 8px;font-weight:600;border:none;font-size:14px;cursor:pointer;background:#8a5cf6;color:#fff}'
+    + '.sg-btn.ghost{background:#f1f2f6;color:#555}.sg-link{color:#666;font-size:12px;text-decoration:underline;cursor:pointer;margin-top:8px;display:inline-block}'
     + '.sg-warn{background:#fff4e5;border-radius:10px;padding:9px 11px;margin:0 0 8px;font-size:13px}'
+    + '.sg-apps{display:flex;flex-direction:column;gap:6px;margin:8px 0 2px}'
+    + '.sg-app-row{display:flex;align-items:center;gap:8px;border:1px solid #e6e8f0;border-radius:10px;padding:7px 9px}'
+    + '.sg-app-row.on{background:#eafaf2;border-color:#bfe8d3}'
+    + '.sg-app-nm{flex:1;display:flex;flex-direction:column;line-height:1.3}.sg-app-nm b{font-size:14px}.sg-app-nm span{font-size:12px;color:#666}'
+    + '.sg-mini{border:none;border-radius:8px;padding:7px 10px;font-weight:600;font-size:13px;background:#8a5cf6;color:#fff;cursor:pointer;text-decoration:none;white-space:nowrap}'
+    + '.sg-mini[disabled]{opacity:.4;cursor:default}.sg-mini.open{background:#1fa971}'
     + '.sg-toast{position:fixed;left:50%;bottom:calc(56px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1fa971;color:#fff;'
     + 'padding:9px 14px;border-radius:10px;z-index:10000;font:600 13px system-ui,sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.2)}';
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function css() {
+    if (typeof document === 'undefined' || !document.head || document.getElementById('sg-css')) return;
+    var s = el('style', null, CSS); s.id = 'sg-css'; document.head.appendChild(s);
+  }
   function noBadge() { return !!G.SNS_GATE_NO_BADGE || typeof document === 'undefined' || !document.body; }
   function badge() {
     if (noBadge()) return;
     var b = document.getElementById('sg-badge');
-    if (!b) {
-      var s = el('style', null, CSS); document.head.appendChild(s);
-      b = el('button', 'sg-badge'); b.id = 'sg-badge'; b.onclick = panel; document.body.appendChild(b);
-    }
-    var left = leftMin(), have = unlocks();
-    b.textContent = (sid() ? '' : '⚠ ') + (left ? '🔓 あと' + left + '分' : (have ? '📵 ' + MIN + '分×' + have : '📵 ' + part() + '/' + N));
-    b.classList.toggle('full', !!(left || have));
+    if (!b) { b = el('button', 'sg-badge'); b.id = 'sg-badge'; b.onclick = panel; document.body.appendChild(b); }
+    var open = APPS.filter(function (a) { return leftMin(a.k); }), have = unlocks();
+    b.textContent = (sid() ? '' : '⚠ ')
+      + (open.length ? '🔓 ' + open.map(function (a) { return a.nm + ' ' + leftMin(a.k) + '分'; }).join('・')
+                     : (have ? '📵 使える×' + have : '📵 ' + part() + '/' + N));
+    b.classList.toggle('full', !!(open.length || have));
   }
   function panel() {
     var old = document.getElementById('sg-mask'); if (old) old.remove();
-    var left = leftMin(), have = unlocks(), p = part();
+    var have = unlocks(), p = part();
     var m = el('div', 'sg-mask'); m.id = 'sg-mask';
     m.onclick = function (e) { if (e.target === m) m.remove(); };
     m.innerHTML = '<div class="sg-panel">'
       + '<h3>📵 SNSゲート</h3>'
       + (sid() ? '' : '<div class="sg-warn">⚠ このページは合言葉の共有がOFFです。ここで解いた問数がほかのサイトに足されません。'
         + '<button class="sg-btn" id="sg-sync" style="margin-top:6px;width:100%">合言葉を設定する</button></div>')
-      + '<div class="sg-sub">どのサイトでも ' + N + '問 答え合わせをするごとに、Instagram・X・YouTube を ' + MIN + '分 使えます。</div>'
-      + (left ? '<div class="sg-open">🔓 あと <b>' + left + '分</b>（' + hhmm(st.until) + 'まで）<div class="sg-row">' + appsHtml() + '</div></div>' : '')
-      + '<div style="margin-top:8px">次の' + MIN + '分まで <b>' + p + ' / ' + N + '問</b>' + (have ? '（' + MIN + '分が <b>' + have + '回</b> たまっています）' : '') + '</div>'
+      + '<div class="sg-sub">どのサイトでも ' + N + '問 答え合わせをするごとに1回ぶんたまり、アプリを1つ選んで開けます。</div>'
+      + '<div style="margin-top:8px">次の1回まで <b>' + p + ' / ' + N + '問</b>' + (have ? '（使えるのが <b>' + have + '回</b> たまっています）' : '') + '</div>'
       + '<div class="sg-bar"><i style="width:' + (have ? 100 : Math.round(p / N * 100)) + '%"></i></div>'
+      + appsHtml()
       + '<div class="sg-row">'
-      + (have ? '<button class="sg-btn" id="sg-use">' + MIN + '分 使う' + (left ? '（残りに足す）' : '') + '</button>' : '')
       + '<button class="sg-btn' + (have ? ' ghost' : '') + '" id="sg-solve">問題を解く（あと ' + (N - p) + '問）</button>'
       + '<button class="sg-btn ghost" id="sg-close" style="flex:0 0 auto">閉じる</button></div>'
       + '<a class="sg-link" href="' + DAILY + '">日替わり学習ページのゲートで解く</a>'
@@ -39411,8 +39486,6 @@ init();
     document.body.appendChild(m);
     document.getElementById('sg-close').onclick = function () { m.remove(); };
     ['sg-sync', 'sg-sync2'].forEach(function (k) { var b = document.getElementById(k); if (b) b.onclick = setSyncId; });
-    var u = document.getElementById('sg-use');
-    if (u) u.onclick = function () { use().then(function (ok) { if (ok) panel(); }); };
     document.getElementById('sg-solve').onclick = function () {
       m.remove();
       /* 各サイトが「問題を選ぶ場所」へ連れていく関数を SNS_GATE_START に置いている。無ければ日替わり学習ページへ */
@@ -39427,15 +39500,16 @@ init();
   }
 
   G.SNSGate = {
-    N: N, MIN: MIN, APPS: APPS,
-    count: count, use: use, unlocks: unlocks, part: part, leftMin: leftMin, iso: iso,
-    state: function () { return { n: st.n, until: st.until }; },
+    N: N, APPS: APPS,
+    count: count, useApp: useApp, editMins: editMins, unlocks: unlocks, part: part, leftMin: leftMin, minsOf: minsOf, iso: iso,
+    state: function () { return JSON.parse(JSON.stringify(st)); },
     onChange: function (f) { subs.push(f); },
-    apiUrl: apiUrl, copyUrl: copyUrl, setSyncId: setSyncId, pending: function () { return pend; }, panel: panel, connect: connect,
-    _set: function (v) { st = v; save(); lastHave = unlocks(); }   /* テスト用 */
+    appsHtml: appsHtml, apiUrl: apiUrl, copyUrl: copyUrl, setSyncId: setSyncId,
+    pending: function () { return pend; }, panel: panel, connect: connect,
+    _set: function (v) { var b = blank(); b.n = v.n | 0; if (v.u) Object.assign(b.u, v.u); if (v.mins) Object.assign(b.mins, v.mins); st = b; save(); lastHave = unlocks(); }   /* テスト用 */
   };
   lastHave = unlocks();
-  function start() { try { badge(); connect(); } catch (e) { console.warn('SNSゲートを起動できませんでした', e); } }
+  function start() { try { css(); badge(); connect(); } catch (e) { console.warn('SNSゲートを起動できませんでした', e); } }
   if (typeof document !== 'undefined' && document.createElement) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
     else start();
