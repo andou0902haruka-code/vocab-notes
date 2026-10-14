@@ -39218,6 +39218,7 @@ init();
 /* SNSゲート（5サイト共通）。正本は .claude/skills_assets/sns-gate/gate.js → inject.py で配る。
    どのサイトでも答え合わせ1問ごとに SNSGate.count() を呼ぶ。30問ごとに1回ぶんたまり、
    使うときにアプリを1つ選ぶと、そのアプリの分数（既定 YouTube 30分・X 5分・Instagram 5分）だけ開く。
+   開けるのは1アプリにつき1日 MAX_DAY 回まで（日本時間の0時で戻る。used_<アプリ> と usedDay に記録）。
    解除時刻はアプリごとに reviewLists/{合言葉}__sns_gate の until_<アプリ> へ書き、
    iPhoneのショートカット（アプリごとに1本）がそれを読んで、開かせるか日替わり学習ページへ飛ばすかを決める。
    問数は Firestore の increment で足すので、どのサイト・どの端末で解いても1か所に合流する。 */
@@ -39231,6 +39232,7 @@ init();
     messagingSenderId: '146537476580',
     appId: '1:146537476580:web:4ef3dfdf9c0969f25b17f1'
   };
+  var MAX_DAY = 3;
   var N = 30, CK = 'sns_gate_cache2', PK = 'sns_gate_pend';   /* PK = まだクラウドへ送れていない問数 */
   var DAILY = 'https://andou0902haruka-code.github.io/ai-english-test/daily/';
   var APPS = [
@@ -39242,8 +39244,8 @@ init();
   var st = load(), ref = null, db = null, pend = loadPend(), subs = [], lastHave = null;
 
   function blank() {
-    var s = { n: 0, u: {}, mins: {} };
-    APPS.forEach(function (a) { s.u[a.k] = 0; s.mins[a.k] = a.min; });
+    var s = { n: 0, u: {}, mins: {}, used: {}, usedDay: '' };
+    APPS.forEach(function (a) { s.u[a.k] = 0; s.mins[a.k] = a.min; s.used[a.k] = 0; });
     return s;
   }
   function load() {
@@ -39255,7 +39257,9 @@ init();
         APPS.forEach(function (a) {
           if (v.u && v.u[a.k]) s.u[a.k] = +v.u[a.k] || 0;
           if (v.mins && v.mins[a.k] > 0) s.mins[a.k] = v.mins[a.k] | 0;
+          if (v.used && v.used[a.k] > 0) s.used[a.k] = v.used[a.k] | 0;
         });
+        s.usedDay = v.usedDay || '';
       } else {
         var old = JSON.parse(localStorage.getItem('sns_gate_cache'));   /* 旧版（全アプリ共通の30分）の問数を引き継ぐ */
         if (old && typeof old === 'object') s.n = Math.max(0, old.n | 0);
@@ -39274,6 +39278,9 @@ init();
   function iso(ms) {   /* ショートカットの「入力から日付を取得」が読めるよう +09:00 つきにする */
     return new Date(ms + 9 * 3600000).toISOString().slice(0, 19) + '+09:00';
   }
+  function today() { return new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10); }   /* 日本時間の日付 */
+  function usedToday(k) { return st.usedDay === today() ? (st.used[k] | 0) : 0; }
+  function leftToday(k) { return Math.max(0, MAX_DAY - usedToday(k)); }
   function app(k) { for (var i = 0; i < APPS.length; i++) if (APPS[i].k === k) return APPS[i]; return null; }
   function unlocks() { return Math.floor(st.n / N); }
   function part() { return st.n % N; }
@@ -39324,7 +39331,9 @@ init();
         APPS.forEach(function (x) {
           st.u[x.k] = +d['untilMs_' + x.k] || 0;
           if (d['mins_' + x.k] > 0) st.mins[x.k] = d['mins_' + x.k] | 0;
+          st.used[x.k] = d['used_' + x.k] | 0;
         });
+        st.usedDay = d.usedDay || '';
         save(); notify();
       }, function (e) { console.warn('SNSゲートの同期に失敗しました', e); });
       if (pend) flush();
@@ -39346,10 +39355,11 @@ init();
   function useApp(k) {
     var a = app(k);
     if (!a) return Promise.resolve(false);
+    if (!leftToday(k)) { alert(a.nm + ' は今日はもう ' + MAX_DAY + '回 開けました。明日（0時）まで待ちましょう。'); return Promise.resolve(false); }
     if (unlocks() < 1) { alert('あと ' + (N - part()) + '問 解くと使えます。'); return Promise.resolve(false); }
     if (!ref) { alert('ゲートを使うには合言葉の共有をONにしてください。\nショートカットがクラウドの記録を読みにいくためです。'); return Promise.resolve(false); }
     var mins = minsOf(k);
-    if (!confirm(N + '問ぶん（1回）を使って、' + a.nm + ' を ' + mins + '分 開けます。')) return Promise.resolve(false);
+    if (!confirm(N + '問ぶん（1回）を使って、' + a.nm + ' を ' + mins + '分 開けます。\n（今日 ' + a.nm + ' を開けるのは、あと ' + leftToday(k) + '回）')) return Promise.resolve(false);
     flush();
     /* 答えた直後に押しても足りなくならないよう、まだ届いていない問数の送信を待ってから数える */
     var wait = db.waitForPendingWrites ? Promise.race([db.waitForPendingWrites(), new Promise(function (r) { setTimeout(r, 8000); })]) : Promise.resolve();
@@ -39357,19 +39367,28 @@ init();
     function attempt() { return db.runTransaction(function (tx) {
       return tx.get(ref).then(function (s) {
         var d = s.exists ? s.data() : {}, n = d.n | 0;
+        var day = today(), w = { updatedAt: stamp(), usedDay: day };
+        if (d.usedDay !== day) APPS.forEach(function (x) { w['used_' + x.k] = 0; });   /* 日付が変わったら回数を戻す */
+        var used = d.usedDay === day ? (d['used_' + k] | 0) : 0;
+        if (used >= MAX_DAY) throw new Error('limit');
         if (n < N) throw new Error('short');
         var until = Math.max(Date.now(), +d['untilMs_' + k] || 0) + mins * 60000;   /* 残りがあれば足し算 */
-        var w = { n: n - N, updatedAt: stamp() };
+        w.n = n - N; w['used_' + k] = used + 1;
         w['until_' + k] = iso(until); w['untilMs_' + k] = until;
         tx.set(ref, w, { merge: true });
-        return { n: n - N, until: until };
+        return { n: n - N, until: until, used: used + 1, day: day, reset: d.usedDay !== day };
       });
     }).catch(function (e) {   /* 送ったばかりの問数がまだ数えられていないときは、少し待って数え直す */
       if (e && e.message === 'short' && ++tries < 4) return new Promise(function (r) { setTimeout(r, 1500); }).then(attempt);
       throw e;
     }); }
-    return wait.then(attempt).then(function (r) { st.n = r.n + pend; st.u[k] = r.until; save(); notify(); return true; })
+    return wait.then(attempt).then(function (r) {
+      if (r.reset) APPS.forEach(function (x) { st.used[x.k] = 0; });
+      st.n = r.n + pend; st.u[k] = r.until; st.used[k] = r.used; st.usedDay = r.day;
+      save(); notify(); return true;
+    })
       .catch(function (e) {
+        if (e && e.message === 'limit') { alert(a.nm + ' は今日はもう ' + MAX_DAY + '回 開けました（別の端末で使った可能性があります）。'); return false; }
         alert(e && e.message === 'short' ? '問数が足りませんでした（別の端末で使った可能性があります）。'
                                          : '送信できませんでした。通信状況を確かめてからもう一度押してください。');
         return false;
@@ -39415,12 +39434,13 @@ init();
   function appsHtml() {
     var have = unlocks();
     return '<div class="sg-apps">' + APPS.map(function (a) {
-      var left = leftMin(a.k), m = minsOf(a.k);
+      var left = leftMin(a.k), m = minsOf(a.k), rest = leftToday(a.k);
       return '<div class="sg-app-row' + (left ? ' on' : '') + '">'
-        + '<div class="sg-app-nm"><b>' + a.nm + '</b><span>' + (left ? '🔓 あと' + left + '分（' + hhmm(st.u[a.k]) + 'まで）' : '🔒 1回で' + m + '分') + '</span></div>'
+        + '<div class="sg-app-nm"><b>' + a.nm + ' <small>今日 ' + usedToday(a.k) + '/' + MAX_DAY + '回</small></b><span>'
+        + (left ? '🔓 あと' + left + '分（' + hhmm(st.u[a.k]) + 'まで）' : (rest ? '🔒 1回で' + m + '分' : '🔒 今日はおしまい（0時に戻ります）')) + '</span></div>'
         + (left ? '<a class="sg-mini open" href="' + a.url + '">開く</a>' : '')
-        + '<button class="sg-mini" onclick="SNSGate.useApp(\'' + a.k + '\')"' + (have ? '' : ' disabled') + '>'
-        + (left ? '+' + m + '分' : m + '分 使う') + '</button>'
+        + (rest ? '<button class="sg-mini" onclick="SNSGate.useApp(\'' + a.k + '\')"' + (have ? '' : ' disabled') + '>'
+        + (left ? '+' + m + '分' : m + '分 使う') + '</button>' : '')
         + '</div>';
     }).join('') + '</div>'
       + '<span class="sg-link" onclick="SNSGate.editMins()">⚙️ 分数を変える</span>';
@@ -39443,7 +39463,7 @@ init();
     + '.sg-apps{display:flex;flex-direction:column;gap:6px;margin:8px 0 2px}'
     + '.sg-app-row{display:flex;align-items:center;gap:8px;border:1px solid #e6e8f0;border-radius:10px;padding:7px 9px}'
     + '.sg-app-row.on{background:#eafaf2;border-color:#bfe8d3}'
-    + '.sg-app-nm{flex:1;display:flex;flex-direction:column;line-height:1.3}.sg-app-nm b{font-size:14px}.sg-app-nm span{font-size:12px;color:#666}'
+    + '.sg-app-nm{flex:1;display:flex;flex-direction:column;line-height:1.3}.sg-app-nm b{font-size:14px}.sg-app-nm small{font-weight:400;color:#888;font-size:11px;margin-left:4px}.sg-app-nm span{font-size:12px;color:#666}'
     + '.sg-mini{border:none;border-radius:8px;padding:7px 10px;font-weight:600;font-size:13px;background:#8a5cf6;color:#fff;cursor:pointer;text-decoration:none;white-space:nowrap}'
     + '.sg-mini[disabled]{opacity:.4;cursor:default}.sg-mini.open{background:#1fa971}'
     + '.sg-toast{position:fixed;left:50%;bottom:calc(56px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1fa971;color:#fff;'
@@ -39500,13 +39520,13 @@ init();
   }
 
   G.SNSGate = {
-    N: N, APPS: APPS,
+    N: N, APPS: APPS, MAX_DAY: MAX_DAY, usedToday: usedToday, leftToday: leftToday, today: today,
     count: count, useApp: useApp, editMins: editMins, unlocks: unlocks, part: part, leftMin: leftMin, minsOf: minsOf, iso: iso,
     state: function () { return JSON.parse(JSON.stringify(st)); },
     onChange: function (f) { subs.push(f); },
     appsHtml: appsHtml, apiUrl: apiUrl, copyUrl: copyUrl, setSyncId: setSyncId,
     pending: function () { return pend; }, panel: panel, connect: connect,
-    _set: function (v) { var b = blank(); b.n = v.n | 0; if (v.u) Object.assign(b.u, v.u); if (v.mins) Object.assign(b.mins, v.mins); st = b; save(); lastHave = unlocks(); }   /* テスト用 */
+    _set: function (v) { var b = blank(); b.n = v.n | 0; if (v.u) Object.assign(b.u, v.u); if (v.mins) Object.assign(b.mins, v.mins); if (v.used) Object.assign(b.used, v.used); b.usedDay = v.usedDay || ''; st = b; save(); lastHave = unlocks(); }   /* テスト用 */
   };
   lastHave = unlocks();
   function start() { try { css(); badge(); connect(); } catch (e) { console.warn('SNSゲートを起動できませんでした', e); } }
