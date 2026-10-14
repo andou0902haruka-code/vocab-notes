@@ -38345,6 +38345,8 @@ function updateCounts() {
 
 /* ================= タブ ================= */
 let currentView = 'words';
+/* SNSゲートの「問題を解く」：テストのタブへ（範囲はそこで選ぶ） */
+window.SNS_GATE_START = function () { switchView('test'); window.scrollTo(0, 0); };
 function switchView(name) {
   currentView = name;
   ['words', 'review', 'favs', 'weeks', 'test', 'roots', 'motiv'].forEach(v => {
@@ -39387,14 +39389,22 @@ init();
       + (left ? '<div class="sg-open">🔓 あと <b>' + left + '分</b>（' + hhmm(st.until) + 'まで）<div class="sg-row">' + appsHtml() + '</div></div>' : '')
       + '<div style="margin-top:8px">次の' + MIN + '分まで <b>' + p + ' / ' + N + '問</b>' + (have ? '（' + MIN + '分が <b>' + have + '回</b> たまっています）' : '') + '</div>'
       + '<div class="sg-bar"><i style="width:' + (have ? 100 : Math.round(p / N * 100)) + '%"></i></div>'
-      + '<div class="sg-row"><button class="sg-btn" id="sg-use"' + (have ? '' : ' disabled') + '>'
-      + (have ? MIN + '分 使う' + (left ? '（残りに足す）' : '') : 'あと ' + (N - p) + '問') + '</button>'
-      + '<button class="sg-btn ghost" id="sg-close">閉じる</button></div>'
+      + '<div class="sg-row">'
+      + (have ? '<button class="sg-btn" id="sg-use">' + MIN + '分 使う' + (left ? '（残りに足す）' : '') + '</button>' : '')
+      + '<button class="sg-btn' + (have ? ' ghost' : '') + '" id="sg-solve">問題を解く（あと ' + (N - p) + '問）</button>'
+      + '<button class="sg-btn ghost" id="sg-close" style="flex:0 0 auto">閉じる</button></div>'
       + '<a class="sg-link" href="' + DAILY + '">日替わり学習ページのゲートで解く</a>'
       + '</div>';
     document.body.appendChild(m);
     document.getElementById('sg-close').onclick = function () { m.remove(); };
-    document.getElementById('sg-use').onclick = function () { use().then(function (ok) { if (ok) panel(); }); };
+    var u = document.getElementById('sg-use');
+    if (u) u.onclick = function () { use().then(function (ok) { if (ok) panel(); }); };
+    document.getElementById('sg-solve').onclick = function () {
+      m.remove();
+      /* 各サイトが「問題を選ぶ場所」へ連れていく関数を SNS_GATE_START に置いている。無ければ日替わり学習ページへ */
+      if (typeof G.SNS_GATE_START === 'function') G.SNS_GATE_START();
+      else location.href = DAILY + '?gate=1';
+    };
   }
   function toast(msg) {
     if (typeof document === 'undefined' || !document.body) return;
