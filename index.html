@@ -38083,6 +38083,7 @@ function getPending() {
 }
 function setPending(list) {
   try { localStorage.setItem(PENDING_KEY, JSON.stringify(list)); } catch (e) {}
+  if (typeof window !== 'undefined' && window.PendingInbox) window.PendingInbox.push('vocab_inbox', list);
 }
 function findDuplicate(text) {
   const n = normWord(text);
@@ -39213,6 +39214,51 @@ function init() {
   initSync().then(changed => { if (changed) { applyDels(); refreshAll(); } paintSync(); });
 }
 init();
+
+/* INBOX:JS:BEGIN */
+/* 未清書メモの受け箱（表現メモ・英単語ノート共通）。正本は .claude/skills_assets/auto-polish/inbox.js → inject.py で配る。
+   setPending() のたびに PendingInbox.push(名前, 一覧) を呼ぶと、この端末の未清書メモを丸ごと
+   reviewLists/{合言葉}__<名前> の dev_<端末ID> に書く（端末ごとに別の欄なので、iPhoneとPCで消し合わない）。
+   Mac の週1回の自動清書（weekly_polish.py）がこれを読み、清書ずみのものは次に開いたとき各端末の一覧から消える。
+   合言葉が無い端末・fetch が無い環境（テストのvm）では何もしない。送れなかったときは次に開いたとき送り直す。 */
+(function (G) {
+  if (G.PendingInbox) return;
+  var KEY = 'AIzaSyASWojYpZ3KJBYG9V30Y4BmplUFORYOelw';
+  var BASE = 'https://firestore.googleapis.com/v1/projects/ai-english-review/databases/(default)/documents/reviewLists/';
+  var timers = {};
+  function ls(k, v) {
+    try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) {}
+    return null;
+  }
+  function sid() { var v = ls('aien_sync_id'); return (v && v !== '__none__') ? v : null; }
+  function dev() {
+    var v = ls('aien_dev_id');
+    if (!v) { v = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); ls('aien_dev_id', v); }
+    return v;
+  }
+  function push(name, list) {
+    if (typeof fetch !== 'function') return;
+    var id = sid();
+    if (!id) return;
+    var json = JSON.stringify(list || []);
+    var sentKey = 'inbox_sent_' + name, mark = id + '|' + json;
+    if (ls(sentKey) === mark) return;   /* 送った中身と同じなら送らない */
+    clearTimeout(timers[name]);
+    timers[name] = setTimeout(function () {
+      var d = dev(), f = 'dev_' + d, a = 'at_' + d, body = { fields: {} };
+      body.fields[f] = { stringValue: json };
+      body.fields[a] = { timestampValue: new Date().toISOString() };
+      fetch(BASE + encodeURIComponent(id + '__' + name) + '?updateMask.fieldPaths=' + f
+        + '&updateMask.fieldPaths=' + a + '&key=' + KEY, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      }).then(function (r) { if (r.ok) ls(sentKey, mark); }).catch(function () {});
+    }, 800);
+  }
+  G.PendingInbox = { push: push };
+})(typeof window !== 'undefined' ? window : this);
+/* INBOX:JS:END */
+/* 開いたときに、この端末の未清書メモを受け箱へ（中身が前回と同じなら送らない） */
+if (typeof window !== 'undefined' && window.PendingInbox) window.PendingInbox.push('vocab_inbox', getPending());
 
 /* SNSGATE:JS:BEGIN */
 /* SNSゲート（5サイト共通）。正本は .claude/skills_assets/sns-gate/gate.js → inject.py で配る。
