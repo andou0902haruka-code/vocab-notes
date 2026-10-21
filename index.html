@@ -819,13 +819,25 @@
         <button class="seg-btn" data-scope="r10">ランダム10問</button>
         <button class="seg-btn" data-scope="r20">ランダム20問</button>
         <button class="seg-btn" data-scope="new">🆕 未解答だけ</button>
-        <button class="seg-btn" data-scope="few">🔢 回数が少ない順20問</button>
+        <button class="seg-btn" data-scope="few">🔢 回数が少ない順</button>
         <button class="seg-btn" data-scope="weak">苦手だけ</button>
+      </div>
+      <div id="newCountRow" hidden>
+        <label class="field-label">何問出す？（🆕 未解答だけ・🔢 回数が少ない順）</label>
+        <div class="seg" id="newCountSeg" style="flex-wrap:wrap">
+          <button class="seg-btn" data-n="5">5問</button>
+          <button class="seg-btn" data-n="10">10問</button>
+          <button class="seg-btn" data-n="20">20問</button>
+          <button class="seg-btn" data-n="30">30問</button>
+          <button class="seg-btn" data-n="50">50問</button>
+          <button class="seg-btn" data-n="0">ぜんぶ</button>
+        </div>
       </div>
       <div class="solved-break" id="testSolvedBreak"></div>
       <label class="auto-speak"><input type="checkbox" id="autoSpeakChk"> 🔊 答えを表示したら英語を自動で読む</label>
       <button class="btn-save" id="testStartBtn" style="margin-top:14px">▶ テスト開始</button>
       <div class="hint-line" id="testSetupInfo"></div>
+      <div id="lastWrongBox"></div>
     </div>
     <div class="section-title"><h2>📊 テスト履歴</h2></div>
     <div id="testHistory"></div>
@@ -43376,12 +43388,71 @@ function renderTestSetup() {
   if (!sel.value) sel.value = 'all';
   document.getElementById('testSetupInfo').innerHTML =
     (gn !== 'all' ? '出題はジャンル <b>' + genreLabel(gn) + '</b> の語だけです。<br>' : '') +
-    (T.scope === 'new' ? '🆕 <b>未解答だけ</b>：この範囲で、まだ一度も答えていない単語だけを出します。<br>'
-      : T.scope === 'few' ? '🔢 <b>回数が少ない順</b>：この範囲で、解いた回数が少ない単語から20問（未解答があれば先に出ます）。<br>' : '') +
+    (T.scope === 'new' ? '🆕 <b>未解答だけ</b>：この範囲で、まだ一度も答えていない単語から' + newCountLabel() + '（ランダム）。<br>'
+      : T.scope === 'few' ? '🔢 <b>回数が少ない順</b>：この範囲で、解いた回数が少ない単語から' + newCountLabel() + '（未解答があれば先に出ます）。<br>' : '') +
     '形式は6種類。<b>意味を選ぶ</b>＝4択、<b>英単語を書く</b>＝日本語から英語を入力（自動採点・差分表示）、<b>例文穴埋め</b>＝文の中で使えるか、<b>語族</b>＝conduct→conductivity のような派生形、<b>言う</b>＝口頭で答えて自己採点。<br>答えた結果は<b>🔁 今日の復習</b>の間隔にも反映されます。';
   renderSolvedBreak();
+  renderNewCount();
+  renderLastWrong();
   document.getElementById('autoSpeakChk').checked = autoSpeakOn();
   renderTestHistory();
+}
+/* ---- 未解答だけ・回数が少ない順の問題数（2026-10-21） ----
+   0＝ぜんぶ。端末ごとの好みなので同期しない */
+const NEWCOUNT_KEY = 'vocabNote_newCount';
+function newCount() {
+  try { const v = localStorage.getItem(NEWCOUNT_KEY); return v == null ? 20 : (Number(v) | 0); } catch (e) { return 20; }
+}
+function setNewCount(n) { try { localStorage.setItem(NEWCOUNT_KEY, String(n)); } catch (e) {} }
+function newCountLabel() { const n = newCount(); return n ? n + '問' : 'ぜんぶ'; }
+function renderNewCount() {
+  document.getElementById('newCountRow').hidden = !(T.scope === 'new' || T.scope === 'few');
+  const n = String(newCount());
+  document.querySelectorAll('#newCountSeg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.n === n));
+}
+/* ---- 途中でやめても、まちがえた語をやり直せる（2026-10-21） ----
+   回が始まるたびに空にし、まちがえた（自己採点80%未満も）語をその場で控える。
+   答え合わせの瞬間に書くので、✕やめる・タブ移動・アプリを閉じる のどれでも残る。端末ごと */
+const LASTWRONG_KEY = 'vocabNote_lastWrong';
+function getLastWrong() {
+  try { const x = JSON.parse(localStorage.getItem(LASTWRONG_KEY) || 'null'); return x && Array.isArray(x.ids) ? x : null; } catch (e) { return null; }
+}
+function setLastWrong(x) { try { localStorage.setItem(LASTWRONG_KEY, JSON.stringify(x)); } catch (e) {} }
+function beginRunLog() { setLastWrong({ at: Date.now(), kind: T.kind, ids: [] }); }
+function logWrong(id) {
+  const x = getLastWrong() || { at: Date.now(), kind: T.kind, ids: [] };
+  if (x.ids.indexOf(id) === -1) x.ids.push(id);
+  setLastWrong(x);
+}
+function lastWrongWords() {
+  const x = getLastWrong();
+  return x ? x.ids.map(id => WORDS.find(w => w.id === id)).filter(Boolean) : [];
+}
+function renderLastWrong() {
+  const el = document.getElementById('lastWrongBox');
+  const ws = lastWrongWords();
+  el.innerHTML = ws.length
+    ? '<button class="btn-outline" style="width:100%;margin-top:10px" onclick="retryLastWrong()">↩️ 前回まちがえた' + ws.length + '語をもう一度</button>'
+      + '<div class="hint-line">' + fmtDateShort(getLastWrong().at) + ' のテスト（途中でやめた回もふくむ）でまちがえた語：'
+      + ws.slice(0, 6).map(w => '<b>' + escapeHtml(w.word) + '</b>').join('、') + (ws.length > 6 ? ' ほか' : '') + '</div>'
+    : '';
+}
+function runQuestions(qs) {
+  T.qs = qs; T.i = 0; T.res = []; T.answered = false; T.startedAt = Date.now();
+  beginRunLog();
+  document.getElementById('testSetup').hidden = true;
+  document.getElementById('testResult').hidden = true;
+  document.getElementById('testRun').hidden = false;
+  renderQuestion();
+}
+function retryLastWrong() {
+  const ws = lastWrongWords();
+  if (!ws.length) { showToast('まちがえた語はありません'); return; }
+  switchView('test');
+  T.week = 'all'; T.genre = 'all';
+  T.kind = (getLastWrong() || {}).kind || T.kind;
+  document.querySelectorAll('#testKindSeg .seg-btn').forEach(x => x.classList.toggle('active', x.dataset.kind === T.kind));
+  runQuestions(buildQuestions(ws, T.kind));
 }
 /* ================= 何回解いたか・未解答だけ（2026-10-14） =================
    回数は U.stats の ok + ng（答えるたびに srsUpdate が1つ増やす。合言葉で同期ずみ）。新しい保存先は持たない */
@@ -43461,18 +43532,14 @@ function startTest(genre) {
   // 今日の復習は1日ぶんに切る。落とすのは箱が高い（＝しばらく持つ）語から（dueToday はジャンルで絞り済み）
   if (T.week === 'due') list = dueToday();
   if (T.scope === 'weak') list = list.filter(w => statusOf(w.id).k === 'weak');
-  if (T.scope === 'new') list = list.filter(w => !solvedCount(w.id));
-  if (T.scope === 'few') list = fewestFirst(list, 20);
+  if (T.scope === 'new') { list = shuffle(list.filter(w => !solvedCount(w.id))); if (newCount()) list = list.slice(0, newCount()); }
+  if (T.scope === 'few') list = fewestFirst(list, newCount() || list.length);
   if (!list.length) { showToast(T.scope === 'new' ? 'この範囲に未解答の単語はありません 🎉（全部1回以上解いています）' : '出題できる単語がありません'); return; }
   if (T.scope === 'r10') list = shuffle(list).slice(0, 10);
   if (T.scope === 'r20') list = shuffle(list).slice(0, 20);
   const qs = buildQuestions(list, T.kind);
   if (!qs.length) { showToast('この形式で出せる問題がありません'); return; }
-  T.qs = qs; T.i = 0; T.res = []; T.answered = false; T.startedAt = Date.now();
-  document.getElementById('testSetup').hidden = true;
-  document.getElementById('testResult').hidden = true;
-  document.getElementById('testRun').hidden = false;
-  renderQuestion();
+  runQuestions(qs);
 }
 function renderQuestion() {
   const q = T.qs[T.i];
@@ -43529,6 +43596,7 @@ function recordAnswer(q, correct, userAns, selfPct) {
   hsAdd({ q: histQ(q), a: q.answer, p: selfPct != null ? selfPct : (correct ? 100 : 0),
           k: (KIND_LABEL[q.kind] || '') + (selfPct != null ? '・自己採点' : '') + '（' + q.w.word + '）' });   /* 学習の履歴 */
   T.res.push({ q: q, ok: correct, user: userAns || '' });
+  if (!correct) logWrong(q.w.id);
   queueAgain(q, correct);
 }
 function judgeBoxHtml(q, correct, userAns, showDiff) {
@@ -43543,7 +43611,8 @@ function judgeBoxHtml(q, correct, userAns, showDiff) {
     + '<button class="play-btn sm" data-icon="🔊"' + (exAuto ? ' data-auto="1"' : '') + ' onclick="playAudio(this,\'' + exAudio(q.w.id, q.si) + '\')">🔊</button>'
     + '<span>' + markTarget(s.ex, s.target || q.w.word) + '</span></div>'
     + (s.exJa ? '<div class="ex-ja">' + escapeHtml(s.exJa) + '</div>' : '') + '</div>';
-  if (q.w.origin && q.w.origin.note) h += '<div class="origin-note" style="margin-top:8px">🧬 ' + q.w.origin.note + '</div>';
+  const detail = originHtml(q.w) + familyHtml(q.w) + matesHtml(q.w) + confuseHtml(q.w);
+  if (detail) h += '<details class="w-detail" style="margin-top:10px"><summary class="fold-btn">▼ 語源・語族・まぎらわしい語をひらく</summary>' + detail + '</details>';
   h += '<div class="row-btns"><button class="btn-primary" onclick="nextQuestion()">' + (T.i + 1 >= T.qs.length ? '結果を見る' : '次へ →') + '</button>'
     + '<button class="btn-outline" onclick="toggleFav(' + q.w.id + ')">☆ お気に入り</button></div>';
   return h;
@@ -43639,8 +43708,9 @@ function nextQuestion() {
   renderQuestion();
 }
 function quitTest() {
-  if (T.res.length && !confirm('ここでやめます。ここまでの' + T.res.length + '問ぶんは記録されます。よろしいですか？')) return;
-  if (T.res.length) saveTestResult();
+  if (T.res.length && !confirm('ここでやめます。ここまでの' + T.res.length + '問ぶんは記録され、まちがえた語はあとでやり直せます。よろしいですか？')) return;
+  stopSinglePlay();
+  if (T.res.length) { T.quit = true; finishTest(); return; }   // 結果画面へ（まちがえた語をもう一度 が押せる）
   document.getElementById('testRun').hidden = true;
   document.getElementById('testSetup').hidden = false;
   renderTestSetup();
@@ -43660,7 +43730,9 @@ function finishTest() {
   const correct = T.res.filter(r => r.ok).length;
   const pct = Math.round(correct / T.res.length * 100);
   const wrong = T.res.filter(r => !r.ok);
-  let h = '<div class="panel"><div class="score-big">' + correct + ' / ' + T.res.length + '</div>'
+  const quit = T.quit; T.quit = false;
+  let h = '<div class="panel">' + (quit ? '<div class="q-sub">⏸ 途中でやめました（' + T.res.length + '問ぶんを記録）</div>' : '')
+    + '<div class="score-big">' + correct + ' / ' + T.res.length + '</div>'
     + '<div class="score-sub">正答率 ' + pct + '%　'
     + (pct === 100 ? '完璧です' : pct >= 80 ? 'よく定着しています' : pct >= 50 ? 'あと一歩、まちがえた語を復習しましょう' : 'まずは意味と語源を読み直しましょう') + '</div>'
     + '<div class="row-btns">'
@@ -43682,10 +43754,7 @@ function retryWrong() {
   const ws = T.res.filter(r => !r.ok).map(r => r.q.w);
   const uniq = [];
   ws.forEach(w => { if (!uniq.some(x => x.id === w.id)) uniq.push(w); });
-  T.qs = buildQuestions(uniq, T.kind); T.i = 0; T.res = [];
-  document.getElementById('testResult').hidden = true;
-  document.getElementById('testRun').hidden = false;
-  renderQuestion();
+  runQuestions(buildQuestions(uniq, T.kind));
 }
 function backToSetup() {
   document.getElementById('testResult').hidden = true;
@@ -43798,11 +43867,7 @@ function startAheadTest() {
   if (!list.length) { showToast('単語がありません'); return; }
   switchView('test');
   T.week = 'all'; T.genre = genreOn();
-  T.qs = buildQuestions(list, T.kind); T.i = 0; T.res = [];
-  document.getElementById('testSetup').hidden = true;
-  document.getElementById('testResult').hidden = true;
-  document.getElementById('testRun').hidden = false;
-  renderQuestion();
+  runQuestions(buildQuestions(list, T.kind));
 }
 
 /* ================= 起動 ================= */
@@ -43864,6 +43929,10 @@ function bind() {
   document.querySelectorAll('#testScopeSeg .seg-btn').forEach(b => b.addEventListener('click', () => {
     T.scope = b.dataset.scope;
     document.querySelectorAll('#testScopeSeg .seg-btn').forEach(x => x.classList.toggle('active', x === b));
+    renderTestSetup();
+  }));
+  document.querySelectorAll('#newCountSeg .seg-btn').forEach(b => b.addEventListener('click', () => {
+    setNewCount(Number(b.dataset.n));
     renderTestSetup();
   }));
   document.getElementById('testStartBtn').addEventListener('click', () => startTest());
