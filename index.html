@@ -44394,7 +44394,24 @@ function rvLimit() {
   if (!(tc >= 0)) tc = Infinity;
   return Math.min(c.cap, Math.max(1, Math.round(tc)));
 }
-function rvLeft() { return Math.max(0, rvLimit() - rvDone()); }
+/* ノルマ（30問）の残り。画面の「◯／30問」はこちらで出す */
+function rvQuotaLeft() { return Math.max(0, rvLimit() - rvDone()); }
+/* ---- 自由復習（2026-10-27） ----
+   ノルマの30問を終えたあと、本人が選んだ日だけ期限の来た問題を続けて解ける。ノルマは30問のまま。
+   答えはふだんの復習と同じに記録する（箱も動く・回数は31, 32…と数える）。この端末の、その日だけ */
+var RV_FREE_ROUND = 30;   /* 自由復習の1回の出題数 */
+function rvFreeKey() { return rvKey() + '_free'; }
+function rvFree() { var v = null; try { v = localStorage.getItem(rvFreeKey()); } catch (e) {} return Number(v) === rvToday(); }
+function rvSetFree(on) { try { if (on) localStorage.setItem(rvFreeKey(), String(rvToday())); else localStorage.removeItem(rvFreeKey()); } catch (e) {} }
+/* 枠を使い切って出題できなかったときに呼ぶ。期限の来た問題が残っていれば自由復習に進むか聞く */
+function rvAskFree(ids) {
+  if (rvFree() || rvQuotaLeft() > 0 || !rvDueIds(ids).length || typeof confirm === 'undefined') return false;
+  if (!confirm('今日のノルマ（' + rvLimit() + rvUnit() + '）は達成ずみです。\nこのあとも自由に復習を続けますか？（ノルマは' + rvLimit() + rvUnit() + 'のまま。答えはふだんどおり記録されます）')) return false;
+  rvSetFree(true);
+  return true;
+}
+/* 出題に使う残り枠。自由復習中は上限なし */
+function rvLeft() { return rvFree() ? 1e6 : rvQuotaLeft(); }
 function rvRetryDone() { return rvTodayEv().filter(function (e) { return e.k === 'a'; }).length; }
 function rvEnrolledToday() { return rvTodayEv().filter(function (e) { return (e.k === 'n' && e.en) || e.k === 'e'; }).length; }
 
@@ -44561,7 +44578,7 @@ function rvLate(id) {
 function rvIsWeak(s) { return s.g === 3 || s.g === 2 || (s.box | 0) <= 1; }
 function rvPick(ids, n) {
   var c = rvCfg(), due = rvDueIds(ids), it = rvItems();
-  if (n == null) n = rvLeft();
+  if (n == null) n = rvFree() ? Math.max(RV_FREE_ROUND, rvQuotaLeft()) : rvLeft();
   n = Math.max(0, Math.min(n, due.length));
   if (!n) return [];
   var weak = [], rest = [];
@@ -44782,10 +44799,14 @@ function rvEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, functi
 function rvLabel(id) { var f = rvEnv().label; try { return f ? (f(id) || String(id)) : String(id); } catch (e) { return String(id); } }
 /* 「このアプリの今日の復習：12／30問」。未消化の総数は大きく出さない（詳細の中だけ） */
 function rvBarHtml(ids) {
-  var c = rvCfg(), done = rvDone(), lim = rvLimit(), left = rvLeft(), u = rvUnit();
+  var c = rvCfg(), done = rvDone(), lim = rvLimit(), left = rvQuotaLeft(), u = rvUnit();
   var due = rvDueIds(ids).length, pct = Math.min(100, Math.round(done / Math.max(1, lim) * 100));
-  var msg;
-  if (left <= 0) msg = '<b>このアプリの今日の復習はここまでです。</b>おつかれさまでした。解説・一覧・履歴はこのまま見られます。';
+  var msg, free = rvFree();
+  if (left <= 0 && free) msg = '<b>今日のノルマは達成ずみ。いまは自由復習中です</b>（+' + (done - lim) + u + '）。期限の来た問題があと ' + due + u + '。'
+    + (due ? '' : 'もう残っていません。') + '<br><button type="button" class="rv-btn" onclick="rvUi(\'free\',false)">自由復習をやめる</button>';
+  else if (left <= 0) msg = '<b>今日のノルマ（' + lim + u + '）は達成です。</b>おつかれさまでした。'
+    + (due ? '<br><button type="button" class="rv-btn rv-on" onclick="rvUi(\'free\',true)">もっと復習する（期限の来た問題 あと' + due + u + '・ノルマは' + lim + u + 'のまま）</button>'
+      : '期限の来た問題はもう残っていません。');
   else if (!due) msg = done ? '期限が来ている問題はもうありません。<b>今日の復習は完了です</b>（' + c.cap + u + 'に届かなくても大丈夫です）。'
     : '今日は期限が来ている問題がありません。新しく覚える入口から進められます。';
   else msg = '今日はあと最大 <b>' + Math.min(left, due) + '</b>' + u + '。直近でまちがえた・弱い問題を最大' + c.weak + u + '、長く待っている問題を最大' + (c.cap - c.weak) + u + 'の割合で選びます。';
@@ -44794,6 +44815,16 @@ function rvBarHtml(ids) {
     + '<div class="rv-bar-top">このアプリの今日の復習：<b>' + done + '</b>／' + lim + u + tnote + '</div>'
     + '<div class="rv-meter"><i style="width:' + pct + '%"></i></div>'
     + '<div class="rv-bar-sub">' + msg + '</div></div>';
+}
+/* 結果画面などの「今日はここまで」の代わり。ノルマを終えていれば、自由復習へ進むボタンを出す。
+   start＝押したあとに実行するJS（そのアプリの「今日の復習を始める」）。ノルマが残っていれば空 */
+function rvDoneHtml(start, ids) {
+  if (rvQuotaLeft() > 0) return '';
+  var u = rvUnit(), lim = rvLimit(), due = rvDueIds(ids).length;
+  if (rvFree()) return '<div class="rv-note">今日のノルマ（' + lim + u + '）は達成ずみ。自由復習中です（+' + (rvDone() - lim) + u + '・期限の来た問題 あと' + due + u + '）。</div>';
+  return '<div class="rv-note"><b>今日のノルマ（' + lim + u + '）は達成です。</b>解説・一覧・履歴はこのまま見られます。'
+    + (due ? '<br><button type="button" class="rv-btn rv-on" onclick="rvSetFree(true);' + rvEsc(start || 'rvChanged()') + '">もっと復習する（期限の来た問題 あと' + due + u + '・ノルマは' + lim + u + 'のまま）</button>' : '')
+    + '</div>';
 }
 /* 3段階の自己採点ボタン。fn は押したときに呼ぶ関数名（点 100/60/0 を渡す）。
    opt.hint=true（ヒントを見た）なら①は押せない。opt.sel=いまの点（付け直し画面で印を付ける）
@@ -44888,6 +44919,7 @@ function rvUi(act, v) {
   else if (act === 'capAll') rvSetCfg('capAll', !!v);
   else if (act === 'newPerDay') rvSetCfg('newPerDay', v | 0);
   else if (act === 'enroll') rvEnrollWaiting();
+  else if (act === 'free') rvSetFree(!!v);
   else if (act === 'detail') return rvShowDetail(v);
   rvChanged();
 }
@@ -46514,8 +46546,10 @@ function renderLastWrong() {
       + ws.slice(0, 6).map(w => '<b>' + escapeHtml(w.word) + '</b>').join('、') + (ws.length > 6 ? ' ほか' : '') + '</div>'
     : '';
 }
-function runQuestions(qs, fromHold) {
-  T.qs = qs; T.i = 0; T.res = []; T.answered = false; T.startedAt = Date.now(); T.cut = 0;
+/* prac=true は「まちがえた語に再挑戦」（2026-10-27）。練習なので記録しない
+   （箱・1日30語の回数・成績・履歴は1回目のまま＝明日の復習にはふつうに出る）。今日もう答えた語も出す */
+function runQuestions(qs, fromHold, prac) {
+  T.qs = qs; T.i = 0; T.res = []; T.answered = false; T.startedAt = Date.now(); T.cut = 0; T.prac = !!prac;
   /* 前に保留した語は、この回に入っていないぶんを残しておく（新しい回で上書きしない） */
   const inRun = new Set(qs.map(q => String(q.w.id)));
   T.holdPrev = fromHold ? [] : ((rvHold() || {}).ids || []).filter(id => !inRun.has(String(id)));
@@ -46530,10 +46564,12 @@ function runQuestions(qs, fromHold) {
 }
 /* 出す直前に確かめる。別の入口・別の端末で今日の枠を使い切った語や、今日もう答えた語は飛ばす */
 function skipUnservable() {
+  if (T.prac) return;
   while (T.i < T.qs.length && !rvServeOk(T.qs[T.i].w.id, T.qs[T.i].again)) { T.cut++; T.i++; }
 }
 /* 途中でやめた回の保留（未回答の語をこの端末に残し、次に開いたとき続きから出す） */
 function saveHold() {
+  if (T.prac) return;
   const rest = T.qs.slice(T.answered ? T.i + 1 : T.i).filter(q => !q.again).map(q => q.w.id).concat(T.holdPrev || []);
   rvHoldSave(rest.length ? { ids: rest, kind: T.kind, week: T.week, genre: T.genre || 'all', at: Date.now() } : null);
 }
@@ -46559,9 +46595,17 @@ function retryLastWrong() {
   T.week = 'all'; T.genre = 'all';
   T.kind = (getLastWrong() || {}).kind || T.kind;
   document.querySelectorAll('#testKindSeg .seg-btn').forEach(x => x.classList.toggle('active', x.dataset.kind === T.kind));
-  const list = gateWords(ws);   // 今日もう答えた語は出さない（当日の解き直しは結果画面から）
-  if (!list) return;
-  runQuestions(buildQuestions(list, T.kind));
+  const qs = buildQuestions(ws, T.kind);
+  if (!qs.length) { showToast('この形式で出せる問題がありません'); return; }
+  runQuestions(qs, false, true);   // 再挑戦＝練習（今日もう答えた語も出す・記録しない）
+}
+/* 結果画面から、いまの回でまちがえた語だけに再挑戦（練習） */
+function retryWrongPrac() {
+  const ws = Array.from(new Set(T.res.filter(r => !r.ok).map(r => r.q.w.id))).map(byId).filter(Boolean);
+  if (!ws.length) return;
+  const qs = buildQuestions(ws, T.kind);
+  if (!qs.length) { showToast('この形式で出せる問題がありません'); return; }
+  runQuestions(qs, false, true);
 }
 /* ================= 何回解いたか・未解答だけ（2026-10-14） =================
    回数は U.stats の ok + ng（答えるたびに srsUpdate が1つ増やす。合言葉で同期ずみ）。新しい保存先は持たない */
@@ -46669,11 +46713,11 @@ function renderQuestion() {
   const q = T.qs[T.i];
   const el = document.getElementById('testRun');
   T.answered = false;
-  if (!rvEnrolled(q.w.id)) rvView(q.w.id);   // 閲覧した（答え合わせ前）
+  if (!T.prac && !rvEnrolled(q.w.id)) rvView(q.w.id);   // 閲覧した（答え合わせ前）
   let h = '<div class="panel">';
   // おかわりを後ろに足しても「◯/◯」の分母は動かさない（本編の問数だけを数える）
   const qN = T.qs.filter(x => !x.again).length || T.qs.length;
-  h += '<div class="q-head"><span>' + (q.again ? '🔁 解き直し（箱は動かしません）' : (T.i + 1) + ' / ' + qN) + '</span>'
+  h += '<div class="q-head"><span>' + (q.again ? '🔁 解き直し（箱は動かしません）' : (T.prac ? '✍️ 再挑戦（練習・記録しない） ' : '') + (T.i + 1) + ' / ' + qN) + '</span>'
     + '<span class="q-kind">' + KIND_LABEL[q.kind] + '</span>' + (q.again ? '' : countChip(q.w.id))
     + '<button class="btn-mini" onclick="quitTest()">やめる</button></div>';
   h += '<div class="q-bar"><div style="width:' + (Math.min(1, T.i / qN) * 100) + '%"></div></div>';
@@ -46718,6 +46762,12 @@ function queueAgain(q, correct) {
 /* 答え合わせが確定した瞬間に1回だけ。pct=100/60/0（4択・書くの一致は自動で100/0） */
 function recordAnswer(q, correct, userAns, selfPct) {
   const pct = selfPct != null ? selfPct : (correct ? 100 : 0);
+  if (T.prac) {   // 再挑戦＝練習。この回の結果と「前回まちがえた語」だけに残す
+    q.pct = pct;
+    T.res.push({ q: q, ok: pct >= 80, user: userAns || '', pct: pct });
+    if (pct < 80) logWrong(q.w.id);
+    return;
+  }
   const r = srsUpdate(q.w.id, pct, { fmt: q.kind, retry: !!q.again });
   q.eid = r.eid; q.pct = pct; q.rv = r;
   if (q.again) { saveHold(); return; }   // 解き直しは回数だけ数える（箱も成績も1回目のまま）
@@ -46864,7 +46914,8 @@ function nextQuestion() {
   renderQuestion();
 }
 function quitTest() {
-  if (T.res.length && !confirm('ここでやめます。ここまでの' + T.res.length + '問ぶんは記録されます。まだ答えていない語は「途中でやめた回の続き」に残ります。よろしいですか？')) return;
+  if (T.res.length && !confirm(T.prac ? '再挑戦をやめますか？（練習なので記録は変わりません）'
+    : 'ここでやめます。ここまでの' + T.res.length + '問ぶんは記録されます。まだ答えていない語は「途中でやめた回の続き」に残ります。よろしいですか？')) return;
   saveHold();
   stopSinglePlay();
   if (T.res.length) { T.quit = true; finishTest(); return; }   // 結果画面へ（まちがえた語をもう一度 が押せる）
@@ -46884,7 +46935,7 @@ function saveTestResult() {
 }
 function finishTest() {
   const quit = T.quit; T.quit = false;
-  if (!quit) rvHoldSave((T.holdPrev || []).length ? { ids: T.holdPrev, kind: T.kind, week: T.week, genre: T.genre || 'all', at: Date.now() } : null);
+  if (!quit && !T.prac) rvHoldSave((T.holdPrev || []).length ? { ids: T.holdPrev, kind: T.kind, week: T.week, genre: T.genre || 'all', at: Date.now() } : null);
   if (!T.res.length) {   // 1語も答えずに終わった（今日の枠を使い切っていた等）
     document.getElementById('testRun').hidden = true;
     document.getElementById('testSetup').hidden = false;
@@ -46892,18 +46943,21 @@ function finishTest() {
     showToast(rvLeft() <= 0 ? 'このアプリの今日の復習はここまでです' : '出題できる語がありませんでした');
     return;
   }
-  saveTestResult();
+  if (!T.prac) saveTestResult();
   const correct = T.res.filter(r => r.ok).length;
   const pct = Math.round(correct / T.res.length * 100);
   const wrong = T.res.filter(r => !r.ok);
-  let h = '<div class="panel">' + (quit ? '<div class="q-sub">⏸ 途中でやめました（' + T.res.length + '問ぶんを記録）</div>' : '')
+  let h = '<div class="panel">'
+    + (T.prac ? '<div class="q-sub">✍️ 再挑戦の結果（練習なので記録していません。明日の復習は1回目の採点どおりに出ます）</div>'
+      : quit ? '<div class="q-sub">⏸ 途中でやめました（' + T.res.length + '問ぶんを記録）</div>' : '')
     + '<div class="score-big">' + correct + ' / ' + T.res.length + '</div>'
     + '<div class="score-sub">正答率 ' + pct + '%　'
     + (pct === 100 ? '完璧です' : pct >= 80 ? 'よく定着しています' : pct >= 50 ? 'あと一歩、まちがえた語を復習しましょう' : 'まずは意味と語源を読み直しましょう') + '</div>'
     + '<div class="row-btns">'
-    + (wrong.length && rvCfg().retry ? '<button class="btn-primary" onclick="retryWrong()">✍️ まちがえた語を解き直す（今日あと' + Math.max(0, rvCfg().retryMax - rvRetryDone()) + '語まで）</button>' : '')
+    + (wrong.length ? '<button class="btn-primary" onclick="retryWrongPrac()">✍️ まちがえた' + wrong.length + '語に再挑戦（練習・記録しない）</button>' : '')
+    + (wrong.length && rvCfg().retry && !T.prac ? '<button class="btn-primary" onclick="retryWrong()">✍️ まちがえた語を解き直す（今日あと' + Math.max(0, rvCfg().retryMax - rvRetryDone()) + '語まで）</button>' : '')
     + '<button class="btn-outline" onclick="backToSetup()">テスト画面に戻る</button></div>'
-    + (rvLeft() <= 0 ? '<div class="hint-line"><b>このアプリの今日の復習はここまでです。</b>カード・語源・履歴はこのまま見られます。</div>' : '')
+    + rvDoneHtml('backToSetup();startDueTest()')
     + (T.cut ? '<div class="hint-line">今日の枠を使い切った・今日もう答えた語 ' + T.cut + '語は出しませんでした。</div>' : '')
     + '<div class="hint-line">まちがえた語は<b>明日</b>の復習に出ます（当日中にはくり返し出しません）。正解した語ほど間隔が空きます。</div>'
     + '<div class="rlist">' + T.res.map(r =>
