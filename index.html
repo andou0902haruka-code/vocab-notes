@@ -144,6 +144,8 @@
     background: var(--card); border-radius: 14px; padding: 14px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 12px;
   }
+  /* 画面外のカードは配置の計算を後回しにする（一覧が長いとiPhoneでカクつくため・2026-10-28。見た目は変わらない） */
+  .wcard { content-visibility: auto; contain-intrinsic-size: auto 550px; }
   .w-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .w-word { font-size: 1.3rem; font-weight: 700; letter-spacing: 0.01em; }
   .w-ipa { font-size: 0.82rem; color: var(--sub); }
@@ -43907,17 +43909,25 @@ function pullSync() {
     return changed;
   }).catch(() => { syncState = 'error'; paintSync(); return false; });
 }
+/* 答えるたびには送らない（記録が増えるほど送信が重くなり、iPhoneで答えた後がもたつくため・2026-10-28）。
+   端末には保存ずみなので、PUSH_MS ごと・画面を離れるとき・テストの結果画面でまとめて送る */
+const PUSH_MS = 30000;
+let pushAgain = false;
 function schedulePush() {
   if (!syncRef) return;
-  if (pushTimer) clearTimeout(pushTimer);
-  pushTimer = setTimeout(doPush, 1500);
+  if (typeof document !== 'undefined' && document.visibilityState === 'hidden') { flushPush(); return; }
+  if (!pushTimer) pushTimer = setTimeout(doPush, PUSH_MS);   /* 予約ずみなら押し戻さない */
+}
+function flushPush() {
+  if (pushTimer) { clearTimeout(pushTimer); doPush(); }
 }
 function doPush() {
   pushTimer = null;
-  if (!syncRef || pushing) return;
+  if (!syncRef) return;
+  if (pushing) { pushAgain = true; return; }   /* 送信中に頼まれたぶんは、終わってから送る */
   pushing = true; syncState = 'busy'; paintSync();
   syncRef.set({ json: JSON.stringify(U), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
-    .then(() => { pushing = false; syncState = 'ok'; paintSync(); })
+    .then(() => { pushing = false; syncState = 'ok'; paintSync(); if (pushAgain) { pushAgain = false; doPush(); } })
     .catch(() => {
       pushing = false; syncState = 'error'; paintSync();
       if (pushTimer) clearTimeout(pushTimer);
@@ -44684,7 +44694,7 @@ function rvMerge(a, b) {
   o.cfg = (b.cfg.t || 0) > (a.cfg.t || 0) ? b.cfg : a.cfg;
   return o;
 }
-var RV_SYNC = { state: 'off', ref: null, timer: null, busy: false, again: false, ready: null };
+var RV_SYNC = { state: 'off', ref: null, timer: null, at: 0, busy: false, again: false, ready: null };
 var RV_FB = { apiKey: 'AIzaSyASWojYpZ3KJBYG9V30Y4BmplUFORYOelw', authDomain: 'ai-english-review.firebaseapp.com',
   projectId: 'ai-english-review', storageBucket: 'ai-english-review.firebasestorage.app',
   messagingSenderId: '146537476580', appId: '1:146537476580:web:4ef3dfdf9c0969f25b17f1' };
@@ -44747,11 +44757,19 @@ function rvPull() {
     return changed;
   }).catch(function () { RV_SYNC.state = 'error'; return false; });
 }
+/* 答えるたびには送らない（記録が増えるほど1回の送信が重くなり、iPhoneで答えた後がもたつくため・2026-10-28）。
+   端末には答えた瞬間に保存ずみ。クラウドへは RV_PUSH_MS ごとにまとめて送り、画面を離れるとき・結果画面ではすぐ送る。
+   すでに予約があれば、それより遅い予約で押し戻さない（解き続けても RV_PUSH_MS ごとには送られる） */
+var RV_PUSH_MS = 30000;
 function rvSchedulePush(ms) {
   if (!rvSid() || typeof setTimeout === 'undefined') return;
-  if (RV_SYNC.timer) clearTimeout(RV_SYNC.timer);
-  RV_SYNC.timer = setTimeout(rvPush, ms == null ? 1200 : ms);
+  var d = ms == null ? RV_PUSH_MS : ms, at = Date.now() + d;
+  if (RV_SYNC.timer) { if (RV_SYNC.at <= at) return; clearTimeout(RV_SYNC.timer); }
+  RV_SYNC.at = at;
+  RV_SYNC.timer = setTimeout(rvPush, d);
 }
+/* 予約している送信を今すぐ行う（結果画面・画面を離れるとき） */
+function rvFlush() { if (RV_SYNC.timer) { clearTimeout(RV_SYNC.timer); rvPush(); } }
 function rvPush() {
   RV_SYNC.timer = null;
   if (!RV_SYNC.ref) return;
@@ -44783,9 +44801,8 @@ function rvInit() {
   rvAbsorb();
   rvCompact();
   if (typeof document !== 'undefined' && document.addEventListener) {
-    document.addEventListener('visibilitychange', function () {
-      if (document.visibilityState === 'hidden' && RV_SYNC.timer) { clearTimeout(RV_SYNC.timer); rvPush(); }
-    });
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') rvFlush(); });
+    if (typeof window !== 'undefined' && window.addEventListener) window.addEventListener('pagehide', rvFlush);
   }
   /* Firebase をまだ読んでいないページ（表現メモ）は、ほかの部品の読み込みが先に始まるよう少し待ってから合流する */
   var G = (typeof window !== 'undefined') ? window : {}, wait = (G.firebase && G.firebase.firestore) || !rvSid() ? 0 : 1500;
@@ -45330,7 +45347,7 @@ function mvRender() {
 var HS_MAX = 800;          /* 残す件数。1件およそ150バイトなので最大でも約120KB */
 var HS_TEXT_MAX = 160;     /* 問題文・答えの保存する長さ */
 var HS_PAGE = 40;          /* 一覧を一度に出す件数 */
-var HS_PUSH_MS = 6000;     /* クラウドへ送るまでの待ち時間 */
+var HS_PUSH_MS = 30000;    /* クラウドへ送るまでの待ち時間。解き続けてもこの間隔でまとめて送る（2026-10-28 に6秒から変更） */
 
 /* 点数の帯。区切りは各アプリの「正解 / 惜しい / まだ」と揃えてある（80以上＝正解・40以上＝惜しい） */
 var HS_BANDS = [
@@ -45353,6 +45370,7 @@ var HS_BAND = 'all';       /* いま選んでいる点数の帯 */
 var HS_SHOWN = HS_PAGE;    /* いま出している件数 */
 var HS_TIMER = null;
 var HS_HOOKED = 0;
+var HS_DIRTY = 0;          /* まだクラウドへ送っていない記録がある */
 
 function hsEnv() { return (typeof HS_ENV !== 'undefined' && HS_ENV) ? HS_ENV : {}; }
 function hsUnit() { return hsEnv().unit || '件'; }
@@ -45436,8 +45454,8 @@ function hsSave(push) {
 }
 /* クラウドへは間を置いてまとめて送る。画面を離れるときは取りこぼさないよう必ず送る */
 function hsSchedulePush() {
-  if (HS_TIMER) clearTimeout(HS_TIMER);
-  HS_TIMER = setTimeout(hsFlush, HS_PUSH_MS);
+  HS_DIRTY = 1;
+  if (!HS_TIMER) HS_TIMER = setTimeout(hsFlush, HS_PUSH_MS);   /* 予約ずみなら押し戻さない */
   if (!HS_HOOKED && typeof window !== 'undefined' && window.addEventListener) {
     HS_HOOKED = 1;
     window.addEventListener('pagehide', hsFlush);
@@ -45448,7 +45466,7 @@ function hsSchedulePush() {
 }
 function hsFlush() {
   if (HS_TIMER) { clearTimeout(HS_TIMER); HS_TIMER = null; }
-  if (HS_LIST) hsSave(true);
+  if (HS_LIST && HS_DIRTY) { HS_DIRTY = 0; hsSave(true); }
 }
 
 /* --- 1件ぶん記録する（答え合わせが済んだ瞬間に呼ぶ） --- */
@@ -45633,6 +45651,60 @@ function weakWords() {
     .sort((a, b) => (statOf(b.id).ng - statOf(b.id).ok) - (statOf(a.id).ng - statOf(a.id).ok));
 }
 
+/* AW:JS:BEGIN */
+/* 音声の先読み（英単語ノート・表現メモ・Gimmy英作文の3サイト共通・2026-10-28）。
+   正本は .claude/skills_assets/audio-warm/warm.js → inject.py で各サイトの AW:JS の目印の間へ配る。
+   音声は押した瞬間にネットから取りに行くと、iPhoneでは鳴るまで間があく（答えた後の自動読み上げが特に目立つ）。
+   そこで出題した時点で答えの音声を裏で取っておき、押したら手元の写しを鳴らす。
+     AudioWarm.warm([src, …]) … 先に取っておく（取り終わるまで待たない・失敗しても何もしない）
+     AudioWarm.src(src)       … 手元に写しがあればそれ、なければ元の src を返す（同期。押した瞬間の再生を止めない）
+   取った音声は端末の Cache Storage にも残すので、次に開いたときもネットを待たない（AW_MAX 件まで、古いものから消す）。
+   file:// で開いたとき（テスト）や fetch の無い環境では何もしない＝元の src のまま再生する。
+   音声ファイルを同じ名前で作り直したときは AW_CACHE の末尾の版を上げる（古い写しを使わないため） */
+var AudioWarm = (function (G) {
+  if (G && G.AudioWarm) return G.AudioWarm;
+  var AW_CACHE = 'aw-audio-v1', AW_MAX = 1500, AW_MEM = 150;
+  var mem = new Map(), pend = {}, puts = 0;
+  var on = !!G && typeof fetch === 'function' && !!G.location && /^https?:$/.test(G.location.protocol) && typeof URL !== 'undefined' && URL.createObjectURL;
+  function abs(s) { try { return new URL(s, G.location.href).href; } catch (e) { return String(s); } }
+  function keep(k, blob) {
+    if (mem.has(k)) return;
+    mem.set(k, URL.createObjectURL(blob));
+    if (mem.size > AW_MEM) { var f = mem.keys().next().value; URL.revokeObjectURL(mem.get(f)); mem.delete(f); }
+  }
+  function prune(c) {
+    if (++puts % 40) return;
+    c.keys().then(function (ks) { ks.slice(0, Math.max(0, ks.length - AW_MAX)).forEach(function (r) { c.delete(r); }); }).catch(function () {});
+  }
+  function get(k) {
+    if (!G.caches) return fetch(k);
+    return G.caches.open(AW_CACHE).then(function (c) {
+      return c.match(k).then(function (hit) {
+        if (hit) return hit;
+        return fetch(k).then(function (r) { if (r.ok) { c.put(k, r.clone()).then(function () { prune(c); }).catch(function () {}); } return r; });
+      });
+    }).catch(function () { return fetch(k); });
+  }
+  function warm(list) {
+    if (!on) return;
+    [].concat(list || []).forEach(function (s) {
+      if (!s) return;
+      var k = abs(s);
+      if (mem.has(k) || pend[k]) return;
+      pend[k] = 1;
+      get(k).then(function (r) { return r && r.ok ? r.blob() : null; })
+        .then(function (b) { if (b && b.size) keep(k, b); })
+        .catch(function () {})
+        .then(function () { delete pend[k]; });
+    });
+  }
+  function src(s) { return on && s ? (mem.get(abs(s)) || s) : s; }
+  var api = { warm: warm, src: src };
+  if (G) G.AudioWarm = api;
+  return api;
+})(typeof window !== 'undefined' ? window : null);
+/* AW:JS:END */
+
 /* ================= 音声 ================= */
 let curAudio = null, curBtn = null;
 function resetPlayBtn(btn) { if (btn) { btn.textContent = btn.dataset.icon || '🔊'; btn.classList.remove('playing'); } }
@@ -45644,7 +45716,7 @@ function playAudio(btn, src) {
   if (curBtn === btn && curAudio) { stopSinglePlay(); return; }
   stopSinglePlay();
   pauseSeqIfPlaying();
-  const a = new Audio(src);
+  const a = new Audio(AudioWarm.src(src));
   curAudio = a; curBtn = btn;
   btn.classList.add('playing'); btn.textContent = '⏸';
   a.onended = () => { if (curAudio === a) stopSinglePlay(); };
@@ -46280,14 +46352,19 @@ function seqEl() {
   }
   return seqAudio;
 }
+function seqStepSrc(s) {
+  const w = s && s.kind !== 'gap' ? seq.list[s.wi] : null;
+  if (!w) return null;
+  return s.kind === 'ja' ? jaAudio(w.id) : s.kind === 'ex' ? exAudio(w.id, 0) : wordAudio(w.id);
+}
 function seqPlayCurrent() {
   const s = seq.steps[seq.i];
   if (!s) { seqEnd(); return; }
   renderPlayer();
   if (s.kind === 'gap') { seqAfter(seq.gap); return; }
-  const w = seq.list[s.wi];
   const a = seqEl();
-  a.src = s.kind === 'ja' ? jaAudio(w.id) : s.kind === 'ex' ? exAudio(w.id, 0) : wordAudio(w.id);
+  a.src = AudioWarm.src(seqStepSrc(s));
+  AudioWarm.warm(seq.steps.slice(seq.i + 1, seq.i + 4).map(seqStepSrc));   /* 次に鳴らす数本を先に取っておく */
   a.playbackRate = seqRateNow();
   const pr = a.play();
   if (pr && pr.catch) pr.catch(() => { seq.playing = false; renderPlayer(); });
@@ -46709,10 +46786,17 @@ function gateWords(list) {
   if (out.length < list.length && g.cutCap) showToast('復習の語は今日の残り枠（あと' + rvLeft() + '語）のぶんだけ出します');
   return out;
 }
+/* 答えの音声を出題した時点で取っておく（答えた瞬間に鳴らすため）。次の問題のぶんも先に */
+function warmQuestionAudio() {
+  [T.qs[T.i], T.qs[T.i + 1]].forEach(q => {
+    if (q && q.w) AudioWarm.warm([wordAudio(q.w.id), exAudio(q.w.id, q.si || 0)]);
+  });
+}
 function renderQuestion() {
   const q = T.qs[T.i];
   const el = document.getElementById('testRun');
   T.answered = false;
+  warmQuestionAudio();
   if (!T.prac && !rvEnrolled(q.w.id)) rvView(q.w.id);   // 閲覧した（答え合わせ前）
   let h = '<div class="panel">';
   // おかわりを後ろに足しても「◯/◯」の分母は動かさない（本編の問数だけを数える）
@@ -46932,6 +47016,8 @@ function saveTestResult() {
   U.hist.unshift({ at: Date.now(), week: T.week, genre: T.genre || 'all', kind: T.kind, n: T.res.length, correct: correct });
   if (U.hist.length > 60) U.hist = U.hist.slice(0, 60);
   saveUser();
+  flushPush();   /* 結果画面が区切り：控えていた送信をここでまとめて送る */
+  try { rvFlush(); } catch (e) {}
 }
 function finishTest() {
   const quit = T.quit; T.quit = false;
@@ -47195,7 +47281,8 @@ function bind() {
   document.getElementById('plRepeatEn').addEventListener('change', e => { seq.twice = e.target.checked; saveSeqPrefs(); rebuildKeepPos(); });
   document.getElementById('plLoop').addEventListener('change', e => { seq.loop = e.target.checked; saveSeqPrefs(); });
   document.getElementById('plShowEn').addEventListener('change', e => { seq.showEn = e.target.checked; saveSeqPrefs(); renderPlayer(); });
-  document.addEventListener('visibilitychange', () => { if (document.hidden) { stopSinglePlay(); pauseSeqIfPlaying(); } else if (syncRef) pullSync().then(ch => { if (ch) refreshAll(); }); });
+  window.addEventListener('pagehide', flushPush);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { stopSinglePlay(); pauseSeqIfPlaying(); flushPush(); } else if (syncRef) pullSync().then(ch => { if (ch) refreshAll(); }); });
 }
 function rebuildKeepPos() {
   const cur = seq.steps[seq.i];
