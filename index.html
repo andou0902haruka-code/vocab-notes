@@ -44105,7 +44105,7 @@ const RV_ENV = {
   legacy() { return Object.keys(U.srs).map(id => { const s = U.srs[id] || {}; return { id: id, box: s.box | 0, due: s.due, last: s.last }; }); },
   put(id, st) { U.srs[String(id)] = { box: st.box, due: st.dueMs, last: st.last }; saveUser(); },
   ids() { return WORDS.map(w => String(w.id)); },
-  timeCap() { return reviewCap(); },
+  /* timeCap は渡さない（2026-10-30）。「今日つかう時間」で30語より少なく削られていたため。上限は30語だけ（表現メモと同じ） */
   recog(fmt) { return fmt === 'e2j'; },
   viewed(id) { return solvedCount(id) > 0; },
   label(id) { const w = byId(id); return w ? w.word + ' … ' + (((w.senses || [])[0] || {}).ja || '') : String(id); },
@@ -45625,7 +45625,7 @@ function riskRank(id) {
   return overdueDaysOf(id) >= 14 ? Math.min(b, 1) : b;
 }
 /* 期限が来た語から、今日ぶんだけを切り出す（rv.js: 直近でまちがえた・弱い語20＋長く待っている語10、
-   今日の残り枠と「今日つかう時間」のどちらか小さいほうまで） */
+   今日の残り枠＝1日30語まで） */
 function dueToday() {
   return rvPick(genreWords(genreOn()).map(w => String(w.id))).map(byId).filter(Boolean);
 }
@@ -47154,8 +47154,7 @@ function renderReview() {
           return '<i class="' + (x > cap ? 'over' : '') + '" style="height:'
             + Math.max(2, Math.round(x / mx * 18)) + 'px" title="' + (i + 1) + '日後 ' + x + '語"></i>'; }).join('')
       + '</span>'
-    : rvLeft() <= 0 ? '' : '新しい語は テスト →「🆕 未解答だけ」から（復習への登録は1日' + rvCfg().newPerDay + '語まで）。')
-    + reviewMinChipsHtml();
+    : rvLeft() <= 0 ? '' : '新しい語は テスト →「🆕 未解答だけ」から（復習への登録は1日' + rvCfg().newPerDay + '語まで）。');
   const sb = document.getElementById('dueStartBtn');
   sb.disabled = !today.length;
   sb.textContent = today.length ? '▶ 今日の復習を始める（' + today.length + '語）' : (rvLeft() <= 0 ? '今日の復習はここまで' : '期限の来た語はありません');
