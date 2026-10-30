@@ -45658,17 +45658,24 @@ function weakWords() {
    そこで出題した時点で答えの音声を裏で取っておき、押したら手元の写しを鳴らす。
      AudioWarm.warm([src, …]) … 先に取っておく（取り終わるまで待たない・失敗しても何もしない）
      AudioWarm.src(src)       … 手元に写しがあればそれ、なければ元の src を返す（同期。押した瞬間の再生を止めない）
+     AudioWarm.play(audio, src) … audio に src（手元の写しがあればそれ）を入れて鳴らす。play() の Promise を返す。
+                                  写しで鳴らせなかったら、同じ audio で元の src に入れ替えて鳴らし直す（2026-10-30）
+   2026-10-30 iPhoneで答えの自動読み上げが鳴らなくなった。GitHub Pages は mp3 を audio/mp3（標準外）で返すので、
+   写し（blob）にもその型が付き、Safari が blob を再生できないことがある。写しは audio/mpeg に付け直し、
+   それでも鳴らなければ元の URL に戻す（この端末ではその後も写しを使わない）。
+   鳴らすときは必ず AudioWarm.play を通す（src だけ差し替えると、失敗したとき無音のままになる）。
    取った音声は端末の Cache Storage にも残すので、次に開いたときもネットを待たない（AW_MAX 件まで、古いものから消す）。
    file:// で開いたとき（テスト）や fetch の無い環境では何もしない＝元の src のまま再生する。
    音声ファイルを同じ名前で作り直したときは AW_CACHE の末尾の版を上げる（古い写しを使わないため） */
 var AudioWarm = (function (G) {
   if (G && G.AudioWarm) return G.AudioWarm;
   var AW_CACHE = 'aw-audio-v1', AW_MAX = 1500, AW_MEM = 150;
-  var mem = new Map(), pend = {}, puts = 0;
+  var mem = new Map(), pend = {}, puts = 0, bad = false;
   var on = !!G && typeof fetch === 'function' && !!G.location && /^https?:$/.test(G.location.protocol) && typeof URL !== 'undefined' && URL.createObjectURL;
   function abs(s) { try { return new URL(s, G.location.href).href; } catch (e) { return String(s); } }
   function keep(k, blob) {
     if (mem.has(k)) return;
+    if (/\.mp3(\?|$)/i.test(k) && blob.type !== 'audio/mpeg') blob = new Blob([blob], { type: 'audio/mpeg' });
     mem.set(k, URL.createObjectURL(blob));
     if (mem.size > AW_MEM) { var f = mem.keys().next().value; URL.revokeObjectURL(mem.get(f)); mem.delete(f); }
   }
@@ -45698,8 +45705,37 @@ var AudioWarm = (function (G) {
         .then(function () { delete pend[k]; });
     });
   }
-  function src(s) { return on && s ? (mem.get(abs(s)) || s) : s; }
-  var api = { warm: warm, src: src };
+  function src(s) { return on && !bad && s ? (mem.get(abs(s)) || s) : s; }
+  function drop(s) { var k = abs(s), u = mem.get(k); if (u) { mem.delete(k); try { URL.revokeObjectURL(u); } catch (e) {} } }
+  /* 写しで鳴らせなかったとき、同じ audio のまま元の src に入れ替える（iPhoneは押した直後の audio なら鳴らし直せる） */
+  function fallback(a) {
+    if (a._awFb) return a._awFb;
+    if (!/^blob:/.test(a.src) || !a._awOrig) return null;
+    var r = a.playbackRate;
+    drop(a._awOrig); bad = true;
+    a.src = a._awOrig; a.playbackRate = r;
+    a._awFb = a.play() || Promise.resolve();
+    return a._awFb;
+  }
+  function play(a, s) {
+    var u = src(s), r = a.playbackRate;
+    a._awOrig = s; a._awFb = null;
+    if (!a._awG && a.addEventListener) {
+      a._awG = 1;
+      /* 写しの読み込み失敗は、ページ側の onerror（ボタンを戻す・「音声がありません」）に届かせない */
+      a.addEventListener('error', function (e) { if (/^blob:/.test(a.src) && fallback(a)) e.stopImmediatePropagation(); }, true);
+    }
+    a.src = u; a.playbackRate = r;
+    var p = a.play();
+    if (!p || !p.then || u === s) return p;
+    return p.catch(function (e) {
+      if (e && e.name === 'NotAllowedError') throw e;   // 自動再生の制限は写しのせいではない
+      var f = fallback(a);
+      if (f) return f;
+      throw e;
+    });
+  }
+  var api = { warm: warm, src: src, play: play };
   if (G) G.AudioWarm = api;
   return api;
 })(typeof window !== 'undefined' ? window : null);
@@ -45716,12 +45752,12 @@ function playAudio(btn, src) {
   if (curBtn === btn && curAudio) { stopSinglePlay(); return; }
   stopSinglePlay();
   pauseSeqIfPlaying();
-  const a = new Audio(AudioWarm.src(src));
+  const a = new Audio();
   curAudio = a; curBtn = btn;
   btn.classList.add('playing'); btn.textContent = '⏸';
   a.onended = () => { if (curAudio === a) stopSinglePlay(); };
   a.onerror = () => { stopSinglePlay(); showToast('音声がまだありません'); };
-  a.play().catch(() => { stopSinglePlay(); showToast('音声を再生できませんでした'); });
+  AudioWarm.play(a, src).catch(() => { if (curAudio === a) { stopSinglePlay(); showToast('音声を再生できませんでした'); } });
 }
 function wordAudio(id) { return 'audio/' + id + '.mp3'; }
 function exAudio(id, i) { return 'audio/' + id + '_' + (i + 1) + '.mp3'; }
@@ -46363,10 +46399,9 @@ function seqPlayCurrent() {
   renderPlayer();
   if (s.kind === 'gap') { seqAfter(seq.gap); return; }
   const a = seqEl();
-  a.src = AudioWarm.src(seqStepSrc(s));
   AudioWarm.warm(seq.steps.slice(seq.i + 1, seq.i + 4).map(seqStepSrc));   /* 次に鳴らす数本を先に取っておく */
   a.playbackRate = seqRateNow();
-  const pr = a.play();
+  const pr = AudioWarm.play(a, seqStepSrc(s));
   if (pr && pr.catch) pr.catch(() => { seq.playing = false; renderPlayer(); });
 }
 function seqAfter(ms) {
