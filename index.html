@@ -112,6 +112,8 @@
   .btn-mini.on { background: var(--teal-bg); border-color: var(--teal); color: var(--teal-dark); }
   .row-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
   .row-btns > * { flex: 1; min-width: 130px; }
+  /* テストの答えの画面の「この単語を削除」（2026-11-08） */
+  .del-in-test { text-align: right; margin-top: 14px; }
   .search-box { margin-bottom: 14px; }
   .section-title {
     display: flex; align-items: center; justify-content: space-between;
@@ -52139,7 +52141,45 @@ function judgeBoxHtml(q, correct, userAns, showDiff) {
   h += rvNoteHtml(q.rv);
   if (q.eid && q.kind !== 'e2j') h += '<details class="rv-panel"><summary>採点を直す（押し間違い・別の正しい答えだったとき）</summary>'
     + rvGradeHtml('fixGrade', { sel: q.pct, fix: true }) + '</details>';
+  h += delInTestHtml();
   return h;
+}
+/* ---- テストの答えの画面から、その単語を削除して次へ（2026-11-08） ----
+   答え合わせ前（自己採点を押す前）なら記録は付けずに外す。答え合わせ後なら記録は残したまま次へ。
+   削除のしくみはカードの🗑と同じ（U.dels・合言葉で同期・下の「🗑 削除した単語」から戻せる）。
+   この回のあとに残っている同じ語（解き直しなど）も外す */
+function delInTestHtml() {
+  return '<div class="del-in-test"><button class="btn-mini" onclick="deleteInTest()">🗑 この単語を削除（今後は出さない）</button></div>';
+}
+function deleteInTest() {
+  const q = T.qs && T.qs[T.i];
+  if (!q) return;
+  const w = q.w;
+  const recorded = !!q.eid || T.res.some(r => r.q === q);
+  if (!confirm('「' + w.word + '」を削除して次へ進みますか？\n（一覧・復習・テストに出なくなります。'
+    + (recorded ? 'この問題の答え合わせの記録は残ります。' : 'この問題は答え合わせをしないので、記録は付きません。')
+    + '下の「🗑 削除した単語」から元に戻せます）')) return;
+  U.dels[String(w.id)] = { t: Date.now(), on: true };
+  saveUser();
+  applyDels();
+  for (let i = T.qs.length - 1; i > T.i; i--) {
+    if (String(T.qs[i].w.id) === String(w.id)) T.qs.splice(i, 1);
+  }
+  updateCounts();
+  showToast('🗑 「' + w.word + '」を削除しました');
+  if (recorded) { nextQuestion(); return; }
+  stopSinglePlay();
+  if (window.speechSynthesis) { try { speechSynthesis.cancel(); } catch (e) {} }
+  T.qs.splice(T.i, 1);
+  T.answered = false; T.userAns = '';
+  skipUnservable();
+  if (T.i < T.qs.length) { saveHold(); renderQuestion(); return; }
+  if (T.res.length) { finishTest(); return; }
+  /* 1問も答え合わせしないまま最後の問題を削除した → 何も記録せずに設定画面へ */
+  saveHold();
+  document.getElementById('testRun').hidden = true;
+  document.getElementById('testSetup').hidden = false;
+  renderTestSetup();
 }
 function answerChoice(ci) {
   if (T.answered) return;
@@ -52172,7 +52212,7 @@ function answerTyped() {
     document.getElementById('judgeBox').innerHTML = '<div class="diff-box">' + diffHtml(val, q.answer) + '</div>'
       + '<div class="ans-line">' + escapeHtml(q.answer) + '</div>' + ansPlayBtnHtml(q, true)
       + rvGradeHtml('selfScore', { q: '模範解答とは一致しません。答えを見る前の自分の答えは？',
-          ref: 'つづりの小さなちがいは②、同じ意味の別の正しい語なら①にできます。' });
+          ref: 'つづりの小さなちがいは②、同じ意味の別の正しい語なら①にできます。' }) + delInTestHtml();
     autoPlayAnswer();
     return;
   }
@@ -52193,6 +52233,7 @@ function revealOral() {
     + '<span>' + markTarget(s.ex, s.target || q.w.word) + '</span></div>'
     + (s.exJa ? '<div class="ex-ja">' + escapeHtml(s.exJa) + '</div>' : '') + '</div>';
   h += rvGradeHtml('selfScore', { q: q.kind === 'recall' ? '答えを見る前に、意味を自分で思い出せていましたか？' : '答えを見る前に、声に出して言えましたか？' });
+  h += delInTestHtml();
   document.getElementById('judgeBox').innerHTML = h;
   autoPlayAnswer();
 }
@@ -52216,7 +52257,7 @@ function revealTypedSelf() {
     + (q.kind === 'cloze' && sx.ex ? '<div class="ex-box" style="margin-top:10px"><div class="ex-en">'
       + '<button class="play-btn sm" data-icon="🔊" data-auto="1" onclick="playAudio(this,\'' + exAudio(q.w.id, q.si) + '\')">🔊</button>'
       + '<span>' + markTarget(sx.ex, sx.target || q.w.word) + '</span></div></div>' : '')
-    + rvGradeHtml('selfScore', { q: '答えを見る前に、頭の中で思い出せていましたか？' });
+    + rvGradeHtml('selfScore', { q: '答えを見る前に、頭の中で思い出せていましたか？' }) + delInTestHtml();
   autoPlayAnswer();
 }
 /* 3段階の自己採点（①100 ②60 ③0）。押した瞬間が答え合わせ。2回目からは付け直し */
