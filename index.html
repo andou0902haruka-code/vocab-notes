@@ -38,6 +38,8 @@
     --photo-bg: #fce7f3;
     --kiwi: #3f6212;
     --kiwi-bg: #ecfccb;
+    --lyr: #a21caf;
+    --lyr-bg: #fae8ff;
   }
   * { box-sizing: border-box; }
   body {
@@ -173,6 +175,10 @@
   .tag.src-web { background: var(--web-bg); color: var(--web); }
   .tag.src-photo { background: var(--photo-bg); color: var(--photo); }
   .tag.src-kiwi { background: var(--kiwi-bg); color: var(--kiwi); }
+  .tag.src-lyr { background: var(--lyr-bg); color: var(--lyr); }
+  .w-src.lyr { color: var(--lyr); }
+  .mini .mnote.lyr { color: var(--lyr); }
+  .pcard .plyr { font-size: 0.74rem; color: var(--lyr); margin-top: 3px; font-weight: 600; }
   .w-src { font-size: 0.72rem; color: var(--note); margin-top: 5px; }
   .w-src.web { color: var(--web); }
   .w-src.web a { color: inherit; text-decoration: underline; }
@@ -60665,12 +60671,24 @@ function photoMiniHtml(w) {
   return '<span class="mnote photo" title="写真から">' + (isAppPhotoWord(w) ? '📱 ' + escapeHtml(w.srcFrom) : '📷 写真') + '</span>';
 }
 
+/* ================= 🎵 歌詞から =================
+   歌詞和訳リンク集（lyrics-links）の「この曲の単語・表現」で「＋単語ノート」を押したもの。
+   同じ github.io なので、あちらのページがこの未清書メモ（vocabNote_pending）に直接入れる
+   （src:"lyrics", srcRef:"曲名 / 歌手", hint:解説, lyricKey）。清書したカードにも src・srcRef が残る。 */
+function isLyricsWord(w) { return !!(w && w.src === 'lyrics'); }
+function lyricsTagHtml(w) { return isLyricsWord(w) ? '<span class="tag src-lyr">🎵 歌詞から</span>' : ''; }
+function lyricsSrcHtml(w) {
+  return isLyricsWord(w) && w.srcRef ? '<div class="w-src lyr">曲: ' + escapeHtml(w.srcRef) + '</div>' : '';
+}
+function lyricsMiniHtml(w) { return isLyricsWord(w) ? '<span class="mnote lyr" title="歌詞から">🎵 歌詞</span>' : ''; }
+
 /* ================= ジャンル（今日の復習・テスト） =================
    出どころでまとめた6つ。今日の復習タブとテストタブで同じ選択が効く（保存キー vocabNote_genre・端末ごと）。
      biz   💼 Bizmate   … src:"note" で srcRef が「Bizmate 〜」（ノートから）
      web   🌐 ネット     … src:"web"（/phrase-research で調べたもの）
      speak 📱 Speak      … src:"photo" で出典がアプリspeak
      kiwi  🥝 Red Kiwi   … src:"photo" で出典が Red Kiwi
+     lyrics 🎵 歌詞      … src:"lyrics"（歌詞和訳リンク集の「＋単語ノート」から）
      self  ✍️ 自分で     … src なし（📕 単語タブで自分で打ち込んで清書したもの）
    どれにも入らないもの（Bizmate 以外のノート・ほかの写真）は「すべて」でだけ出る。
    週まとめ・お気に入りから始めたテストはジャンルを見ない（その一覧をそのまま出す）。 */
@@ -60680,6 +60698,7 @@ const GENRES = [
   { k: 'web',   nm: '🌐 ネット' },
   { k: 'speak', nm: '📱 Speak' },
   { k: 'kiwi',  nm: '🥝 Red Kiwi' },
+  { k: 'lyrics', nm: '🎵 歌詞' },
   { k: 'self',  nm: '✍️ 自分で' }
 ];
 const GENRE_KEY = 'vocabNote_genre';
@@ -60688,6 +60707,7 @@ function genreOf(w) {
   if (!w.src) return 'self';
   if (w.src === 'note' && /^bizmate/i.test(String(w.srcRef || '').trim())) return 'biz';
   if (w.src === 'web') return 'web';
+  if (isLyricsWord(w)) return 'lyrics';
   if (isRedKiwiWord(w)) return 'kiwi';
   if (w.src === 'photo' && /speak/i.test(String(w.srcFrom || '') + ' ' + String(w.srcRef || ''))) return 'speak';
   return null;
@@ -60733,11 +60753,13 @@ function wordCardHtml(w, opts) {
     + (isNoteWord(w) ? '<span class="tag src-note">📓 ノートから</span>' : '')
     + (isWebWord(w) ? '<span class="tag src-web">🌐 調べて</span>' : '')
     + photoTagHtml(w)
+    + lyricsTagHtml(w)
     + (s.ok + s.ng ? '<span class="tag">正答 ' + s.ok + '/' + (s.ok + s.ng) + '</span>' : '')
     + (w.tags || []).map(t => '<span class="tag">' + escapeHtml(t) + '</span>').join('') + '</div>';
   if (isNoteWord(w) && w.srcRef) h += '<div class="w-src">出典: ' + escapeHtml(noteSrcLabel(w)) + '</div>';
   h += webSrcHtml(w);
   h += photoSrcHtml(w);
+  h += lyricsSrcHtml(w);
   (w.senses || []).forEach((sn, i) => { h += senseHtml(w, sn, i); });
   const detail = originHtml(w) + familyHtml(w) + matesHtml(w) + confuseHtml(w);
   if (detail) {
@@ -60876,6 +60898,7 @@ function renderPending() {
     '<div class="pcard"><div class="pw">' + escapeHtml(p.word) + '</div>'
     + (p.rough ? '<div class="pr">' + escapeHtml(p.rough) + '<span style="font-size:0.7rem;color:#a0aec0"> ※機械翻訳の目安</span></div>' : '<div class="pr" style="color:#a0aec0">意味は清書時にClaudeが調べます</div>')
     + (p.memo ? '<div class="pm">📝 ' + escapeHtml(p.memo) + '</div>' : '')
+    + (p.src === 'lyrics' && p.srcRef ? '<div class="plyr">🎵 歌詞から: ' + escapeHtml(p.srcRef) + '</div>' : '')
     + '<div class="pfoot"><span>' + fmtDateFull(p.savedAt) + '</span>'
     + '<button class="del-btn" onclick="deletePending(' + p.id + ')">🗑</button></div></div>'
   ).join('');
@@ -60990,6 +61013,7 @@ function renderWeeks() {
         + (isNoteWord(w) ? '<span class="mnote" title="ノートから">📓 ノート</span>' : '')
         + (isWebWord(w) ? '<span class="mnote web" title="調べて">🌐 調べて</span>' : '')
         + photoMiniHtml(w)
+        + lyricsMiniHtml(w)
         + '<span class="mj hid" onclick="this.classList.remove(\'hid\')">' + escapeHtml((w.senses[0] || {}).ja || '') + '</span>'
         + favBtnHtml(w.id) + '</div>').join('')
     ).join('');
