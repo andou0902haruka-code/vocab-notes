@@ -333,6 +333,10 @@
     border: none; border-bottom: 2px solid var(--teal); border-radius: 4px 4px 0 0; background: rgba(20,150,140,0.10); color: inherit; letter-spacing: 1px; }
   .q-sent .ci:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
   .q-sent .ci:disabled { opacity: 0.75; }
+  .q-timer { position: relative; height: 22px; margin: 2px 0 8px; border-radius: 11px; background: rgba(127,127,127,0.15); overflow: hidden; }
+  .q-timer-bar { position: absolute; inset: 0 auto 0 0; width: 100%; background: rgba(20,150,140,0.35); transition: width 0.2s linear; }
+  .q-timer.low .q-timer-bar { background: rgba(220,60,60,0.45); }
+  .q-timer span { position: relative; display: block; text-align: center; font-size: 0.8rem; line-height: 22px; font-weight: 700; }
   .q-blank { display: inline-block; min-width: 82px; border-bottom: 2px solid var(--teal); text-align: center; color: var(--teal); font-weight: 700; }
   .choices { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
   .choice {
@@ -906,6 +910,11 @@
         <button class="seg-btn" data-kind="cloze">📝 例文穴埋め</button>
         <button class="seg-btn" data-kind="family">🌱 語族</button>
         <button class="seg-btn" data-kind="oral">🗣 言う</button>
+      </div>
+      <label class="field-label">制限時間（例文穴埋めだけ・DETと同じ1語20秒）</label>
+      <div class="seg" id="testTimerSeg">
+        <button class="seg-btn" data-timer="0">なし</button>
+        <button class="seg-btn" data-timer="1">⏱ あり</button>
       </div>
       <label class="field-label">問題数</label>
       <div class="seg" id="testScopeSeg" style="flex-wrap:wrap">
@@ -100873,7 +100882,7 @@ function renderTestSetup() {
     (gn !== 'all' ? '出題はジャンル <b>' + genreLabel(gn) + '</b> の語だけです。<br>' : '') +
     (T.scope === 'new' ? '🆕 <b>未解答だけ</b>：この範囲で、まだ一度も答えていない単語から' + newCountLabel() + '（ランダム）。<br>'
       : T.scope === 'few' ? '🔢 <b>回数が少ない順</b>：この範囲で、解いた回数が少ない単語から' + newCountLabel() + '（未解答があれば先に出ます）。<br>' : '') +
-    '形式は7種類。<b>意味を思い出す</b>＝英単語を見て意味を思い出してから答えを見る（復習の基本）、<b>意味を選ぶ</b>＝4択（選べた＝使える、ではないので補助）、<b>英単語を書く</b>＝日本語から英語を入力（自動採点・差分表示）、<b>例文穴埋め</b>＝DETの Fill in the Blanks と同じ形（文の中の単語の前半だけ見えるので、後半を打つ）、<b>語族</b>＝conduct→conductivity のような派生形、<b>言う</b>＝口頭で答えて自己採点。<br>答えた結果は<b>🔁 今日の復習</b>の間隔にも反映されます。';
+    '形式は7種類。<b>意味を思い出す</b>＝英単語を見て意味を思い出してから答えを見る（復習の基本）、<b>意味を選ぶ</b>＝4択（選べた＝使える、ではないので補助）、<b>英単語を書く</b>＝日本語から英語を入力（自動採点・差分表示）、<b>例文穴埋め</b>＝DETの Fill in the Blanks と同じ形（文の中の単語の前半だけ見えるので、後半を打つ。⏱ 制限時間ありなら1語20秒）、<b>語族</b>＝conduct→conductivity のような派生形、<b>言う</b>＝口頭で答えて自己採点。<br>答えた結果は<b>🔁 今日の復習</b>の間隔にも反映されます。';
   renderSolvedBreak();
   renderNewCount();
   renderLastWrong();
@@ -101104,7 +101113,8 @@ function renderQuestion() {
     + '<button class="btn-mini" onclick="quitTest()">やめる</button></div>';
   h += '<div class="q-bar"><div style="width:' + (Math.min(1, T.i / qN) * 100) + '%"></div></div>';
   if (q.kind === 'cloze') {
-    h += '<div class="q-sub" style="text-align:left;margin-bottom:4px">Type the missing letters to complete the text below</div>'
+    h += (q.tok && timerOn() ? '<div class="q-timer" id="qTimer"><div class="q-timer-bar"></div><span>残り ' + clozeSec(q) + ' 秒</span></div>' : '')
+      + '<div class="q-sub" style="text-align:left;margin-bottom:4px">Type the missing letters to complete the text below</div>'
       + '<div class="q-sent' + (q.tok ? ' fib' : '') + '">' + q.prompt + '</div>'
       + (q.tok ? '<div class="q-sub" style="text-align:left">あと ' + q.left + ' 文字</div>' : '')
       + '<div class="q-sub" style="text-align:left">' + escapeHtml(q.sub) + '</div>';
@@ -101144,6 +101154,33 @@ function renderQuestion() {
     });
   });
   if (cis[0]) cis[0].focus();
+  clearQTimer();
+  if (q.kind === 'cloze' && q.tok && timerOn()) startQTimer(q);
+}
+/* ---- 例文穴埋めの制限時間（2026-11-18）。なし/あり を端末に覚える（既定はなし）。
+   1語20秒（熟語は空欄の語数×20秒）。0になったら、そこまで打った分で答え合わせ（全部空欄なら答えを見て自己採点）。
+   画面が隠れている間（別タブ・アプリ切り替え）は減らさない。答え合わせ・次の問題・やめるで自然に止まる */
+const TIMER_KEY = 'vocabNote_timer';
+function timerOn() { try { return localStorage.getItem(TIMER_KEY) === '1'; } catch (e) { return false; } }
+function setTimerOn(v) { try { localStorage.setItem(TIMER_KEY, v ? '1' : '0'); } catch (e) {} syncTimerSeg(); }
+function syncTimerSeg() { const v = timerOn() ? '1' : '0'; document.querySelectorAll('#testTimerSeg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.timer === v)); }
+function clozeSec(q) { return 20 * Math.max(1, (q.tok || []).filter(t => t.rest).length); }
+let QT = null;
+function clearQTimer() { if (QT) { clearInterval(QT); QT = null; } }
+function startQTimer(q) {
+  const total = clozeSec(q) * 1000;
+  let left = total, last = Date.now();
+  const tick = () => {
+    const box = document.getElementById('qTimer');
+    if (!box || !box.querySelector || T.qs[T.i] !== q || T.answered) { clearQTimer(); return; }
+    const now = Date.now(), dt = now - last; last = now;
+    if (!document.hidden && box.offsetParent !== null) left = Math.max(0, left - dt);
+    box.querySelector('span').textContent = left > 0 ? '残り ' + Math.ceil(left / 1000) + ' 秒' : '時間切れ';
+    box.querySelector('.q-timer-bar').style.width = (left / total * 100) + '%';
+    box.classList.toggle('low', left <= 5000);
+    if (left <= 0) { clearQTimer(); answerTyped(); }
+  };
+  QT = setInterval(tick, 200);
 }
 /* 穴埋めの答え：見せていた前半＋打った後半をつなげて1つの語句に。全部空欄なら '' */
 function clozeValue(q, typed) {
@@ -101362,6 +101399,7 @@ function nextQuestion() {
 function quitTest() {
   if (T.res.length && !confirm(T.prac ? '再挑戦をやめますか？（練習なので記録は変わりません）'
     : 'ここでやめます。ここまでの' + T.res.length + '問ぶんは記録されます。まだ答えていない語は「途中でやめた回の続き」に残ります。よろしいですか？')) return;
+  clearQTimer();
   saveHold();
   stopSinglePlay();
   if (T.res.length) { T.quit = true; finishTest(); return; }   // 結果画面へ（まちがえた語をもう一度 が押せる）
@@ -101592,7 +101630,8 @@ function bind() {
     document.querySelectorAll('#rootKindSeg .seg-btn').forEach(x => x.classList.toggle('active', x === b));
     renderRoots();
   }));
-  loadKinds(); syncKindSeg();
+  loadKinds(); syncKindSeg(); syncTimerSeg();
+  document.querySelectorAll('#testTimerSeg .seg-btn').forEach(b => b.addEventListener('click', () => setTimerOn(b.dataset.timer === '1')));
   document.querySelectorAll('#testKindSeg .seg-btn').forEach(b => b.addEventListener('click', () => toggleKind(b.dataset.kind)));
   document.querySelectorAll('#testScopeSeg .seg-btn').forEach(b => b.addEventListener('click', () => {
     T.scope = b.dataset.scope;
