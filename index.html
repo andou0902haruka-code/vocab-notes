@@ -326,6 +326,13 @@
   .q-prompt { font-size: 1.35rem; font-weight: 700; text-align: center; padding: 10px 0 4px; line-height: 1.5; }
   .q-sub { font-size: 0.85rem; color: var(--sub); text-align: center; line-height: 1.6; }
   .q-sent { font-size: 1rem; line-height: 1.8; padding: 6px 2px; }
+  /* 例文穴埋め＝DETの Fill in the Blanks 形式（単語の前半は見せて、後半だけ打つ） */
+  .q-sent.fib { line-height: 2.1; }
+  .q-sent .cw { white-space: nowrap; font-weight: 700; color: var(--teal); }
+  .q-sent .ci { font: inherit; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 16px; padding: 0 2px; margin: 0 0 0 1px;
+    border: none; border-bottom: 2px solid var(--teal); border-radius: 4px 4px 0 0; background: rgba(20,150,140,0.10); color: inherit; letter-spacing: 1px; }
+  .q-sent .ci:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
+  .q-sent .ci:disabled { opacity: 0.75; }
   .q-blank { display: inline-block; min-width: 82px; border-bottom: 2px solid var(--teal); text-align: center; color: var(--teal); font-weight: 700; }
   .choices { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
   .choice {
@@ -718,7 +725,7 @@
       <li>すでに追加した単語をもう一度保存しようとすると<b>「この単語はすでにノートにあります（追加日）」</b>と出て、前回の内容もその場で確認できる</li>
       <li>各カードの<b>📝 メモ</b>は自分で自由に書き換えられる（合言葉を設定すればPC⇄スマホで共有される）</li>
       <li><b>☆</b>で<b>⭐ お気に入り</b>に登録。<b>📅 週まとめ</b>は月曜〜日曜の週ごとに並び、<b>🎧 通し再生</b>で手を使わず流せる</li>
-      <li><b>✍️ テスト</b>は5種類（意味を選ぶ／英単語を書く／例文穴埋め／語族／ミックス）。成績は週ごとに記録される</li>
+      <li><b>✍️ テスト</b>は7種類（意味を思い出す／意味を選ぶ／英単語を書く／例文穴埋め＝DETのFill in the Blanks形式／語族／言う／ミックス）。形式はいくつでも組み合わせて選べる。成績は週ごとに記録される</li>
       <li><b>🔁 今日の復習</b>は間隔反復。まちがえた単語ほど早く、覚えた単語ほど間を空けて出てくる</li>
       <li><b>🌳 語根マップ</b>は語根・接頭辞ごとに単語をまとめる。1語おぼえると芋づる式に増える</li>
       <li><b>📓 ノートから</b>… 手書きノートの写真から <code>/note-phrase-add</code> で取り込んだ単語。カードに「📓 ノートから」と出典（ノート名・画像名）が付く。一覧の「📓 ノートから」ボタンで絞り込めて、テストの出題範囲でも選べる</li>
@@ -890,7 +897,7 @@
       <div class="genre-row" id="testGenreRow"></div>
       <label class="field-label">出題する範囲</label>
       <select id="testWeekSel" class="select"></select>
-      <label class="field-label">テストの形式</label>
+      <label class="field-label">テストの形式（いくつでも選べます。ミックスは自動で混ぜる）</label>
       <div class="seg" id="testKindSeg" style="flex-wrap:wrap">
         <button class="seg-btn active" data-kind="mix">🎲 ミックス</button>
         <button class="seg-btn" data-kind="recall">💭 意味を思い出す</button>
@@ -99131,7 +99138,7 @@ const HS_ENV = {
   save(list, push){ U.qhist = list; saveUser(push ? true : false); }
 };
 /* 履歴に残す「何を」。例文穴埋めの問題文はHTMLなので、タグを落として文だけにする */
-function histQ(q){ return String(q.prompt || '').replace(/<[^>]*>/g, ' '); }
+function histQ(q){ const p = String(q.prompt || ''); return q.tok ? p.replace(/<input[^>]*maxlength="(\d+)"[^>]*>/g, (m, n) => '_'.repeat(+n)).replace(/<[^>]*>/g, '') : p.replace(/<[^>]*>/g, ' '); }
 /* MOTIV:JS:BEGIN */
 /* ============================================================
    やる気の仕掛け — 中身（連続日数＋12週カレンダー／レベル＆XP／バッジ12種）
@@ -100766,9 +100773,17 @@ function makeQuestion(w, kind, pool) {
     const s = senses[idx];
     const tgt = s.target || w.word;
     const re = new RegExp('\\b' + tgt.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
-    if (!re.test(s.ex)) return null;
-    const blanked = escapeHtml(s.ex).replace(re, '<span class="q-blank">?</span>');
-    return { kind: 'cloze', w: w, si: idx, prompt: blanked, sub: s.exJa || '', answer: tgt, accept: [tgt, w.word], html: true };
+    const m = s.ex.match(re);
+    if (!m) return null;
+    /* DETの Fill in the Blanks と同じ形：単語ごとに前半 floor(n/2) 文字を見せ、後半を打つ（熟語は1語ずつ） */
+    const actual = m[0];
+    const tok = actual.split(/(\s+)/).filter(x => x !== '').map(x => /^\s+$/.test(x) ? { sp: x } : { keep: x.slice(0, Math.floor(x.length / 2)), rest: x.slice(Math.floor(x.length / 2)) });
+    let bi = 0;
+    const mid = tok.map(t => t.sp != null ? escapeHtml(t.sp)
+      : '<span class="cw">' + escapeHtml(t.keep) + '<input class="ci" data-bi="' + (bi++) + '" maxlength="' + t.rest.length + '" style="width:calc(' + t.rest.length + 'ch + ' + (t.rest.length + 6) + 'px)" placeholder="' + '_'.repeat(t.rest.length) + '" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"></span>').join('');
+    const blanked = escapeHtml(s.ex.slice(0, m.index)) + mid + escapeHtml(s.ex.slice(m.index + actual.length));
+    const left = tok.reduce((n, t) => n + (t.rest ? t.rest.length : 0), 0);
+    return { kind: 'cloze', w: w, si: idx, prompt: blanked, sub: s.exJa || '', answer: actual, accept: [actual], html: true, tok: tok, left: left };
   }
   if (kind === 'family') {
     const fam = (w.family || []).filter(f => f.w && f.ja);
@@ -100788,9 +100803,42 @@ function makeQuestion(w, kind, pool) {
   return null;
 }
 const KIND_LABEL = { recall: '意味を思い出す', e2j: '意味を選ぶ', j2e: '英単語を書く', cloze: '例文穴埋め', family: '語族', oral: '言う' };
+/* 形式は複数えらべる（2026-11-18）。T.kind は 'mix' か 'recall,cloze' のようなカンマ区切り */
+const KIND_ORDER = ['recall', 'e2j', 'j2e', 'cloze', 'family', 'oral'];
+function kindList(kind) { return String(kind || 'mix').split(',').filter(k => KIND_ORDER.indexOf(k) !== -1); }
+function kindLabel(kind) { const ks = kindList(kind); return ks.length ? ks.map(k => KIND_LABEL[k]).join('＋') : 'ミックス'; }
+const KINDS_KEY = 'vocabNote_kinds';
+function loadKinds() { try { const v = localStorage.getItem(KINDS_KEY); if (v && (v === 'mix' || kindList(v).length)) T.kind = v; } catch (e) {} }
+function saveKinds() { try { localStorage.setItem(KINDS_KEY, T.kind); } catch (e) {} }
+function syncKindSeg() {
+  const ks = kindList(T.kind);
+  document.querySelectorAll('#testKindSeg .seg-btn').forEach(x => x.classList.toggle('active', ks.length ? ks.indexOf(x.dataset.kind) !== -1 : x.dataset.kind === 'mix'));
+}
+/* ミックスを押す→ミックスだけ。ほかの形式は押すたびに入れる/外す（全部外したらミックス） */
+function toggleKind(k) {
+  if (k === 'mix') T.kind = 'mix';
+  else {
+    const ks = kindList(T.kind), i = ks.indexOf(k);
+    if (i === -1) ks.push(k); else ks.splice(i, 1);
+    T.kind = ks.length ? KIND_ORDER.filter(x => ks.indexOf(x) !== -1).join(',') : 'mix';
+  }
+  saveKinds(); syncKindSeg();
+}
 function buildQuestions(list, kind) {
   const pool = WORDS.length >= 4 ? WORDS : list;
   const qs = [];
+  const ks = kindList(kind);
+  if (ks.length > 1) {   /* 複数えらんだ形式を、語ごとに順番に割り当てる（作れない形式なら、えらんだ中の別の形式へ） */
+    const order = shuffle(ks.slice());
+    shuffle(list.slice()).forEach((w, n) => {
+      let q = null;
+      for (let j = 0; j < order.length && !q; j++) q = makeQuestion(w, order[(n + j) % order.length], pool);
+      if (!q) q = makeQuestion(w, 'j2e', pool);
+      if (q) qs.push(q);
+    });
+    return shuffle(qs);
+  }
+  if (ks.length === 1) kind = ks[0];
   list.forEach(w => {
     let k = kind;
     if (kind === 'mix') {
@@ -100825,7 +100873,7 @@ function renderTestSetup() {
     (gn !== 'all' ? '出題はジャンル <b>' + genreLabel(gn) + '</b> の語だけです。<br>' : '') +
     (T.scope === 'new' ? '🆕 <b>未解答だけ</b>：この範囲で、まだ一度も答えていない単語から' + newCountLabel() + '（ランダム）。<br>'
       : T.scope === 'few' ? '🔢 <b>回数が少ない順</b>：この範囲で、解いた回数が少ない単語から' + newCountLabel() + '（未解答があれば先に出ます）。<br>' : '') +
-    '形式は7種類。<b>意味を思い出す</b>＝英単語を見て意味を思い出してから答えを見る（復習の基本）、<b>意味を選ぶ</b>＝4択（選べた＝使える、ではないので補助）、<b>英単語を書く</b>＝日本語から英語を入力（自動採点・差分表示）、<b>例文穴埋め</b>＝文の中で使えるか、<b>語族</b>＝conduct→conductivity のような派生形、<b>言う</b>＝口頭で答えて自己採点。<br>答えた結果は<b>🔁 今日の復習</b>の間隔にも反映されます。';
+    '形式は7種類。<b>意味を思い出す</b>＝英単語を見て意味を思い出してから答えを見る（復習の基本）、<b>意味を選ぶ</b>＝4択（選べた＝使える、ではないので補助）、<b>英単語を書く</b>＝日本語から英語を入力（自動採点・差分表示）、<b>例文穴埋め</b>＝DETの Fill in the Blanks と同じ形（文の中の単語の前半だけ見えるので、後半を打つ）、<b>語族</b>＝conduct→conductivity のような派生形、<b>言う</b>＝口頭で答えて自己採点。<br>答えた結果は<b>🔁 今日の復習</b>の間隔にも反映されます。';
   renderSolvedBreak();
   renderNewCount();
   renderLastWrong();
@@ -100921,7 +100969,7 @@ function retryLastWrong() {
   switchView('test');
   T.week = 'all'; T.genre = 'all';
   T.kind = (getLastWrong() || {}).kind || T.kind;
-  document.querySelectorAll('#testKindSeg .seg-btn').forEach(x => x.classList.toggle('active', x.dataset.kind === T.kind));
+  syncKindSeg();
   const qs = buildQuestions(ws, T.kind);
   if (!qs.length) { showToast('この形式で出せる問題がありません'); return; }
   runQuestions(qs, false, true);   // 再挑戦＝練習（今日もう答えた語も出す・記録しない）
@@ -100993,7 +101041,7 @@ function renderTestHistory() {
   el.innerHTML = h.map(x => {
     const label = (x.week === 'all' ? '全期間' : x.week === 'favs' ? '⭐お気に入り' : x.week === 'due' ? '🔁今日の復習' : x.week === 'note' ? '📓ノートから' : x.week === 'web' ? '🌐調べて' : x.week === 'photo' ? '📷写真から' : x.week === 'weak' ? '⚠️苦手' : weekRangeLabel(x.week))
       + (x.genre && x.genre !== 'all' ? '・' + genreLabel(x.genre) : '');
-    return '<div class="hist-row"><span>' + fmtDateShort(x.at) + ' ' + label + '<span style="color:var(--sub);font-size:0.76rem"> / ' + (KIND_LABEL[x.kind] || 'ミックス') + '</span></span>'
+    return '<div class="hist-row"><span>' + fmtDateShort(x.at) + ' ' + label + '<span style="color:var(--sub);font-size:0.76rem"> / ' + kindLabel(x.kind) + '</span></span>'
       + '<span class="hs">' + x.correct + '/' + x.n + '（' + Math.round(x.correct / x.n * 100) + '%）</span></div>';
   }).join('');
 }
@@ -101056,7 +101104,10 @@ function renderQuestion() {
     + '<button class="btn-mini" onclick="quitTest()">やめる</button></div>';
   h += '<div class="q-bar"><div style="width:' + (Math.min(1, T.i / qN) * 100) + '%"></div></div>';
   if (q.kind === 'cloze') {
-    h += '<div class="q-sent">' + q.prompt + '</div><div class="q-sub" style="text-align:left">' + escapeHtml(q.sub) + '</div>';
+    h += '<div class="q-sub" style="text-align:left;margin-bottom:4px">Type the missing letters to complete the text below</div>'
+      + '<div class="q-sent' + (q.tok ? ' fib' : '') + '">' + q.prompt + '</div>'
+      + (q.tok ? '<div class="q-sub" style="text-align:left">あと ' + q.left + ' 文字</div>' : '')
+      + '<div class="q-sub" style="text-align:left">' + escapeHtml(q.sub) + '</div>';
   } else if (q.kind === 'e2j') {
     h += '<div class="q-prompt">' + escapeHtml(q.prompt) + '</div>'
       + '<div style="text-align:center"><button class="play-btn" data-icon="🔊" onclick="playAudio(this,\'' + wordAudio(q.w.id) + '\')">🔊</button></div>'
@@ -101069,6 +101120,9 @@ function renderQuestion() {
       '<button class="choice" data-ci="' + i + '" onclick="answerChoice(' + i + ')">' + escapeHtml(c) + '</button>').join('') + '</div>';
   } else if (q.kind === 'oral' || q.kind === 'recall') {
     h += '<div class="row-btns"><button class="btn-primary" onclick="revealOral()">答えを表示</button></div>';
+  } else if (q.kind === 'cloze' && q.tok) {
+    h += '<button class="btn-save" style="margin-top:14px" onclick="answerTyped()">答え合わせ</button>'
+      + '<div class="q-sub">空欄のままでも答え合わせできます（答えを見て自己採点）</div>';
   } else {
     h += '<input type="text" class="ans-input" id="ansInput" style="margin-top:14px" placeholder="英語で入力（空欄なら答えを見て自己採点）" autocomplete="off" autocapitalize="none" spellcheck="false">'
       + '<button class="btn-save" onclick="answerTyped()">答え合わせ</button>';
@@ -101080,6 +101134,22 @@ function renderQuestion() {
     inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); answerTyped(); } });
     inp.focus();
   }
+  /* 穴埋め：文字数ぶん打ったら次の空欄へ・空でBackspaceなら前へ・Enterで答え合わせ */
+  const cis = Array.from(el.querySelectorAll('.ci'));
+  cis.forEach((c, k) => {
+    c.addEventListener('input', () => { if (c.value.length >= c.maxLength && cis[k + 1]) cis[k + 1].focus(); });
+    c.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); answerTyped(); }
+      else if (e.key === 'Backspace' && !c.value && cis[k - 1]) { e.preventDefault(); cis[k - 1].focus(); }
+    });
+  });
+  if (cis[0]) cis[0].focus();
+}
+/* 穴埋めの答え：見せていた前半＋打った後半をつなげて1つの語句に。全部空欄なら '' */
+function clozeValue(q, typed) {
+  if (!typed.some(t => String(t || '').trim())) return '';
+  let b = 0;
+  return q.tok.map(t => t.sp != null ? t.sp : t.keep + String(typed[b++] || '').trim()).join('');
 }
 /* ---- おかわり（2026-08-27 追加） ----
    1日に出せる語数を上限で削るので、1回の復習を「必ず一度は正解して終わる」形にしておく。
@@ -101207,10 +101277,12 @@ function answerTyped() {
   if (T.answered) return;
   const q = T.qs[T.i];
   const inp = document.getElementById('ansInput');
-  const val = inp ? inp.value : '';
+  const cis = q.tok ? Array.from(document.querySelectorAll('#testRun .ci')) : [];
+  const val = q.tok ? clozeValue(q, cis.map(c => c.value)) : (inp ? inp.value : '');
   if (!normAns(val)) { revealTypedSelf(); return; }   // 空欄でも提出できる → 答えを見て自己採点
   T.answered = true;
   if (inp) inp.disabled = true;
+  cis.forEach(c => { c.disabled = true; });
   const accept = (q.accept || [q.answer]).map(normAns);
   const correct = accept.indexOf(normAns(val)) !== -1;
   if (!correct) {   // 一致しない＝まだ決めない。差分を見せて自分で①②③を付ける
@@ -101256,6 +101328,7 @@ function revealTypedSelf() {
   const q = T.qs[T.i];
   const inp = document.getElementById('ansInput');
   if (inp) inp.disabled = true;
+  document.querySelectorAll('#testRun .ci').forEach(c => { c.disabled = true; });
   document.querySelectorAll('#testRun .btn-save').forEach(b => { b.hidden = true; });
   const sx = q.w.senses[q.si] || q.w.senses[0] || {};
   document.getElementById('judgeBox').innerHTML =
@@ -101519,10 +101592,8 @@ function bind() {
     document.querySelectorAll('#rootKindSeg .seg-btn').forEach(x => x.classList.toggle('active', x === b));
     renderRoots();
   }));
-  document.querySelectorAll('#testKindSeg .seg-btn').forEach(b => b.addEventListener('click', () => {
-    T.kind = b.dataset.kind;
-    document.querySelectorAll('#testKindSeg .seg-btn').forEach(x => x.classList.toggle('active', x === b));
-  }));
+  loadKinds(); syncKindSeg();
+  document.querySelectorAll('#testKindSeg .seg-btn').forEach(b => b.addEventListener('click', () => toggleKind(b.dataset.kind)));
   document.querySelectorAll('#testScopeSeg .seg-btn').forEach(b => b.addEventListener('click', () => {
     T.scope = b.dataset.scope;
     document.querySelectorAll('#testScopeSeg .seg-btn').forEach(x => x.classList.toggle('active', x === b));
