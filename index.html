@@ -98322,7 +98322,10 @@ function dueWords() {
      ① 1段進めて移動先の段の間隔 ／ ② 段はそのまま、その段の間隔の半分（切り上げ・1〜7日）
      ③ 2段下げて翌日。不正解でも当日中には戻さない。同じ問題の箱が動くのは1日1回まで
    ・30問の選び方は 20（直近でまちがえた・定着が弱い）＋10（長く待っている）。片方が余れば他方へ
+     どちらの枠も「復習での正答率」が高い問題ほど後ろへ（初回学習の正誤は数えない・2026-11-19）
    ・新規登録は1日5件まで。期限の来た未消化が30件を超える日は0件。超えたぶんは「登録待ち」
+   ・期限の来た問題がノルマの残りより少ない日は、登録待ちを古い順に復習へ入れて30問にそろえる
+     （前日までに初回学習したものだけ・新規登録の5件とは別枠・2026-11-19）
    ・③が3回続いた問題は「学び直し候補」。本人が選んだときだけ7日休める（習得済みとは別）
 
    アプリ側がこのブロックより前に用意するもの:
@@ -98453,10 +98456,12 @@ function rvClampPct(p) { p = Math.round(Number(p)); return isFinite(p) ? Math.ma
    状態は「移行時（または取り込み時）の箱」＋「それ以降の回答」から毎回計算する。
    だから採点を付け直しても、2台の記録が合流しても、回答前の状態から正しく計算し直される。
    e.k: 'r'=復習（登録済みの問題に答えた）'n'=新規学習 'a'=当日の解き直し 'e'=登録待ちから登録 */
-function rvNewSt() { return { en: 0, box: 0, due: 0, last: 0, g: 0, ng3: 0, mv: -1, ad: -1, ed: -1, n: 0 }; }
+/* rs/rn＝復習（k='r'）で箱が動いた回答の点の合計／回数。初回学習（k='n'）は数えない＝正答率の材料 */
+function rvNewSt() { return { en: 0, box: 0, due: 0, last: 0, g: 0, ng3: 0, mv: -1, ad: -1, ed: -1, n: 0, rs: 0, rn: 0 }; }
 function rvFromBase(b) {
   var s = rvNewSt();
   s.en = 1; s.box = b[0] | 0; s.due = b[1] == null ? 0 : b[1]; s.last = b[2] || 0; s.g = b[4] || 0; s.ng3 = b[5] || 0;
+  s.rs = b[6] || 0; s.rn = b[7] || 0;
   return s;
 }
 function rvIsRecog(f) { var fn = rvEnv().recog; try { return !!(fn && f && fn(f)); } catch (e) { return false; } }
@@ -98493,6 +98498,7 @@ function rvApply(s, e) {
     else return;                           /* 初回学習したが、まだ登録していない（登録待ち） */
   }
   if (s.mv === e.d) return;                /* 同じ日に箱が動くのは1回だけ（本体と応用、2台の同時利用でも） */
+  if (e.k === 'r') { s.rs += rvClampPct(e.p); s.rn++; }   /* 正答率は復習の回答だけ（初回学習の正誤は数えない） */
   rvStep(s, e);
 }
 function rvSortEv(a, b) { return a.t - b.t || (a._id < b._id ? -1 : a._id > b._id ? 1 : 0); }
@@ -98588,7 +98594,8 @@ function rvAskFree(ids) {
 /* 出題に使う残り枠。自由復習中は上限なし */
 function rvLeft() { return rvFree() ? 1e6 : rvQuotaLeft(); }
 function rvRetryDone() { return rvTodayEv().filter(function (e) { return e.k === 'a'; }).length; }
-function rvEnrolledToday() { return rvTodayEv().filter(function (e) { return (e.k === 'n' && e.en) || e.k === 'e'; }).length; }
+/* 今日の新規登録の数。空き枠の補充（fl）は新規登録の5件とは別枠なので数えない */
+function rvEnrolledToday() { return rvTodayEv().filter(function (e) { return (e.k === 'n' && e.en) || (e.k === 'e' && !e.fl); }).length; }
 
 /* 期限の来た未消化（今日まだ答えていない・休止していない） */
 function rvDueIds(ids) { return (ids || rvLiveIds()).map(String).filter(rvIsDue); }
@@ -98734,7 +98741,7 @@ function rvCompact() {
     if (!old.length) return;
     var s = rvReplayOne(id, old), lastT = old[old.length - 1].t;
     if (!s.en) return;   /* 登録待ち（初回学習だけ）の記録は残す。消すと「未学習」に見えてしまうため */
-    RV.base[id] = [s.box, s.due, s.last, lastT, s.g, s.ng3];
+    RV.base[id] = [s.box, s.due, s.last, lastT, s.g, s.ng3, s.rs, s.rn];
     old.forEach(function (e) { delete RV.ev[e._id]; n++; });
   });
   if (n) rvSave(false);
@@ -98744,22 +98751,53 @@ function rvCompact() {
 /* ---------------- 30問の選び方 ----------------
    最大20問: 直近でまちがえた・惜しかった・定着が弱い（箱0・1）問題
    最大10問: それ以外の期限到来から、本来の間隔に対して遅れている割合が大きい順
-   片方が余ればもう片方へ回す。期限が来ていない問題で枠を埋めない */
-function rvWeakKey(s) { return (s.g === 3 ? 0 : s.g === 2 ? 1 : 2) * 1000 + (s.box | 0); }
+   片方が余ればもう片方へ回す。期限が来ていない問題で枠を埋めない
+   2026-11-19: どちらの枠も「復習での正答率」が高い問題ほど後ろへ回す。
+     正答率＝復習で答えた点の合計 ÷（回数＋1）。初回学習の正誤は入れない。＋1 は回数が少ないうちに
+     高く出すぎないため（復習でまだ答えていない＝0%＝いちばん前・1回①＝50%・2回①＝67%・3回①＝75%…）
+     弱い枠では、復習でまだ答えていない問題は前回③と同じ扱い（初回に正解していても後ろに回さない） */
+function rvAcc(s) { return s && s.rn ? (s.rs / 100) / (s.rn + 1) : 0; }
+function rvWeakKey(s) { return (!s.rn || s.g === 3) ? 0 : (s.g === 2 ? 1 : 2); }
 function rvLate(id) {
   var s = rvSt(id), iv = rvIv(), over = rvToday() - s.due;
   return over / Math.max(1, iv[Math.min(iv.length - 1, s.box | 0)]);
 }
+/* 長く待っている枠の並び。遅れの割合が大きいほど前、正答率が高いほど後ろ（正答率が高くても遅れが大きければ出る） */
+function rvRestScore(id) { return (1 + Math.max(0, rvLate(id))) * (1.2 - rvAcc(rvSt(id))); }
 function rvIsWeak(s) { return s.g === 3 || s.g === 2 || (s.box | 0) <= 1; }
+/* 期限の来た問題がノルマの残りより少ない日は、登録待ちを古い順に復習へ入れて埋める（2026-11-19）。
+   ・前日までに初回学習（☆）したものだけ（今日覚えたばかりの問題はその日に戻さない）
+   ・新規登録の1日5件とは別枠（fl=1）。ids（いま見ている入口・ジャンル）の問題を先に入れる
+   ・足りないかどうかはアプリ全体の期限到来で数える。自由復習中は埋めない */
+function rvFillWaiting(ids) {
+  rvLoad();
+  if (rvFree()) return [];
+  var need = rvQuotaLeft() - rvDueIds().length;
+  if (need <= 0) return [];
+  var today = rvToday(), want = {};
+  (ids || []).forEach(function (id) { want[String(id)] = 1; });
+  var w = rvWaitIds().filter(function (id) { return rvDayOf(RV.wait[id]) < today && !rvPaused(id); });
+  if (!w.length) return [];
+  var pick = w.filter(function (id) { return want[id]; }).concat(w.filter(function (id) { return !want[id]; })).slice(0, need);
+  var now = rvNow();
+  pick.forEach(function (id, i) {
+    RV.ev['e:' + id] = { i: id, t: now + i, d: rvDayOf(now), k: 'e', fl: 1, u: now };
+    delete RV.wait[id];
+  });
+  rvSave(); pick.forEach(rvMirror);
+  return pick;
+}
 function rvPick(ids, n) {
+  rvFillWaiting(ids);
   var c = rvCfg(), due = rvDueIds(ids), it = rvItems();
   if (n == null) n = rvFree() ? Math.max(RV_FREE_ROUND, rvQuotaLeft()) : rvLeft();
   n = Math.max(0, Math.min(n, due.length));
   if (!n) return [];
-  var weak = [], rest = [];
-  due.forEach(function (id) { (rvIsWeak(it[id]) ? weak : rest).push(id); });
-  weak.sort(function (a, b) { var A = it[a], B = it[b]; return rvWeakKey(A) - rvWeakKey(B) || A.due - B.due; });
-  rest.sort(function (a, b) { return rvLate(b) - rvLate(a) || it[a].due - it[b].due; });
+  var weak = [], rest = [], acc = {}, rs = {};
+  due.forEach(function (id) { acc[id] = rvAcc(it[id]); (rvIsWeak(it[id]) ? weak : rest).push(id); });
+  rest.forEach(function (id) { rs[id] = rvRestScore(id); });
+  weak.sort(function (a, b) { var A = it[a], B = it[b]; return rvWeakKey(A) - rvWeakKey(B) || acc[a] - acc[b] || (A.box | 0) - (B.box | 0) || A.due - B.due; });
+  rest.sort(function (a, b) { return rs[b] - rs[a] || it[a].due - it[b].due; });
   var wN = Math.round(n * c.weak / Math.max(1, c.cap)), rN = n - wN;
   var a = weak.slice(0, wN), b = rest.slice(0, rN);
   if (a.length < wN) b = rest.slice(0, rN + (wN - a.length));
@@ -98981,6 +99019,7 @@ function rvEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, functi
 function rvLabel(id) { var f = rvEnv().label; try { return f ? (f(id) || String(id)) : String(id); } catch (e) { return String(id); } }
 /* 「このアプリの今日の復習：12／30問」。未消化の総数は大きく出さない（詳細の中だけ） */
 function rvBarHtml(ids) {
+  rvFillWaiting(ids);
   var c = rvCfg(), done = rvDone(), lim = rvLimit(), left = rvQuotaLeft(), u = rvUnit();
   var due = rvDueIds(ids).length, pct = Math.min(100, Math.round(done / Math.max(1, lim) * 100));
   var msg, free = rvFree();
@@ -99034,7 +99073,7 @@ function rvNoteHtml(r) {
   if (!r) return '';
   var c = rvCfg(), u = rvUnit(), h = '';
   if (r.kind === 'n' && r.newlyEnrolled) h = '復習対象に登録しました（今日の新規登録 ' + rvEnrolledToday() + '／' + rvEnrollLimit() + '件）。';
-  else if (r.kind === 'n' && r.waiting) h = '初回学習ずみ・<b>登録待ち</b>です（今日の新規登録は' + (rvEnrollLimit() ? '上限' + rvEnrollLimit() + '件に達しました' : '、未消化が' + c.backlogStop + u + 'を超えているので0件です') + '）。';
+  else if (r.kind === 'n' && r.waiting) h = '初回学習ずみ・<b>登録待ち</b>です（今日の新規登録は' + (rvEnrollLimit() ? '上限' + rvEnrollLimit() + '件に達しました' : '、未消化が' + c.backlogStop + u + 'を超えているので0件です') + '）。今日の復習が' + c.cap + u + 'に足りない日に、古い順に自動で復習に入ります。';
   else if (r.kind === 'a') h = '解き直し（箱は動かしません。最初の回答にもとづく確認がそのまま残ります）。';
   if (r.relearn) h += (h ? '<br>' : '') + '<b>③が' + c.relearnN + '回続きました。</b>「学び直し候補」に入りました（復習のくわしい状況から確認できます）。';
   return h ? '<div class="rv-note">' + h + '</div>' : '';
@@ -99044,6 +99083,7 @@ function rvRowHtml(id, btns) {
 }
 /* 詳細（未消化の総数・登録待ち・休止・学び直し候補・設定）。<details> で閉じておく */
 function rvPanelHtml(ids) {
+  rvFillWaiting(ids);
   var c = rvCfg(), u = rvUnit(), due = rvDueIds(ids).length, all = (ids || rvLiveIds()).map(String);
   var en = all.filter(rvEnrolled).length, wait = rvWaitIds(), paused = rvPausedIds(), rel = rvRelearnIds();
   var viewed = all.filter(function (id) { return rvStage(id) === 1; }).length;
@@ -99060,7 +99100,7 @@ function rvPanelHtml(ids) {
     + '<div class="rv-p">今日の新規登録：<b>' + rvEnrolledToday() + '</b>／' + el + '件'
     + (el === 0 ? '（期限の来た未消化が' + c.backlogStop + u + 'を超えているので、今日は登録しません）' : '') + '</div>';
   if (wait.length) {
-    h += '<div class="rv-p">登録待ちは、初回学習は済んでいるが、まだ復習に入れていない問題です（自動では登録しません）。'
+    h += '<div class="rv-p">登録待ちは、初回学習は済んでいるが、まだ復習に入れていない問題です。期限の来た問題が' + c.cap + u + 'に足りない日は、古い順に自動で復習に入れて' + c.cap + u + 'にそろえます（前日までに学習したもの）。'
       + (eLeft ? '<br><button type="button" class="rv-btn" onclick="rvUi(\'enroll\')">登録待ちから ' + Math.min(eLeft, wait.length) + '件を復習に入れる</button>' : '')
       + '</div>';
   }
