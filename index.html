@@ -101554,6 +101554,8 @@ function renderReview() {
   const g = genreOn(), gw = genreWords(g);
   document.getElementById('dueGenreLabel').textContent = g !== 'all' ? genreLabel(g) : '';
   const gids = gw.map(w => String(w.id)), today = dueToday(), cap = rvLimit();
+  /* ノルマを終えた日でも、期限の来た語が残っていれば大きいボタンから自由復習へ進める */
+  const moreN = !today.length && rvLeft() <= 0 ? rvDueIds(gids).length : 0;
   const fc = dueForecast(), mx = Math.max(cap, Math.max.apply(null, fc.concat([1])));
   document.getElementById('rvBar').innerHTML = rvBarHtml(gids);
   document.getElementById('dueHint').innerHTML = (today.length
@@ -101563,10 +101565,13 @@ function renderReview() {
           return '<i class="' + (x > cap ? 'over' : '') + '" style="height:'
             + Math.max(2, Math.round(x / mx * 18)) + 'px" title="' + (i + 1) + '日後 ' + x + '語"></i>'; }).join('')
       + '</span>'
+    : moreN ? '今日のノルマ（' + cap + '語）は達成。期限の来た語が<b>あと ' + moreN + ' 語</b>あります。続けて解いてもノルマは' + cap + '語のまま、記録はふだんの復習と同じです。'
     : rvLeft() <= 0 ? '' : '新しい語は テスト →「🆕 未解答だけ」から（復習への登録は1日' + rvCfg().newPerDay + '語まで）。');
   const sb = document.getElementById('dueStartBtn');
-  sb.disabled = !today.length;
-  sb.textContent = today.length ? '▶ 今日の復習を始める（' + today.length + '語）' : (rvLeft() <= 0 ? '今日の復習はここまで' : '期限の来た語はありません');
+  sb.disabled = !today.length && !moreN;
+  sb.textContent = today.length ? '▶ 今日の復習を始める（' + today.length + '語）'
+    : moreN ? '▶ もっと復習する（期限の来た語 あと' + moreN + '語）'
+    : (rvLeft() <= 0 ? '今日の復習はここまで' : '期限の来た語はありません');
   document.getElementById('holdBox').innerHTML = holdHtml();
   document.getElementById('rvPanel').innerHTML = rvPanelHtml(WORDS.map(w => String(w.id)));
   const counts = { new: 0, learning: 0, weak: 0, known: 0 };
@@ -101603,6 +101608,7 @@ function renderReview() {
   updateCounts();
 }
 function startDueTest() {
+  if (!dueToday().length && rvLeft() <= 0 && rvDueIds(genreWords(genreOn()).map(w => String(w.id))).length) rvSetFree(true);
   if (!dueToday().length) { showToast(rvLeft() <= 0 ? 'このアプリの今日の復習はここまでです' : '復習期限の単語がありません'); return; }
   switchView('test');
   document.getElementById('testWeekSel').value = 'due';
@@ -101615,6 +101621,11 @@ function startAheadTest() {
   const cand = genreWords(genreOn()).filter(w => rvEnrolled(w.id) && !rvIsDue(w.id))
     .sort((a, b) => rvSt(a.id).due - rvSt(b.id).due).slice(0, 10);
   if (!cand.length) { showToast('先取りできる語がありません'); return; }
+  /* ノルマを終えた日は、先取りも自由復習として続ける（聞いてから） */
+  if (rvQuotaLeft() <= 0 && !rvFree()) {
+    if (!confirm('今日のノルマ（' + rvLimit() + '語）は達成ずみです。\n先取りの10語を続けて解きますか？（ノルマは' + rvLimit() + '語のまま。答えはふだんどおり記録されます）')) return;
+    rvSetFree(true);
+  }
   const list = gateWords(cand);   // 先取りも復習なので、今日の30語の枠に数える
   if (!list) return;
   switchView('test');
