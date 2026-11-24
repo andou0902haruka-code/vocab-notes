@@ -684,6 +684,11 @@
 .rv-modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;}
 .rv-modal-in{background:var(--rv-card);color:var(--rv-ink);border-radius:14px;max-width:560px;width:100%;max-height:85vh;overflow:auto;padding:16px;}
 .rv-modal-b{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;}
+
+/* 定着した問題の目印（2026-11-24）。一覧の中に置くのでアプリの文字色に合わせる */
+.rv-master{display:inline-block;font-size:.72rem;font-weight:700;line-height:1.5;padding:1px 8px;margin:0 2px;border-radius:999px;
+  color:#8a5a00;background:#fff3d6;border:1px solid #f0d08a;white-space:nowrap;vertical-align:middle;}
+@media (prefers-color-scheme: dark){ .rv-master{color:#ffd27a;background:#3a2f14;border-color:#6b5520;} }
 /* RV:CSS:END */
 </style>
 </head>
@@ -701,6 +706,7 @@
     <button class="tab active" data-view="words">📕 単語</button>
     <button class="tab" data-view="review">🔁 今日の復習<span class="cnt" id="tabDue"></span></button>
     <button class="tab" data-view="favs">⭐ お気に入り</button>
+    <button class="tab" data-view="mastered">🏆 定着</button>
     <button class="tab" data-view="weeks">📅 週まとめ</button>
     <button class="tab" data-view="test">✍️ テスト</button>
     <button class="tab" data-view="roots">🌳 語根マップ</button>
@@ -832,6 +838,28 @@
     </div>
   </div>
   <div id="favList"></div>
+</section>
+
+<!-- ============ 定着タブ（2026-11-24）次の復習が30日以上先の段まで上がった語。テストは練習（記録しない） ============ -->
+<section id="view-mastered" hidden>
+  <div class="panel">
+    <h2 class="panel-title">🏆 定着した単語</h2>
+    <div class="hint-line" id="msSummary"></div>
+    <div class="row-btns">
+      <button class="btn-primary" id="msTestBtn">✍️ 定着した単語だけでテスト（練習・記録しない）</button>
+    </div>
+  </div>
+  <input type="text" class="search-box" id="msSearch" placeholder="🔍 定着した単語を検索">
+  <div class="section-title">
+    <h2>🏆 定着（<span id="msCount">0</span>語）</h2>
+    <div class="section-actions">
+      <div class="seg" id="msSortSeg">
+        <button class="seg-btn active" data-sort="due">📅次の復習</button>
+        <button class="seg-btn" data-sort="az">A→Z</button>
+      </div>
+    </div>
+  </div>
+  <div id="msList"></div>
 </section>
 
 <!-- ============ 週まとめタブ ============ -->
@@ -113987,6 +114015,29 @@ function rvWaitIds() {
 /* 登録待ちを今日の登録の残り枠まで登録する。2026-11-20〜 空いている日に予約する（rvReserve と同じ） */
 function rvEnrollWaiting(n) { return rvReserve(n); }
 
+/* ---------------- 定着した問題（2026-11-24） ----------------
+   いまの段の間隔が RV_MASTER_DAYS（30日）以上＝次の復習が30日以上先になる段まで上がった問題。
+   英単語ノート・表現メモは30日の段、ほか（1/3/7/14/35/90日）は35日の段から。②③で段が下がれば外れる。
+   定着した問題だけのテストは練習（記録しない）で、各アプリが自分の出題画面で出す */
+var RV_MASTER_DAYS = 30;
+function rvMasterBox() {
+  var iv = rvIv();
+  for (var i = 0; i < iv.length; i++) if (iv[i] >= RV_MASTER_DAYS) return i;
+  return iv.length - 1;
+}
+function rvMastered(id) { var s = rvSt(id); return !!(s.en && (s.box | 0) >= rvMasterBox()); }
+function rvMasteredIds(ids) { return (ids || rvLiveIds()).map(String).filter(rvMastered); }
+/* 一覧に付ける目印「🏆 定着・次 12/30」。定着していなければ空 */
+function rvMasterChip(id) {
+  if (!rvMastered(id)) return '';
+  return '<span class="rv-master" title="次の復習まで30日以上の段まで上がった">🏆 定着・次 ' + rvMd(rvSt(id).due) + '</span>';
+}
+/* 定着した問題の一覧・テストの見出しに出す説明 */
+function rvMasterNote() {
+  return '次の復習が' + RV_MASTER_DAYS + '日以上先になる段（' + rvIv()[rvMasterBox()] + '日の段）まで上がった' + rvUnit() + 'です。'
+    + '復習で②③を付けて段が下がると、ここから外れます。定着テストは練習なので記録しません（箱・今日の' + rvCfg().cap + rvUnit() + '・成績は動きません）。';
+}
+
 /* ---------------- 途中でやめた回の保留（この端末だけ） ---------------- */
 function rvHoldKey() { return rvKey() + '_hold'; }
 function rvHoldSave(h) { try { if (h && h.ids && h.ids.length) localStorage.setItem(rvHoldKey(), JSON.stringify(h)); else localStorage.removeItem(rvHoldKey()); } catch (e) {} }
@@ -114214,6 +114265,7 @@ function rvPanelHtml(ids) {
     + '<div><b>' + viewed + '</b><span>閲覧のみ</span></div>'
     + '<div><b>' + paused.length + '</b><span>休止中</span></div>'
     + '<div><b>' + rel.length + '</b><span>学び直し候補</span></div>'
+    + '<div><b>' + all.filter(rvMastered).length + '</b><span>定着（' + RV_MASTER_DAYS + '日以上の段）</span></div>'
     + '</div>'
     + '<div class="rv-p">今日の登録（登録待ち→復習対象）：<b>' + rvEnrolledToday() + '</b>／' + el + '件</div>';
   if (wait.length || rsv.length) {
@@ -115391,6 +115443,7 @@ function wordCardHtml(w, opts) {
     + '<span class="w-spacer"></span>' + favBtnHtml(w.id) + '</div>';
   if (w.ipa) h += '<div class="w-ipa">' + escapeHtml(w.ipa) + '</div>';
   h += '<div class="w-tags"><span class="tag st-' + st.k + '">' + st.label + '</span>'
+    + rvMasterChip(w.id)
     + noteTagHtml(w)
     + (isWebWord(w) ? '<span class="tag src-web">🌐 調べて</span>' : '')
     + photoTagHtml(w)
@@ -115634,6 +115687,29 @@ function renderFavs() {
   el.innerHTML = list.length ? list.map(w => wordCardHtml(w)).join('')
     : '<div class="empty">' + (q ? '一致するお気に入りはありません。' : '☆ を押した単語がここに並びます。') + '</div>';
 }
+/* ================= 定着した単語（2026-11-24） =================
+   rv.js の rvMastered（いまの段の間隔が30日以上）で決める。テストは練習（記録しない）＝再挑戦と同じ T.prac */
+function masteredWords() { return WORDS.filter(w => rvMastered(w.id)); }
+let msSort = 'due';
+function renderMastered() {
+  const q = (document.getElementById('msSearch').value || '').trim();
+  let list = masteredWords().filter(w => matchWord(w, q));
+  if (msSort === 'az') list.sort((a, b) => a.word.toLowerCase().localeCompare(b.word.toLowerCase()));
+  else list.sort((a, b) => rvSt(a.id).due - rvSt(b.id).due);
+  const all = masteredWords().length;
+  document.getElementById('msCount').textContent = list.length;
+  document.getElementById('msSummary').innerHTML = (all ? '🏆 ' + all + '語が定着しています。' : 'まだ定着した単語はありません。復習で①を付け続けると、ここに入ってきます。')
+    + '<br>' + rvMasterNote();
+  document.getElementById('msTestBtn').disabled = !all;
+  document.querySelectorAll('#msSortSeg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.sort === msSort));
+  document.getElementById('msList').innerHTML = list.length ? list.map(w => wordCardHtml(w)).join('')
+    : '<div class="empty">' + (q ? '一致する単語はありません。' : '定着した単語がここに並びます。') + '</div>';
+}
+function startMasteredTest() {
+  switchView('test');
+  document.getElementById('testWeekSel').value = 'mastered';
+  startTest('all');
+}
 function renderWeeks() {
   const gs = groupByWeek(WORDS);
   document.getElementById('weeksSummary').innerHTML =
@@ -115689,13 +115765,14 @@ let currentView = 'words';
 window.SNS_GATE_START = function () { switchView('test'); window.scrollTo(0, 0); };
 function switchView(name) {
   currentView = name;
-  ['words', 'review', 'favs', 'weeks', 'test', 'roots', 'motiv'].forEach(v => {
+  ['words', 'review', 'favs', 'mastered', 'weeks', 'test', 'roots', 'motiv'].forEach(v => {
     document.getElementById('view-' + v).hidden = (v !== name);
   });
   document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.view === name));
   stopSinglePlay();
   if (name === 'words') renderPolished();
   if (name === 'favs') renderFavs();
+  if (name === 'mastered') renderMastered();
   if (name === 'weeks') renderWeeks();
   if (name === 'test') renderTestSetup();
   if (name === 'roots') renderRoots();
@@ -115916,6 +115993,7 @@ function sourceWords(week) {
   if (week === 'favs') return favWords();
   if (week === 'due') return dueWords();
   if (week === 'weak') return weakWords();
+  if (week === 'mastered') return masteredWords();
   if (week === 'note') return noteWords();
   if (week === 'web') return webWords();
   if (week === 'photo') return photoWords();
@@ -116032,6 +116110,7 @@ function renderTestSetup() {
     + '<option value="due">🔁 今日の復習（今日ぶん ' + dueToday().length + '語 / 期限 ' + dueWordsG().length + '語）</option>'
     + '<option value="favs">⭐ お気に入り（' + n(favWords()) + '語）</option>'
     + '<option value="weak">⚠️ 苦手な単語（' + n(weakWords()) + '語）</option>'
+    + (n(masteredWords()) ? '<option value="mastered">🏆 定着した単語（' + n(masteredWords()) + '語・練習＝記録しない）</option>' : '')
     + (n(noteWords()) ? '<option value="note">📓 ノートから（' + n(noteWords()) + '語）</option>' : '')
     + (n(webWords()) ? '<option value="web">🌐 調べて（' + n(webWords()) + '語）</option>' : '')
     + (n(photoWords()) ? '<option value="photo">📷 写真から（' + n(photoWords()) + '語）</option>' : '')
@@ -116094,6 +116173,7 @@ function renderLastWrong() {
    （箱・1日30語の回数・成績・履歴は1回目のまま＝明日の復習にはふつうに出る）。今日もう答えた語も出す */
 function runQuestions(qs, fromHold, prac) {
   T.qs = qs; T.i = 0; T.res = []; T.answered = false; T.startedAt = Date.now(); T.cut = 0; T.prac = !!prac;
+  T.pracLabel = T.pracName || '✍️ 再挑戦'; T.pracName = '';   // 練習の名前（再挑戦／定着テスト）
   /* 前に保留した語は、この回に入っていないぶんを残しておく（新しい回で上書きしない） */
   const inRun = new Set(qs.map(q => String(q.w.id)));
   T.holdPrev = fromHold ? [] : ((rvHold() || {}).ids || []).filter(id => !inRun.has(String(id)));
@@ -116234,6 +116314,13 @@ function startTest(genre) {
   if (!list.length) { showToast(T.scope === 'new' ? 'この範囲に未解答の単語はありません 🎉（全部1回以上解いています）' : '出題できる単語がありません'); return; }
   if (T.scope === 'r10') list = shuffle(list).slice(0, 10);
   if (T.scope === 'r20') list = shuffle(list).slice(0, 20);
+  if (T.week === 'mastered') {   // 定着テスト＝練習（今日の枠・今日答えたかを見ない・記録しない）
+    const qs = buildQuestions(list, T.kind);
+    if (!qs.length) { showToast('この形式で出せる問題がありません'); return; }
+    T.pracName = '🏆 定着テスト';
+    runQuestions(qs, false, true);
+    return;
+  }
   list = gateWords(list);
   if (!list) return;
   const qs = buildQuestions(list, T.kind);
@@ -116268,7 +116355,7 @@ function renderQuestion() {
   let h = '<div class="panel">';
   // おかわりを後ろに足しても「◯/◯」の分母は動かさない（本編の問数だけを数える）
   const qN = T.qs.filter(x => !x.again).length || T.qs.length;
-  h += '<div class="q-head"><span>' + (q.again ? '🔁 解き直し（箱は動かしません）' : (T.prac ? '✍️ 再挑戦（練習・記録しない） ' : '') + (T.i + 1) + ' / ' + qN) + '</span>'
+  h += '<div class="q-head"><span>' + (q.again ? '🔁 解き直し（箱は動かしません）' : (T.prac ? T.pracLabel + '（練習・記録しない） ' : '') + (T.i + 1) + ' / ' + qN) + '</span>'
     + '<span class="q-kind">' + KIND_LABEL[q.kind] + '</span>' + (q.again ? '' : countChip(q.w.id))
     + '<button class="btn-mini" onclick="quitTest()">やめる</button></div>';
   h += '<div class="q-bar"><div style="width:' + (Math.min(1, T.i / qN) * 100) + '%"></div></div>';
@@ -116574,7 +116661,7 @@ function nextQuestion() {
   renderQuestion();
 }
 function quitTest() {
-  if (T.res.length && !confirm(T.prac ? '再挑戦をやめますか？（練習なので記録は変わりません）'
+  if (T.res.length && !confirm(T.prac ? T.pracLabel.replace(/^\S+ /, '') + 'をやめますか？（練習なので記録は変わりません）'
     : 'ここでやめます。ここまでの' + T.res.length + '問ぶんは記録されます。まだ答えていない語は「途中でやめた回の続き」に残ります。よろしいですか？')) return;
   clearQTimer();
   saveHold();
@@ -116611,7 +116698,7 @@ function finishTest() {
   const pct = Math.round(correct / T.res.length * 100);
   const wrong = T.res.filter(r => !r.ok);
   let h = '<div class="panel">'
-    + (T.prac ? '<div class="q-sub">✍️ 再挑戦の結果（練習なので記録していません。明日の復習は1回目の採点どおりに出ます）</div>'
+    + (T.prac ? '<div class="q-sub">' + T.pracLabel + 'の結果（練習なので記録していません。' + (T.pracLabel.indexOf('定着') >= 0 ? '定着した語の箱・次の復習日はそのままです' : '明日の復習は1回目の採点どおりに出ます') + '）</div>'
       : quit ? '<div class="q-sub">⏸ 途中でやめました（' + T.res.length + '問ぶんを記録）</div>' : '')
     + '<div class="score-big">' + correct + ' / ' + T.res.length + '</div>'
     + '<div class="score-sub">正答率 ' + pct + '%　'
@@ -116839,6 +116926,9 @@ function bind() {
     startTest('all');
   });
   document.getElementById('favPlayBtn').addEventListener('click', () => seqStart('favs'));
+  document.getElementById('msTestBtn').addEventListener('click', startMasteredTest);
+  document.getElementById('msSearch').addEventListener('input', renderMastered);
+  document.querySelectorAll('#msSortSeg .seg-btn').forEach(b => b.addEventListener('click', () => { msSort = b.dataset.sort; renderMastered(); }));
   document.getElementById('dueStartBtn').addEventListener('click', startDueTest);
   document.getElementById('dueAheadBtn').addEventListener('click', startAheadTest);
   document.getElementById('syncChange').addEventListener('click', changeSyncId);
