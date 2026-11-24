@@ -116273,7 +116273,7 @@ function renderQuestion() {
       + '<div class="q-sub" style="text-align:left;margin-bottom:4px">Type the missing letters to complete the text below</div>'
       + '<div class="q-sent' + (q.tok ? ' fib' : '') + '">' + q.prompt + '</div>'
       + (q.tok ? '<div class="q-sub" style="text-align:left">あと ' + q.left + ' 文字</div>' : '')
-      + '<div class="q-sub" style="text-align:left">' + escapeHtml(q.sub) + '</div>';
+      + clozeJaHtml(q);
   } else if (q.kind === 'e2j') {
     h += '<div class="q-prompt">' + escapeHtml(q.prompt) + '</div>'
       + '<div style="text-align:center"><button class="play-btn" data-icon="🔊" onclick="playAudio(this,\'' + wordAudio(q.w.id) + '\')">🔊</button></div>'
@@ -116320,6 +116320,22 @@ const TIMER_KEY = 'vocabNote_timer';
 function timerOn() { try { return localStorage.getItem(TIMER_KEY) === '1'; } catch (e) { return false; } }
 function setTimerOn(v) { try { localStorage.setItem(TIMER_KEY, v ? '1' : '0'); } catch (e) {} syncTimerSeg(); }
 function syncTimerSeg() { const v = timerOn() ? '1' : '0'; document.querySelectorAll('#testTimerSeg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.timer === v)); }
+/* 例文穴埋めの日本語訳は最初は隠す（2026-11-24）。ヒントとして「💡 日本語訳を表示」で出す */
+function clozeJaHtml(q) {
+  if (!q.sub) return '';
+  return '<div id="clozeJa" style="text-align:left;margin-top:6px">'
+    + '<button type="button" class="btn-mini" onclick="showClozeJa()">💡 日本語訳を表示</button>'
+    + '<div class="q-sub" style="text-align:left" hidden>' + escapeHtml(q.sub) + '</div></div>';
+}
+function showClozeJa() {
+  const box = document.getElementById('clozeJa'); if (!box) return;
+  const b = box.querySelector('button'), d = box.querySelector('.q-sub');
+  if (b) b.remove();
+  if (d) d.hidden = false;
+  const q = T.qs && T.qs[T.i]; if (q) q.jaShown = true;
+  const c = box.parentNode && box.parentNode.querySelector && box.parentNode.querySelector('.ci');
+  if (c && !T.answered) { const e = Array.from(box.parentNode.querySelectorAll('.ci')).find(x => !x.value) || c; e.focus(); }
+}
 function clozeSec(q) { return 20 * Math.max(1, (q.tok || []).filter(t => t.rest).length); }
 let QT = null;
 function clearQTimer() { if (QT) { clearInterval(QT); QT = null; } }
@@ -116529,7 +116545,8 @@ function revealTypedSelf() {
     + ansPlayBtnHtml(q, !(q.kind === 'cloze' && sx.ex))
     + (q.kind === 'cloze' && sx.ex ? '<div class="ex-box" style="margin-top:10px"><div class="ex-en">'
       + '<button class="play-btn sm" data-icon="🔊" data-auto="1" onclick="playAudio(this,\'' + exAudio(q.w.id, q.si) + '\')">🔊</button>'
-      + '<span>' + markTarget(sx.ex, sx.target || q.w.word) + '</span></div></div>' : '')
+      + '<span>' + markTarget(sx.ex, sx.target || q.w.word) + '</span></div>'
+      + (sx.exJa ? '<div class="ex-ja">' + escapeHtml(sx.exJa) + '</div>' : '') + '</div>' : '')
     + rvGradeHtml('selfScore', { q: '答えを見る前に、頭の中で思い出せていましたか？' }) + delInTestHtml();
   autoPlayAnswer();
 }
