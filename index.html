@@ -116427,6 +116427,9 @@ function showClozeJa() {
   const c = box.parentNode && box.parentNode.querySelector && box.parentNode.querySelector('.ci');
   if (c && !T.answered) { const e = Array.from(box.parentNode.querySelectorAll('.ci')).find(x => !x.value) || c; e.focus(); }
 }
+/* 日本語訳を見て答えた穴埋めは②惜しいまで（2026-11-24）。正解でも60%で記録・自己採点の①は押せない */
+function clozeHintCap(q, v) { return q && q.kind === 'cloze' && q.jaShown ? Math.min(v, 60) : v; }
+function clozeHintNote(q) { return q && q.kind === 'cloze' && q.jaShown ? '<div class="rv-note">💡 日本語訳を見て答えたので、② 惜しい で記録しました。</div>' : ''; }
 function clozeSec(q) { return 20 * Math.max(1, (q.tok || []).filter(t => t.rest).length); }
 let QT = null;
 function clearQTimer() { if (QT) { clearInterval(QT); QT = null; } }
@@ -116461,11 +116464,11 @@ function queueAgain(q, correct) {
   if (T.qs.some(x => x.again && x.w.id === q.w.id)) return;
   const queued = T.qs.filter(x => x.again && !x.eid).length;
   if (!rvCanRetry(q.w.id) || rvRetryDone() + queued >= rvCfg().retryMax) return;   // 標準オフ。オンでも1日3語・30語の内数
-  T.qs.push(Object.assign({}, q, { again: true, eid: null, pct: null, rv: null }));
+  T.qs.push(Object.assign({}, q, { again: true, eid: null, pct: null, rv: null, jaShown: false }));
 }
 /* 答え合わせが確定した瞬間に1回だけ。pct=100/60/0（4択・書くの一致は自動で100/0） */
 function recordAnswer(q, correct, userAns, selfPct) {
-  const pct = selfPct != null ? selfPct : (correct ? 100 : 0);
+  const pct = clozeHintCap(q, selfPct != null ? selfPct : (correct ? 100 : 0));
   if (T.prac) {   // 再挑戦＝練習。この回の結果と「前回まちがえた語」だけに残す
     q.pct = pct;
     T.res.push({ q: q, ok: pct >= 80, user: userAns || '', pct: pct });
@@ -116488,6 +116491,7 @@ function recordAnswer(q, correct, userAns, selfPct) {
 function fixGrade(v) {
   const q = T.qs[T.i];
   if (!q || !q.eid) { selfScore(v); return; }
+  v = clozeHintCap(q, v);
   const was = q.pct >= 80;
   q.rv = rvRegrade(q.eid, v) || q.rv;
   q.pct = v;
@@ -116515,9 +116519,9 @@ function judgeBoxHtml(q, correct, userAns, showDiff) {
   if (detail) h += '<details class="w-detail" style="margin-top:10px"><summary class="fold-btn">▼ 語源・語族・まぎらわしい語をひらく</summary>' + detail + '</details>';
   h += '<div class="row-btns"><button class="btn-primary" onclick="nextQuestion()">' + (T.i + 1 >= T.qs.length ? '結果を見る' : '次へ →') + '</button>'
     + '<button class="btn-outline" onclick="toggleFav(' + q.w.id + ')">☆ お気に入り</button></div>';
-  h += rvNoteHtml(q.rv);
+  h += clozeHintNote(q) + rvNoteHtml(q.rv);
   if (q.eid && q.kind !== 'e2j') h += '<details class="rv-panel"><summary>採点を直す（押し間違い・別の正しい答えだったとき）</summary>'
-    + rvGradeHtml('fixGrade', { sel: q.pct, fix: true }) + '</details>';
+    + rvGradeHtml('fixGrade', { sel: q.pct, fix: true, hint: !!(q.kind === 'cloze' && q.jaShown) }) + '</details>';
   h += delInTestHtml();
   return h;
 }
@@ -116591,7 +116595,7 @@ function answerTyped() {
     document.getElementById('judgeBox').innerHTML = '<div class="diff-box">' + diffHtml(val, q.answer) + '</div>'
       + '<div class="ans-line">' + escapeHtml(q.answer) + '</div>' + ansPlayBtnHtml(q, true)
       + rvGradeHtml('selfScore', { q: '模範解答とは一致しません。答えを見る前の自分の答えは？',
-          ref: 'つづりの小さなちがいは②、同じ意味の別の正しい語なら①にできます。' }) + delInTestHtml();
+          ref: 'つづりの小さなちがいは②、同じ意味の別の正しい語なら①にできます。', hint: !!(q.kind === 'cloze' && q.jaShown) }) + delInTestHtml();
     autoPlayAnswer();
     return;
   }
@@ -116638,7 +116642,7 @@ function revealTypedSelf() {
       + '<button class="play-btn sm" data-icon="🔊" data-auto="1" onclick="playAudio(this,\'' + exAudio(q.w.id, q.si) + '\')">🔊</button>'
       + '<span>' + markTarget(sx.ex, sx.target || q.w.word) + '</span></div>'
       + (sx.exJa ? '<div class="ex-ja">' + escapeHtml(sx.exJa) + '</div>' : '') + '</div>' : '')
-    + rvGradeHtml('selfScore', { q: '答えを見る前に、頭の中で思い出せていましたか？' }) + delInTestHtml();
+    + rvGradeHtml('selfScore', { q: '答えを見る前に、頭の中で思い出せていましたか？', hint: !!(q.kind === 'cloze' && q.jaShown) }) + delInTestHtml();
   autoPlayAnswer();
 }
 /* 3段階の自己採点（①100 ②60 ③0）。押した瞬間が答え合わせ。2回目からは付け直し */
