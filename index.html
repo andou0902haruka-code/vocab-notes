@@ -1894,7 +1894,7 @@ const WORDS = [
   id: 1788359450396,
   word: "convince",
   ipa: "/kənˈvɪns/",
-  tags: ["TOEFL", "ライティング頻出"],
+  tags: ["TOEFL", "ライティング頻出", "Red Kiwi"],
   senses: [
     {
       pos: "動詞",
@@ -1904,6 +1904,24 @@ const WORDS = [
       target: "convinced",
       exJa: "新たな証拠は、その実験をやり直すべきだと委員会を納得させた。",
       colloc: ["convince A that ...", "convince A of B", "be convinced that ...", "convince A to do"]
+    },
+    {
+      pos: "動詞（convinced の形）",
+      ja: "（理屈で）納得させた（persuaded は説得して行動させた）",
+      def: "made someone believe something is true",
+      ex: "She convinced me that the plan would work.",
+      target: "convinced",
+      exJa: "彼女は計画がうまくいくと私に納得させた。",
+      colloc: ["convince A that", "be convinced of"]
+    },
+    {
+      pos: "形容詞（convincing の形）",
+      ja: "説得力のある・納得させる",
+      def: "able to make you believe that something is true",
+      ex: "The researcher gave convincing evidence that the new method works.",
+      target: "convincing",
+      exJa: "研究者はその新しい方法が有効だという説得力のある証拠を示した。",
+      colloc: ["convincing evidence", "a convincing argument", "not very convincing"]
     }
   ],
   origin: {
@@ -1925,7 +1943,9 @@ const WORDS = [
     { w: "province", ja: "属州、（学問の）分野（征服した土地）" }
   ],
   confuse: [
-    { w: "persuade", ja: "<b>convince</b> は「頭で納得させる」、<b>persuade</b> は「行動させる」が中心。I convinced him that it was true ／ I persuaded him to come のように、続く形も違う。" }
+    { w: "persuade", ja: "<b>convince</b> は「頭で納得させる」、<b>persuade</b> は「行動させる」が中心。I convinced him that it was true ／ I persuaded him to come のように、続く形も違う。" },
+    { w: "persuaded", ja: "convince は「信じさせる・納得させる」（考えを変える）。persuade は「説得して行動させる」（persuade A to do）。" },
+    { w: "convinced", ja: "<b>convincing</b> は話や証拠が「人を納得させる」、<b>convinced</b> は人が「納得している」。" }
   ],
   memo: "",
   savedAt: "2026-09-02T14:30:50.396Z"
@@ -3840,58 +3860,6 @@ const WORDS = [
   savedAt: "2026-09-06T14:24:29.999Z"
 },
 {
-  id: 1788704554537,
-  word: "adjoining",
-  ipa: "/əˈdʒɔɪnɪŋ/",
-  tags: ["TOEFL", "アカデミック"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "隣接する、隣り合った（壁や境を共有して直接くっついている）",
-      def: "next to something and connected to it, usually sharing a wall or a border",
-      ex: "The laboratory and the adjoining storeroom are kept at the same temperature.",
-      target: "adjoining",
-      exJa: "実験室と、それに隣接する保管室は同じ温度に保たれている。",
-      colloc: ["an adjoining room", "an adjoining building", "adjoining property"]
-    },
-    {
-      pos: "動詞",
-      ja: "（adjoin の現在分詞）〜に接している、〜と地続きである",
-      def: "sharing a border or a wall with something (the -ing form of adjoin)",
-      ex: "Farmland adjoining the river was flooded when the embankment failed.",
-      target: "adjoining",
-      exJa: "堤防が決壊したとき、川に接する農地が浸水した。",
-      colloc: ["land adjoining the river", "the room adjoining the hall"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "ad-", type: "接頭辞", mean: "〜へ・〜に" },
-      { p: "join", type: "語根", mean: "つなぐ・結びつける（ラテン語 jungere）" },
-      { p: "-ing", type: "接尾辞", mean: "〜している（分詞・形容詞化）" }
-    ],
-    note: "<b>ad-（〜へ）＋ jungere（つなぐ）</b>＝「くっつけてつなぐ」。だから adjoining は単に近いのではなく<b>境や壁を共有して実際に接している</b>ことを指す。ホテルの adjoining rooms が<b>あいだのドアでつながった隣室</b>を意味するのはこのため。"
-  },
-  family: [
-    { w: "adjoin", pos: "動", ja: "〜に隣接する、〜と接している" },
-    { w: "joint", pos: "名/形", ja: "継ぎ目、関節／共同の" },
-    { w: "junction", pos: "名", ja: "接合点、交差点" },
-    { w: "conjoin", pos: "動", ja: "結合する、つなぎ合わせる" }
-  ],
-  mates: [
-    { w: "conjunction", ja: "接続詞、同時に起こること（共に con- つなぐ）" },
-    { w: "injunction", ja: "差し止め命令（縛りつけて止める）" },
-    { w: "juncture", ja: "（重大な）時点、接合部" },
-    { w: "subjugate", ja: "征服する、服従させる（くびきの下 sub- につなぐ）" }
-  ],
-  confuse: [
-    { w: "adjacent", ja: "<b>隣り合っている</b>が接していなくてもよい（道を挟んだ向かいも adjacent）。adjoining は<b>物理的に接している</b>ぶん狭い。" },
-    { w: "adjourn", ja: "<b>（会議を）休会にする・延期する</b>。綴りが似ているだけで語源も意味も別。" }
-  ],
-  memo: "",
-  savedAt: "2026-09-06T14:22:34.537Z"
-},
-{
   id: 1788565477986,
   word: "situationship",
   ipa: "/ˌsɪtʃuˈeɪʃənʃɪp/",
@@ -5100,7 +5068,7 @@ const WORDS = [
   id: 1789037591510,
   word: "soar",
   ipa: "/sɔːr/",
-  tags: ["TOEFL", "リスニング頻出"],
+  tags: ["TOEFL", "リスニング頻出", "Red Kiwi", "ニュース"],
   senses: [
     {
       pos: "動詞",
@@ -5119,6 +5087,15 @@ const WORDS = [
       target: "soar",
       exJa: "ワシは上昇する暖気の柱に乗って何時間も舞い続ける。",
       colloc: ["soar into the sky", "soar overhead", "soar on thermals"]
+    },
+    {
+      pos: "動詞（soared の形）",
+      ja: "急上昇した",
+      def: "rose quickly to a high level",
+      ex: "Fuel prices soared last year.",
+      target: "soared",
+      exJa: "昨年、燃料価格が急上昇した。",
+      colloc: ["soar to"]
     }
   ],
   origin: {
@@ -8358,7 +8335,7 @@ const WORDS = [
   id: 1789035659414,
   word: "devastate",
   ipa: "/ˈdevəsteɪt/",
-  tags: ["TOEFL", "リーディング頻出"],
+  tags: ["TOEFL", "リーディング頻出", "強さ:強", "どちらでも", "ライティング"],
   senses: [
     {
       pos: "動詞",
@@ -8377,6 +8354,24 @@ const WORDS = [
       target: "devastated",
       exJa: "閉鎖の知らせは研究チーム全体を打ちのめした。",
       colloc: ["be devastated by the news", "utterly devastated"]
+    },
+    {
+      pos: "形容詞（devastated の形）",
+      ja: "（知らせなどに）打ちのめされた、ひどく衝撃を受けた",
+      def: "extremely shocked and upset",
+      ex: "He was devastated when he learned that the program had been canceled.",
+      target: "devastated",
+      exJa: "その課程が廃止されたと知って、彼は打ちのめされた。",
+      colloc: ["be devastated by 〜", "absolutely devastated"]
+    },
+    {
+      pos: "動詞（devastated の形）",
+      ja: "（土地・地域が）壊滅させられた",
+      def: "destroyed or badly damaged over a wide area",
+      ex: "The coastal town was devastated by the tsunami.",
+      target: "devastated",
+      exJa: "その沿岸の町は津波で壊滅した。",
+      colloc: ["be devastated by a storm", "devastate an area"]
     }
   ],
   origin: {
@@ -8398,7 +8393,8 @@ const WORDS = [
     { w: "vacant", ja: "空いている（同じ「からっぽ」の発想）" }
   ],
   confuse: [
-    { w: "damage", ja: "<b>damage は程度を問わない「損害」</b>、<b>devastate は回復困難なほど徹底的</b>。slightly damaged とは言えるが slightly devastated とは言わない。" }
+    { w: "damage", ja: "<b>damage は程度を問わない「損害」</b>、<b>devastate は回復困難なほど徹底的</b>。slightly damaged とは言えるが slightly devastated とは言わない。" },
+    { w: "disappointed", ja: "<b>disappointed</b> は期待が外れた程度。<b>devastated</b> は立ち直れないほどの衝撃で、強さがまるで違う。" }
   ],
   memo: "",
   savedAt: "2026-09-10T10:20:59.414Z"
@@ -8467,7 +8463,7 @@ const WORDS = [
   id: 1789035618644,
   word: "replenish",
   ipa: "/rɪˈplenɪʃ/",
-  tags: ["TOEFL", "リーディング頻出"],
+  tags: ["TOEFL", "リーディング頻出", "日常"],
   senses: [
     {
       pos: "動詞",
@@ -8486,6 +8482,15 @@ const WORDS = [
       target: "replenish",
       exJa: "長距離競技では、失われた水分を選手が補給しなければならない。",
       colloc: ["replenish energy", "replenish fluids", "replenish nutrients"]
+    },
+    {
+      pos: "動詞（replenishes の形）",
+      ja: "補充する／再び満たす",
+      def: "fills something again",
+      ex: "Rain replenishes the lake.",
+      target: "replenishes",
+      exJa: "雨が湖を再び満たす。",
+      colloc: ["replenish supplies", "replenish water"]
     }
   ],
   origin: {
@@ -9530,7 +9535,7 @@ const WORDS = [
   id: 1789035142423,
   word: "exhaust",
   ipa: "/ɪɡˈzɔːst/",
-  tags: ["TOEFL", "アカデミック"],
+  tags: ["TOEFL", "アカデミック", "日常会話", "気持ち"],
   senses: [
     {
       pos: "動詞",
@@ -9558,6 +9563,15 @@ const WORDS = [
       target: "exhaust",
       exJa: "自動車の排気ガスは今なお市内の窒素酸化物の主要な発生源である。",
       colloc: ["exhaust fumes", "exhaust pipe", "vehicle exhaust"]
+    },
+    {
+      pos: "形容詞（exhausted の形）",
+      ja: "疲れ果てている",
+      def: "extremely tired",
+      ex: "I was exhausted after the long flight to Canada.",
+      target: "exhausted",
+      exJa: "カナダまでの長いフライトのあと、私は疲れ果てていた。",
+      colloc: ["feel exhausted", "completely exhausted", "physically exhausted"]
     }
   ],
   origin: {
@@ -9570,7 +9584,8 @@ const WORDS = [
   family: [
     { w: "exhaustion", pos: "名", ja: "疲労困憊、枯渇" },
     { w: "exhausting", pos: "形", ja: "（人を）疲れさせる" },
-    { w: "exhaustive", pos: "形", ja: "網羅的な、徹底的な" }
+    { w: "exhaustive", pos: "形", ja: "網羅的な、徹底的な" },
+    { w: "exhausted", pos: "形", ja: "疲れ果てている" }
   ],
   mates: [
     { w: "exhale", ja: "息を吐く（外へ ex- 出す）" },
@@ -9801,7 +9816,7 @@ const WORDS = [
   id: 1789035001763,
   word: "intrigue",
   ipa: "動 /ɪnˈtriːɡ/ ・ 名 /ˈɪntriːɡ/（品詞でアクセントが動く）",
-  tags: ["TOEFL", "リスニング頻出"],
+  tags: ["TOEFL", "リスニング頻出", "描写"],
   senses: [
     {
       pos: "動詞",
@@ -9820,6 +9835,15 @@ const WORDS = [
       target: "intrigue",
       exJa: "反乱前の数年間、宮廷は陰謀に満ちていた。",
       colloc: ["political intrigue", "court intrigue"]
+    },
+    {
+      pos: "形容詞（intriguing の形）",
+      ja: "興味をそそる、面白い",
+      def: "very interesting because it is unusual or mysterious",
+      ex: "The scientists made an intriguing discovery about the ancient city.",
+      target: "intriguing",
+      exJa: "科学者たちはその古代都市について興味をそそる発見をした。",
+      colloc: ["an intriguing question", "an intriguing possibility"]
     }
   ],
   origin: {
@@ -10103,7 +10127,7 @@ const WORDS = [
   id: 1789034879587,
   word: "prevail",
   ipa: "/prɪˈveɪl/",
-  tags: ["TOEFL", "リーディング頻出"],
+  tags: ["TOEFL", "リーディング頻出", "アカデミック"],
   senses: [
     {
       pos: "動詞",
@@ -10122,6 +10146,15 @@ const WORDS = [
       target: "prevailed",
       exJa: "1960年代に新たな証拠が現れるまで、古い理論が優勢だった。",
       colloc: ["prevail over", "prevail against", "eventually prevail"]
+    },
+    {
+      pos: "形容詞（prevailing の形）",
+      ja: "支配的な・一般的な",
+      def: "most common or strongest at a particular time",
+      ex: "The prevailing wind here is from the west.",
+      target: "prevailing",
+      exJa: "ここの卓越風は西から吹く。",
+      colloc: ["prevailing winds", "the prevailing view"]
     }
   ],
   origin: {
@@ -11367,7 +11400,7 @@ const WORDS = [
   id: 1789034161690,
   word: "commodity",
   ipa: "/kəˈmɑːdəti/",
-  tags: ["TOEFL", "リーディング頻出"],
+  tags: ["TOEFL", "リーディング頻出", "経済"],
   senses: [
     {
       pos: "名詞",
@@ -11386,6 +11419,15 @@ const WORDS = [
       target: "commodity",
       exJa: "大学院生にとって、まとまった時間は希少な資源である。",
       colloc: ["a scarce commodity", "a valuable commodity"]
+    },
+    {
+      pos: "名詞（commodities の形）",
+      ja: "一次生産物・商品",
+      def: "raw materials or products that are bought and sold",
+      ex: "Oil and wheat are important commodities.",
+      target: "commodities",
+      exJa: "石油と小麦は重要な商品だ。",
+      colloc: ["commodity prices", "basic commodities"]
     }
   ],
   origin: {
@@ -11943,7 +11985,7 @@ const WORDS = [
   id: 1788778348930,
   word: "errand",
   ipa: "/ˈerənd/",
-  tags: ["会話表現", "リスニング頻出"],
+  tags: ["会話表現", "リスニング頻出", "日常"],
   senses: [
     {
       pos: "名詞",
@@ -11962,6 +12004,15 @@ const WORDS = [
       target: "errand",
       exJa: "助手は中央図書館へ使いに出された。",
       colloc: ["send someone on an errand", "an errand boy"]
+    },
+    {
+      pos: "名詞（errands の形）",
+      ja: "用事／お使い",
+      def: "short trips to do tasks such as shopping",
+      ex: "I have some errands to run this afternoon.",
+      target: "errands",
+      exJa: "午後にいくつか用事がある。",
+      colloc: ["run errands"]
     }
   ],
   origin: {
@@ -13321,62 +13372,6 @@ const WORDS = [
   savedAt: "2026-09-21T13:53:23.194Z"
 },
 {
-  id: 1789998803195,
-  word: "fatigued",
-  ipa: "/fəˈtiːɡd/",
-  tags: ["フォーマル", "ライティング", "TOEFL", "アカデミック"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "（改まった言い方で）疲労した、疲れきった",
-      def: "very tired, especially after long effort or illness",
-      ex: "Patients often feel fatigued for several weeks after the treatment.",
-      target: "fatigued",
-      exJa: "患者は治療のあと数週間、疲労感が続くことが多い。",
-      colloc: ["feel fatigued", "become fatigued", "mentally fatigued"]
-    },
-    {
-      pos: "形容詞",
-      ja: "（金属などが）繰り返しの力で弱くなった",
-      def: "weakened by repeated stress, especially of metal",
-      ex: "Engineers inspect the bridge regularly for fatigued metal in the support beams.",
-      target: "fatigued",
-      exJa: "技術者は、支柱に金属疲労が起きていないか定期的に橋を点検している。",
-      colloc: ["fatigued metal", "metal fatigue"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "fatig-", type: "語根", mean: "疲れさせる（ラテン語 fatigare）" },
-      { p: "-ed", type: "接尾辞", mean: "〜された状態の（形容詞をつくる）" }
-    ],
-    note: "ラテン語 fatigare（疲れさせる）がフランス語を経て入った語。ゲルマン系の tired より<b>改まった響き</b>になるので、診断書・報告書・論文で使われる。金属が繰り返しの力で弱る「金属疲労（metal fatigue）」も同じ語で、<b>少しずつ力を削られる</b>のが芯にある。"
-  },
-  family: [
-    { w: "fatigue", pos: "名", ja: "疲労、（金属の）疲労" },
-    { w: "fatigue", pos: "動", ja: "疲れさせる" },
-    { w: "fatiguing", pos: "形", ja: "疲れさせる、骨の折れる" }
-  ],
-  mates: [
-    { w: "indefatigable", ja: "疲れを知らない（in-「否定」＋de-「すっかり」＋fatig「疲れる」＋-able）" },
-    { w: "debilitated", ja: "衰弱した（de-「下げる」＋bilis「力」）" },
-    { w: "enervated", ja: "力が抜けた（e-「外へ」＋nerv「力・筋」）" }
-  ],
-  confuse: [
-    { w: "tired", ja: "<b>tired</b> は軽い疲れから使える日常語。<b>fatigued</b> は改まった語で、長く続いた疲労・病気・金属疲労のように<b>原因があって力が削られた</b>場面に使う。" }
-  ],
-  memo: "",
-  group: "仕事で丁寧に伝える",
-  sites: 2,
-  src: "web",
-  srcRef: "疲れたときに言う言葉（疲れの度合い別）",
-  srcUrl: [
-    { name: "ESLBuzz — 30+ Different Ways to Say I'm Tired in English", url: "https://eslbuzz.com/30-different-ways-to-say-im-tired/" },
-    { name: "Learn Laugh Speak — How to Politely & Professionally Say You Are Tired In English", url: "https://learnlaughspeak.com/say-you-are-tired-in-english/" }
-  ],
-  savedAt: "2026-09-21T13:53:23.195Z"
-},
-{
   id: 1789999735910,
   word: "grateful",
   ipa: "/ˈɡreɪtfəl/",
@@ -13716,62 +13711,6 @@ const WORDS = [
   savedAt: "2026-09-21T14:08:55.915Z"
 },
 {
-  id: 1789999735916,
-  word: "devastated",
-  ipa: "/ˈdevəsteɪtɪd/",
-  tags: ["強さ:強", "どちらでも", "ライティング"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "（知らせなどに）打ちのめされた、ひどく衝撃を受けた",
-      def: "extremely shocked and upset",
-      ex: "He was devastated when he learned that the program had been canceled.",
-      target: "devastated",
-      exJa: "その課程が廃止されたと知って、彼は打ちのめされた。",
-      colloc: ["be devastated by 〜", "absolutely devastated"]
-    },
-    {
-      pos: "動詞",
-      ja: "（土地・地域が）壊滅させられた",
-      def: "destroyed or badly damaged over a wide area",
-      ex: "The coastal town was devastated by the tsunami.",
-      target: "devastated",
-      exJa: "その沿岸の町は津波で壊滅した。",
-      colloc: ["be devastated by a storm", "devastate an area"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "de-", type: "接頭辞", mean: "すっかり・下へ" },
-      { p: "vast-", type: "語根", mean: "がらんとした・荒れ果てた（ラテン語 vastus）" },
-      { p: "-ate", type: "接尾辞", mean: "〜にする" }
-    ],
-    note: "de-（すっかり）＋ vastus（荒れ果てた）で「<b>何もない荒れ地にする</b>」。土地を壊滅させる意味が先にあり、そこから<b>心が焼け野原になる</b>＝打ちのめされる、という使い方が生まれた。"
-  },
-  family: [
-    { w: "devastate", pos: "動", ja: "壊滅させる・打ちのめす" },
-    { w: "devastating", pos: "形", ja: "壊滅的な・衝撃的な" },
-    { w: "devastation", pos: "名", ja: "荒廃・惨状" }
-  ],
-  mates: [
-    { w: "vast", ja: "がらんと vast 広い→広大な" },
-    { w: "waste", ja: "荒れ vast- させる→浪費する・荒地" },
-    { w: "vastly", ja: "広大 vast に→大いに" }
-  ],
-  confuse: [
-    { w: "disappointed", ja: "<b>disappointed</b> は期待が外れた程度。<b>devastated</b> は立ち直れないほどの衝撃で、強さがまるで違う。" }
-  ],
-  memo: "",
-  group: "つらい・落ち込む（弱→強）",
-  sites: 1,
-  src: "web",
-  srcRef: "感情を伝える表現（うれしい・つらい・不安・怒り）",
-  srcUrl: [
-    { name: "Learn English With Jo", url: "https://www.learnenglishwithjo.co.uk/blog/advanced-english-vocabulary-for-expressing-feelings-and-emotions" }
-  ],
-  savedAt: "2026-09-21T14:08:55.916Z"
-},
-{
   id: 1789999735917,
   word: "apprehensive",
   ipa: "/ˌæprɪˈhensɪv/",
@@ -13878,59 +13817,6 @@ const WORDS = [
   savedAt: "2026-09-21T14:08:55.918Z"
 },
 {
-  id: 1789999735919,
-  word: "irritated",
-  ipa: "/ˈɪrɪteɪtɪd/",
-  tags: ["強さ:弱", "どちらでも", "会話"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "いらいらした、むっとした",
-      def: "slightly angry and impatient",
-      ex: "He sounded irritated when he had to repeat the instructions again.",
-      target: "irritated",
-      exJa: "指示をもう一度繰り返すことになり、彼はいらついた口調だった。",
-      colloc: ["be irritated by 〜", "get irritated with 人"]
-    },
-    {
-      pos: "形容詞",
-      ja: "（皮膚・のどが）炎症を起こした、ひりひりした",
-      def: "sore and painful, especially skin or a throat affected by something",
-      ex: "The smoke from the fire left her eyes irritated for hours.",
-      target: "irritated",
-      exJa: "火事の煙のせいで、彼女の目は何時間もひりひりした。",
-      colloc: ["irritated skin", "an irritated throat"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "irrit-", type: "語根", mean: "いらだたせる（ラテン語 irritare）" },
-      { p: "-ate", type: "接尾辞", mean: "〜にする" },
-      { p: "-ed", type: "接尾辞", mean: "〜された状態の" }
-    ],
-    note: "irritare（いらだたせる）から。もとは「<b>繰り返しこすられてむずむずする</b>」感覚で、それが人の神経に向けば「いらいら」、皮膚に向けば「炎症」になる。どちらも「刺激され続けて不快」で一本につながっている。"
-  },
-  family: [
-    { w: "irritate", pos: "動", ja: "いらだたせる・炎症を起こす" },
-    { w: "irritating", pos: "形", ja: "いらいらさせる" },
-    { w: "irritation", pos: "名", ja: "いらだち・炎症" },
-    { w: "irritable", pos: "形", ja: "怒りっぽい" }
-  ],
-  confuse: [
-    { w: "annoyed", ja: "ほぼ同じ強さ。<b>annoyed</b> は出来事に「うんざり」、<b>irritated</b> は神経を逆なでされて「むっと」で、体の感覚に近い。" }
-  ],
-  memo: "",
-  group: "イライラする・怒る（弱→強）",
-  sites: 2,
-  src: "web",
-  srcRef: "感情を伝える表現（うれしい・つらい・不安・怒り）",
-  srcUrl: [
-    { name: "Preply", url: "https://preply.com/en/blog/emotions-in-english/" },
-    { name: "Migaku", url: "https://migaku.com/blog/language-fun/english-emotions-vocabulary" }
-  ],
-  savedAt: "2026-09-21T14:08:55.919Z"
-},
-{
   id: 1789999735920,
   word: "furious",
   ipa: "/ˈfjʊriəs/",
@@ -13992,7 +13878,7 @@ const WORDS = [
   id: 1789999735921,
   word: "content",
   ipa: "形 /kənˈtent/ ・ 名 /ˈkɑːntent/（品詞でアクセントが動く）",
-  tags: ["強さ:弱", "フォーマル", "ライティング"],
+  tags: ["強さ:弱", "フォーマル", "ライティング", "生活", "TOEFL"],
   senses: [
     {
       pos: "形容詞",
@@ -14020,6 +13906,15 @@ const WORDS = [
       target: "contents",
       exJa: "税関職員は彼女にスーツケースの中身を申告するよう求めた。",
       colloc: ["the contents of 〜", "a table of contents"]
+    },
+    {
+      pos: "名詞（contents の形）",
+      ja: "中身、内容物",
+      def: "the things that are inside a container",
+      ex: "She emptied the contents of her bag onto the table.",
+      target: "contents",
+      exJa: "彼女はバッグの中身をテーブルの上に出した。",
+      colloc: ["the contents of A", "table of contents"]
     }
   ],
   origin: {
@@ -18054,49 +17949,6 @@ const WORDS = [
   savedAt: "2026-10-05T06:32:21.165Z"
 },
 {
-  id: 1791181941166,
-  word: "convincing",
-  ipa: "/kənˈvɪnsɪŋ/",
-  tags: ["TOEFL", "ライティング頻出"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "説得力のある・納得させる",
-      def: "able to make you believe that something is true",
-      ex: "The researcher gave convincing evidence that the new method works.",
-      target: "convincing",
-      exJa: "研究者はその新しい方法が有効だという説得力のある証拠を示した。",
-      colloc: ["convincing evidence", "a convincing argument", "not very convincing"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "con-", type: "接頭辞", mean: "完全に" },
-      { p: "vinc", type: "語根", mean: "打ち負かす（ラテン語 vincere）" },
-      { p: "-ing", type: "接尾辞", mean: "〜させるような" }
-    ],
-    note: "<b>完全に（con-）打ち負かす（vinc）</b>＝反論できなくさせる、から「納得させる」。"
-  },
-  family: [
-    { w: "convince", pos: "動", ja: "納得させる・確信させる" },
-    { w: "convinced", pos: "形", ja: "確信している" },
-    { w: "conviction", pos: "名", ja: "確信・有罪判決" }
-  ],
-  mates: [
-    { w: "invincible", ja: "打ち負かせ vinc ない in-＝無敵の" },
-    { w: "victory", ja: "打ち負かすこと＝勝利" },
-    { w: "province", ja: "打ち負かして得た土地＝州" }
-  ],
-  confuse: [
-    { w: "convinced", ja: "<b>convincing</b> は話や証拠が「人を納得させる」、<b>convinced</b> は人が「納得している」。" }
-  ],
-  memo: "",
-  src: "photo",
-  srcRef: "speak_exploit/IMG_2028.PNG",
-  srcFrom: "アプリspeak",
-  savedAt: "2026-10-05T06:32:21.166Z"
-},
-{
   id: 1791181941167,
   word: "thought-provoking",
   ipa: "/ˈθɔːt prəˌvoʊkɪŋ/",
@@ -18866,45 +18718,6 @@ const WORDS = [
   srcRef: "Red Kiwi/IMG_3367.PNG",
   srcFrom: "アプリRed Kiwi",
   savedAt: "2026-10-05T08:21:09.045Z"
-},
-{
-  id: 1791188469046,
-  word: "astonishing",
-  ipa: "/əˈstɑːnɪʃɪŋ/",
-  tags: ["Red Kiwi", "TOEFL"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "驚くべき・信じがたい",
-      def: "very surprising",
-      ex: "the results were astonishing.",
-      target: "astonishing",
-      exJa: "結果は驚くべきものでした。",
-      colloc: ["astonishing results", "an astonishing number of"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "as-", type: "接頭辞", mean: "外へ（ex- の変形）" },
-      { p: "ton", type: "語根", mean: "雷（ラテン語 tonare）" },
-      { p: "-ish", type: "接尾辞", mean: "動詞を作る" }
-    ],
-    note: "<b>雷（ton）に打たれたように</b>驚かせる＝astonish。"
-  },
-  family: [
-    { w: "astonish", pos: "動", ja: "驚かせる" },
-    { w: "astonishment", pos: "名", ja: "驚き" },
-    { w: "astonished", pos: "形", ja: "驚いた" }
-  ],
-  mates: [
-    { w: "thunder", ja: "同じ語源の「雷」" },
-    { w: "astound", ja: "雷に打たれたように驚かせる" }
-  ],
-  memo: "",
-  src: "photo",
-  srcRef: "Red Kiwi/IMG_3367.PNG",
-  srcFrom: "アプリRed Kiwi",
-  savedAt: "2026-10-05T08:21:09.046Z"
 },
 {
   id: 1791188469047,
@@ -26238,31 +26051,6 @@ const WORDS = [
   savedAt: "2026-10-05T08:21:09.370Z"
 },
 {
-  id: 1791188469371,
-  word: "enticing",
-  ipa: "/ɪnˈtaɪsɪŋ/",
-  tags: ["Red Kiwi"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "魅力的な・誘惑的な",
-      def: "attractive and tempting",
-      ex: "The prize was enticing enough to keep players coming back.",
-      target: "enticing",
-      exJa: "賞品は、プレーヤーを何度も呼び戻すほど魅力的だった。",
-      colloc: ["an enticing offer"]
-    }
-  ],
-  family: [
-    { w: "entice", pos: "動", ja: "誘惑する" }
-  ],
-  memo: "",
-  src: "photo",
-  srcRef: "Red Kiwi/IMG_3443.PNG",
-  srcFrom: "アプリRed Kiwi",
-  savedAt: "2026-10-05T08:21:09.371Z"
-},
-{
   id: 1791188469372,
   word: "deterrent",
   ipa: "/dɪˈtɜːrənt/",
@@ -26841,7 +26629,7 @@ const WORDS = [
 {
   id: 1791188469398,
   word: "in terms of",
-  tags: ["Red Kiwi", "つなぎ表現", "アカデミック"],
+  tags: ["Red Kiwi", "つなぎ表現", "アカデミック", "駿台単語", "熟語"],
   senses: [
     {
       pos: "前置詞句",
@@ -26851,13 +26639,26 @@ const WORDS = [
       target: "in terms of",
       exJa: "費用の点では、この計画が一番だ。",
       colloc: ["in terms of"]
+    },
+    {
+      pos: "熟語（in terms of A の形）",
+      ja: "Aの観点から",
+      def: "when considering a particular aspect of something",
+      ex: "In terms of cost, the train is much cheaper than a taxi.",
+      target: "In terms of",
+      exJa: "費用の点では、電車の方がタクシーよりずっと安い。",
+      colloc: ["in terms of cost", "in terms of quality"]
     }
   ],
   memo: "",
   src: "photo",
   srcRef: "Red Kiwi/IMG_3446.PNG",
   srcFrom: "アプリRed Kiwi",
-  savedAt: "2026-10-05T08:21:09.398Z"
+  savedAt: "2026-10-05T08:21:09.398Z",
+  origin: {
+    parts: [],
+    note: "term は「区切り・限界」→「言葉・条件」。in terms of は「〜という言葉で言えば」＝その観点から。"
+  }
 },
 {
   id: 1791188469399,
@@ -27000,6 +26801,15 @@ const WORDS = [
       target: "be present",
       exJa: "人と話すときは、その場に集中しなさい。",
       colloc: ["be fully present"]
+    },
+    {
+      pos: "表現（are present の形）",
+      ja: "存在している",
+      def: "exist in a place",
+      ex: "The virus is spread where rodents are present.",
+      target: "are present",
+      exJa: "ウイルスはげっ歯類がいる場所で広がる。",
+      colloc: ["be present at"]
     }
   ],
   memo: "",
@@ -27206,28 +27016,6 @@ const WORDS = [
   srcRef: "Red Kiwi/IMG_3448.PNG",
   srcFrom: "アプリRed Kiwi",
   savedAt: "2026-10-05T08:21:09.414Z"
-},
-{
-  id: 1791188469415,
-  word: "honing",
-  ipa: "/ˈhoʊnɪŋ/",
-  tags: ["Red Kiwi"],
-  senses: [
-    {
-      pos: "動詞",
-      ja: "（技などを）磨くこと",
-      def: "improving a skill through practice",
-      ex: "She spent years honing her writing skills.",
-      target: "honing",
-      exJa: "彼女は何年もかけて文章力を磨いた。",
-      colloc: ["hone one's skills"]
-    }
-  ],
-  memo: "",
-  src: "photo",
-  srcRef: "Red Kiwi/IMG_3448.PNG",
-  srcFrom: "アプリRed Kiwi",
-  savedAt: "2026-10-05T08:21:09.415Z"
 },
 {
   id: 1791188469416,
@@ -27537,28 +27325,6 @@ const WORDS = [
   srcRef: "Red Kiwi/IMG_3450.PNG",
   srcFrom: "アプリRed Kiwi",
   savedAt: "2026-10-05T08:21:09.428Z"
-},
-{
-  id: 1791188469429,
-  word: "nobles",
-  ipa: "/ˈnoʊblz/",
-  tags: ["Red Kiwi", "歴史"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "貴族",
-      def: "people of high social rank",
-      ex: "The nobles controlled most of the land.",
-      target: "nobles",
-      exJa: "貴族が土地の大半を支配していた。",
-      colloc: ["the nobility"]
-    }
-  ],
-  memo: "",
-  src: "photo",
-  srcRef: "Red Kiwi/IMG_3450.PNG",
-  srcFrom: "アプリRed Kiwi",
-  savedAt: "2026-10-05T08:21:09.429Z"
 },
 {
   id: 1791188469430,
@@ -28300,28 +28066,6 @@ const WORDS = [
   savedAt: "2026-10-05T08:21:09.463Z"
 },
 {
-  id: 1791188469464,
-  word: "soared",
-  ipa: "/sɔːrd/",
-  tags: ["Red Kiwi", "ニュース"],
-  senses: [
-    {
-      pos: "動詞",
-      ja: "急上昇した",
-      def: "rose quickly to a high level",
-      ex: "Fuel prices soared last year.",
-      target: "soared",
-      exJa: "昨年、燃料価格が急上昇した。",
-      colloc: ["soar to"]
-    }
-  ],
-  memo: "",
-  src: "photo",
-  srcRef: "Red Kiwi/IMG_3454.PNG",
-  srcFrom: "アプリRed Kiwi",
-  savedAt: "2026-10-05T08:21:09.464Z"
-},
-{
   id: 1791188469465,
   word: "started to unravel",
   tags: ["Red Kiwi"],
@@ -28794,31 +28538,6 @@ const WORDS = [
   savedAt: "2026-10-05T08:21:09.485Z"
 },
 {
-  id: 1791188469486,
-  word: "lingering",
-  ipa: "/ˈlɪŋɡərɪŋ/",
-  tags: ["Red Kiwi"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "長引く・なかなか消えない",
-      def: "lasting for a long time",
-      ex: "I still have some lingering doubts.",
-      target: "lingering",
-      exJa: "まだ少し疑いが残っている。",
-      colloc: ["lingering doubts"]
-    }
-  ],
-  family: [
-    { w: "linger", pos: "動", ja: "長居する・なかなか消えない" }
-  ],
-  memo: "",
-  src: "photo",
-  srcRef: "Red Kiwi/IMG_3457.PNG",
-  srcFrom: "アプリRed Kiwi",
-  savedAt: "2026-10-05T08:21:09.486Z"
-},
-{
   id: 1791188469487,
   word: "be tough on ourselves",
   tags: ["Red Kiwi"],
@@ -29247,7 +28966,7 @@ const WORDS = [
   id: 1791188469506,
   word: "irritate",
   ipa: "/ˈɪrɪteɪt/",
-  tags: ["Red Kiwi"],
+  tags: ["Red Kiwi", "強さ:弱", "どちらでも", "会話"],
   senses: [
     {
       pos: "動詞",
@@ -29257,17 +28976,48 @@ const WORDS = [
       target: "irritate",
       exJa: "ほこりは目を刺激することがある。",
       colloc: ["irritate the skin"]
+    },
+    {
+      pos: "形容詞（irritated の形）",
+      ja: "いらいらした、むっとした",
+      def: "slightly angry and impatient",
+      ex: "He sounded irritated when he had to repeat the instructions again.",
+      target: "irritated",
+      exJa: "指示をもう一度繰り返すことになり、彼はいらついた口調だった。",
+      colloc: ["be irritated by 〜", "get irritated with 人"]
+    },
+    {
+      pos: "形容詞（irritated の形）",
+      ja: "（皮膚・のどが）炎症を起こした、ひりひりした",
+      def: "sore and painful, especially skin or a throat affected by something",
+      ex: "The smoke from the fire left her eyes irritated for hours.",
+      target: "irritated",
+      exJa: "火事の煙のせいで、彼女の目は何時間もひりひりした。",
+      colloc: ["irritated skin", "an irritated throat"]
     }
   ],
   family: [
     { w: "irritation", pos: "名", ja: "刺激・いら立ち" },
-    { w: "irritating", pos: "形", ja: "いらいらさせる" }
+    { w: "irritating", pos: "形", ja: "いらいらさせる" },
+    { w: "irritable", pos: "形", ja: "怒りっぽい" },
+    { w: "irritated", pos: "形", ja: "いらいらした、むっとした" }
   ],
   memo: "",
   src: "photo",
   srcRef: "Red Kiwi/IMG_3459.PNG",
   srcFrom: "アプリRed Kiwi",
-  savedAt: "2026-10-05T08:21:09.506Z"
+  savedAt: "2026-10-05T08:21:09.506Z",
+  confuse: [
+    { w: "annoyed", ja: "ほぼ同じ強さ。<b>annoyed</b> は出来事に「うんざり」、<b>irritated</b> は神経を逆なでされて「むっと」で、体の感覚に近い。" }
+  ],
+  origin: {
+    parts: [
+      { p: "irrit-", type: "語根", mean: "いらだたせる（ラテン語 irritare）" },
+      { p: "-ate", type: "接尾辞", mean: "〜にする" },
+      { p: "-ed", type: "接尾辞", mean: "〜された状態の" }
+    ],
+    note: "irritare（いらだたせる）から。もとは「<b>繰り返しこすられてむずむずする</b>」感覚で、それが人の神経に向けば「いらいら」、皮膚に向けば「炎症」になる。どちらも「刺激され続けて不快」で一本につながっている。"
+  }
 },
 {
   id: 1791188469507,
@@ -30110,28 +29860,6 @@ const WORDS = [
   savedAt: "2026-10-05T08:21:09.544Z"
 },
 {
-  id: 1791188469545,
-  word: "journaling",
-  ipa: "/ˈdʒɜːrnəlɪŋ/",
-  tags: ["Red Kiwi"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "日記を書くこと（ジャーナリング）",
-      def: "writing your thoughts in a diary regularly",
-      ex: "Journaling helps me organize my thoughts.",
-      target: "journaling",
-      exJa: "日記を書くと考えが整理される。",
-      colloc: ["daily journaling"]
-    }
-  ],
-  memo: "",
-  src: "photo",
-  srcRef: "Red Kiwi/IMG_3464.PNG",
-  srcFrom: "アプリRed Kiwi",
-  savedAt: "2026-10-05T08:21:09.545Z"
-},
-{
   id: 1791188469546,
   word: "having the first few hours of the day to myself",
   tags: ["Red Kiwi"],
@@ -30367,31 +30095,6 @@ const WORDS = [
   savedAt: "2026-10-05T08:21:09.556Z"
 },
 {
-  id: 1791188469557,
-  word: "convinced",
-  ipa: "/kənˈvɪnst/",
-  tags: ["Red Kiwi"],
-  senses: [
-    {
-      pos: "動詞",
-      ja: "（理屈で）納得させた（persuaded は説得して行動させた）",
-      def: "made someone believe something is true",
-      ex: "She convinced me that the plan would work.",
-      target: "convinced",
-      exJa: "彼女は計画がうまくいくと私に納得させた。",
-      colloc: ["convince A that", "be convinced of"]
-    }
-  ],
-  confuse: [
-    { w: "persuaded", ja: "convince は「信じさせる・納得させる」（考えを変える）。persuade は「説得して行動させる」（persuade A to do）。" }
-  ],
-  memo: "",
-  src: "photo",
-  srcRef: "Red Kiwi/IMG_3465.PNG",
-  srcFrom: "アプリRed Kiwi",
-  savedAt: "2026-10-05T08:21:09.557Z"
-},
-{
   id: 1791188469558,
   word: "convinced some usage guides to begin using",
   tags: ["Red Kiwi"],
@@ -30594,27 +30297,6 @@ const WORDS = [
   srcRef: "Red Kiwi/IMG_3466.PNG",
   srcFrom: "アプリRed Kiwi",
   savedAt: "2026-10-05T08:21:09.565Z"
-},
-{
-  id: 1791188469566,
-  word: "are present",
-  tags: ["Red Kiwi"],
-  senses: [
-    {
-      pos: "表現",
-      ja: "存在している",
-      def: "exist in a place",
-      ex: "The virus is spread where rodents are present.",
-      target: "are present",
-      exJa: "ウイルスはげっ歯類がいる場所で広がる。",
-      colloc: ["be present at"]
-    }
-  ],
-  memo: "",
-  src: "photo",
-  srcRef: "Red Kiwi/IMG_3466.PNG",
-  srcFrom: "アプリRed Kiwi",
-  savedAt: "2026-10-05T08:21:09.566Z"
 },
 {
   id: 1791188469567,
@@ -31439,6 +31121,15 @@ const WORDS = [
       target: "condominium",
       exJa: "彼らは家を売って、都心の分譲マンションを買った。",
       colloc: ["buy a condominium", "a condominium complex"]
+    },
+    {
+      pos: "名詞（condominiums の形）",
+      ja: "分譲マンション",
+      def: "apartment buildings in which each apartment is owned by the person living in it",
+      ex: "Several new condominiums were built near the station.",
+      target: "condominiums",
+      exJa: "駅の近くに新しい分譲マンションがいくつか建った。",
+      colloc: ["a condominium complex"]
     }
   ],
   origin: {
@@ -31497,44 +31188,6 @@ const WORDS = [
   src: "note",
   srcRef: "Bizmate 表現まとめ/IMG_2188.HEIC",
   savedAt: "2026-10-05T09:49:41.722Z"
-},
-{
-  id: 1791193781723,
-  word: "engaging",
-  ipa: "/ɪnˈɡeɪdʒɪŋ/",
-  tags: ["TOEFL", "人物描写"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "（人を）引きつける、魅力的な",
-      def: "interesting or pleasant in a way that holds your attention",
-      ex: "The professor's lectures were so engaging that nobody looked at their phones.",
-      target: "engaging",
-      exJa: "その教授の講義はとても引きつけられるもので、誰もスマホを見なかった。",
-      colloc: ["an engaging speaker", "engaging content", "highly engaging"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "en-", type: "接頭辞", mean: "中に入れる" },
-      { p: "gage", type: "語根", mean: "担保、誓い（古フランス語 gage）" },
-      { p: "-ing", type: "接尾辞", mean: "〜させる（形容詞化）" }
-    ],
-    note: "engage は「担保を入れて約束させる」→「（人を）引き込む、関わらせる」。engaging は<b>相手を話や活動に引き込む</b>魅力を表し、見た目の美しさより「夢中にさせる」感じ。"
-  },
-  family: [
-    { w: "engage", pos: "動", ja: "引き込む、従事させる" },
-    { w: "engagement", pos: "名", ja: "関与、婚約" },
-    { w: "engaged", pos: "形", ja: "従事した、婚約した" }
-  ],
-  mates: [
-    { w: "mortgage", ja: "住宅ローン（死の担保）" },
-    { w: "wage", ja: "賃金（約束の支払い）" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "Bizmate 表現まとめ/IMG_2189.HEIC",
-  savedAt: "2026-10-05T09:49:41.723Z"
 },
 {
   id: 1791193781724,
@@ -32962,7 +32615,7 @@ const WORDS = [
   id: 1789658439858,
   word: "persecute",
   ipa: "/ˈpɜːrsɪkjuːt/",
-  tags: ["TOEFL", "アカデミック"],
+  tags: ["TOEFL", "アカデミック", "歴史"],
   senses: [
     {
       pos: "動詞",
@@ -32981,6 +32634,15 @@ const WORDS = [
       target: "persecuted",
       exJa: "その俳優は、どこへ行ってもカメラマンにしつこくつきまとわれると不満を述べた。",
       colloc: ["persecute someone with"]
+    },
+    {
+      pos: "動詞（persecuted の形）",
+      ja: "迫害する、しつこく苦しめる",
+      def: "to treat someone cruelly and unfairly, especially because of their beliefs",
+      ex: "Many people were persecuted for their religious beliefs.",
+      target: "persecuted",
+      exJa: "多くの人が宗教的信念のために迫害された。",
+      colloc: ["be persecuted for A", "persecute minorities"]
     }
   ],
   origin: {
@@ -33755,6 +33417,15 @@ const WORDS = [
       target: "tactics",
       exJa: "将軍の戦術は数で勝る敵軍の不意を突いた。",
       colloc: ["military tactics", "change tactics"]
+    },
+    {
+      pos: "名詞（tactics の形）",
+      ja: "戦術、作戦",
+      def: "the methods you use to achieve something",
+      ex: "The company changed its marketing tactics to attract younger customers.",
+      target: "tactics",
+      exJa: "その会社は若い客を引きつけるために販売戦術を変えた。",
+      colloc: ["change tactics", "delaying tactics"]
     }
   ],
   origin: {
@@ -38070,6 +37741,24 @@ const WORDS = [
       target: "adjoins",
       exJa: "図書館は大講堂に隣接しているので、学生は簡単に行き来できる。",
       colloc: ["adjoining rooms", "the adjoining building"]
+    },
+    {
+      pos: "形容詞（adjoining の形）",
+      ja: "隣接する、隣り合った（壁や境を共有して直接くっついている）",
+      def: "next to something and connected to it, usually sharing a wall or a border",
+      ex: "The laboratory and the adjoining storeroom are kept at the same temperature.",
+      target: "adjoining",
+      exJa: "実験室と、それに隣接する保管室は同じ温度に保たれている。",
+      colloc: ["an adjoining room", "an adjoining building", "adjoining property"]
+    },
+    {
+      pos: "動詞（adjoining の形）",
+      ja: "（adjoin の現在分詞）〜に接している、〜と地続きである",
+      def: "sharing a border or a wall with something (the -ing form of adjoin)",
+      ex: "Farmland adjoining the river was flooded when the embankment failed.",
+      target: "adjoining",
+      exJa: "堤防が決壊したとき、川に接する農地が浸水した。",
+      colloc: ["land adjoining the river", "the room adjoining the hall"]
     }
   ],
   origin: {
@@ -38080,7 +37769,10 @@ const WORDS = [
     note: "<b>「〜へつながっている」</b>＝隣接している。他動詞で adjoin A（Aに隣接する）。前置詞 to は付けない。"
   },
   family: [
-    { w: "adjoining", pos: "形", ja: "隣接した" }
+    { w: "adjoining", pos: "形", ja: "隣接した" },
+    { w: "joint", pos: "名/形", ja: "継ぎ目、関節／共同の" },
+    { w: "junction", pos: "名", ja: "接合点、交差点" },
+    { w: "conjoin", pos: "動", ja: "結合する、つなぎ合わせる" }
   ],
   mates: [
     { w: "junction", ja: "合流点（つながる所）" },
@@ -38088,7 +37780,8 @@ const WORDS = [
     { w: "joint", ja: "関節、共同の" }
   ],
   confuse: [
-    { w: "adjacent", ja: "「隣接した」の形容詞。adjacent <b>to</b> A と to が付く。adjoin は動詞で to なし。" }
+    { w: "adjacent", ja: "「隣接した」の形容詞。adjacent <b>to</b> A と to が付く。adjoin は動詞で to なし。" },
+    { w: "adjourn", ja: "<b>（会議を）休会にする・延期する</b>。綴りが似ているだけで語源も意味も別。" }
   ],
   memo: "",
   savedAt: "2026-10-15T00:22:52.333Z"
@@ -38545,7 +38238,7 @@ const WORDS = [
   id: 1792024093329,
   word: "linger",
   ipa: "/ˈlɪŋɡər/",
-  tags: ["TOEFL", "リスニング頻出"],
+  tags: ["TOEFL", "リスニング頻出", "Red Kiwi"],
   senses: [
     {
       pos: "動詞",
@@ -38564,6 +38257,15 @@ const WORDS = [
       target: "lingered",
       exJa: "講義のあと、何人かの学生が教授に質問するため居残った。",
       colloc: ["linger over", "linger around"]
+    },
+    {
+      pos: "形容詞（lingering の形）",
+      ja: "長引く・なかなか消えない",
+      def: "lasting for a long time",
+      ex: "I still have some lingering doubts.",
+      target: "lingering",
+      exJa: "まだ少し疑いが残っている。",
+      colloc: ["lingering doubts"]
     }
   ],
   origin: {
@@ -40580,7 +40282,7 @@ const WORDS = [
   id: 1792028578490,
   word: "endow",
   ipa: "/ɪnˈdaʊ/",
-  tags: ["TOEFL", "アカデミック"],
+  tags: ["TOEFL", "アカデミック", "駿台単語", "熟語"],
   senses: [
     {
       pos: "動詞",
@@ -40599,6 +40301,15 @@ const WORDS = [
       target: "endowed",
       exJa: "裕福な卒業生が大学に新しい奨学基金を寄付した。",
       colloc: ["endow a chair", "endow a scholarship"]
+    },
+    {
+      pos: "熟語（be endowed の形）",
+      ja: "恵まれている",
+      def: "to naturally have a good quality or ability",
+      ex: "She is endowed with a beautiful voice.",
+      target: "is endowed with",
+      exJa: "彼女は生まれつき美しい声に恵まれている。",
+      colloc: ["be endowed with A", "be richly endowed"]
     }
   ],
   origin: {
@@ -40670,7 +40381,7 @@ const WORDS = [
   id: 1792028611520,
   word: "entice",
   ipa: "/ɪnˈtaɪs/",
-  tags: ["TOEFL", "アカデミック"],
+  tags: ["TOEFL", "アカデミック", "Red Kiwi"],
   senses: [
     {
       pos: "動詞",
@@ -40680,6 +40391,15 @@ const WORDS = [
       target: "entice",
       exJa: "その会社は海外から優秀な技術者を誘い込むため高い給料を提示している。",
       colloc: ["entice A to do", "entice A into doing", "entice customers"]
+    },
+    {
+      pos: "形容詞（enticing の形）",
+      ja: "魅力的な・誘惑的な",
+      def: "attractive and tempting",
+      ex: "The prize was enticing enough to keep players coming back.",
+      target: "enticing",
+      exJa: "賞品は、プレーヤーを何度も呼び戻すほど魅力的だった。",
+      colloc: ["an enticing offer"]
     }
   ],
   origin: {
@@ -45686,7 +45406,7 @@ const WORDS = [
   id: 1793090250673,
   word: "procrastinate",
   ipa: "/proʊˈkræstɪneɪt/",
-  tags: ["TOEFL", "アカデミック"],
+  tags: ["TOEFL", "アカデミック", "Red Kiwi"],
   senses: [
     {
       pos: "動詞",
@@ -45696,6 +45416,24 @@ const WORDS = [
       target: "procrastinate",
       exJa: "多くの学生は締め切り前夜まで先延ばしにする。",
       colloc: ["procrastinate on", "stop procrastinating"]
+    },
+    {
+      pos: "動詞（-ing形）（procrastinating の形）",
+      ja: "先延ばしにする（するべきことを後回しにする）",
+      def: "delaying something that you should do, often because it is unpleasant",
+      ex: "I've been procrastinating hanging up.",
+      target: "procrastinating",
+      exJa: "ずっと飾るのを後回しにしていました。",
+      colloc: ["stop procrastinating", "procrastinate on A"]
+    },
+    {
+      pos: "動詞（procrastinating の形）",
+      ja: "（勉強・課題などを）ぐずぐず先送りにする",
+      def: "to keep putting off work until later",
+      ex: "Many students procrastinate until the night before an essay is due.",
+      target: "procrastinate",
+      exJa: "多くの学生はエッセイの締め切り前夜まで先延ばしにしてしまう。",
+      colloc: ["procrastinate on an assignment"]
     }
   ],
   origin: {
@@ -45716,7 +45454,10 @@ const WORDS = [
     { w: "delay", ja: "遅らせる" }
   ],
   memo: "",
-  savedAt: "2026-10-27T08:37:30.673Z"
+  savedAt: "2026-10-27T08:37:30.673Z",
+  confuse: [
+    { w: "postpone", ja: "postpone は予定を正式に<b>延期する</b>（中立）。procrastinate はやるべきことを<b>ぐずぐず後回しにする</b>（悪い意味）。" }
+  ]
 },
 {
   id: 1793090287191,
@@ -47192,58 +46933,6 @@ const WORDS = [
   srcRef: "Red Kiwi/IMG_3602.PNG",
   srcFrom: "アプリRed Kiwi",
   savedAt: "2026-10-30T08:03:51.879Z"
-},
-{
-  id: 1793347431880,
-  word: "procrastinating",
-  ipa: "/prəˈkræstɪneɪtɪŋ/",
-  tags: ["Red Kiwi", "TOEFL"],
-  senses: [
-    {
-      pos: "動詞（-ing形）",
-      ja: "先延ばしにする（するべきことを後回しにする）",
-      def: "delaying something that you should do, often because it is unpleasant",
-      ex: "I've been procrastinating hanging up.",
-      target: "procrastinating",
-      exJa: "ずっと飾るのを後回しにしていました。",
-      colloc: ["stop procrastinating", "procrastinate on A"]
-    },
-    {
-      pos: "動詞",
-      ja: "（勉強・課題などを）ぐずぐず先送りにする",
-      def: "to keep putting off work until later",
-      ex: "Many students procrastinate until the night before an essay is due.",
-      target: "procrastinate",
-      exJa: "多くの学生はエッセイの締め切り前夜まで先延ばしにしてしまう。",
-      colloc: ["procrastinate on an assignment"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "pro-", type: "接頭辞", mean: "前へ・〜のほうへ" },
-      { p: "crastin", type: "語根", mean: "明日の（ラテン語 crastinus ← cras 明日）" },
-      { p: "-ate", type: "接尾辞", mean: "〜する（動詞を作る）" }
-    ],
-    note: "<b>明日（cras）のほうへ（pro-）押しやる</b>＝今日やるべきことを明日に回す＝先延ばしにする。"
-  },
-  family: [
-    { w: "procrastinate", pos: "動", ja: "先延ばしにする" },
-    { w: "procrastination", pos: "名", ja: "先延ばし（癖）" },
-    { w: "procrastinator", pos: "名", ja: "先延ばしにする人" }
-  ],
-  mates: [
-    { w: "propel", ja: "前へ pro- 押す＝推進する" },
-    { w: "prolong", ja: "前へ pro- 長くする＝延長する" },
-    { w: "postpone", ja: "後に post- 置く＝延期する" }
-  ],
-  confuse: [
-    { w: "postpone", ja: "postpone は予定を正式に<b>延期する</b>（中立）。procrastinate はやるべきことを<b>ぐずぐず後回しにする</b>（悪い意味）。" }
-  ],
-  memo: "",
-  src: "photo",
-  srcRef: "Red Kiwi/IMG_3603.PNG",
-  srcFrom: "アプリRed Kiwi",
-  savedAt: "2026-10-30T08:03:51.880Z"
 },
 {
   id: 1793347431881,
@@ -48864,45 +48553,6 @@ const WORDS = [
   savedAt: "2026-10-31T10:14:58.922Z"
 },
 {
-  id: 1793441698923,
-  word: "exhausted",
-  ipa: "/ɪɡˈzɔːstɪd/",
-  tags: ["日常会話", "気持ち", "TOEFL"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "疲れ果てている",
-      def: "extremely tired",
-      ex: "I was exhausted after the long flight to Canada.",
-      target: "exhausted",
-      exJa: "カナダまでの長いフライトのあと、私は疲れ果てていた。",
-      colloc: ["feel exhausted", "completely exhausted", "physically exhausted"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "ex-", type: "接頭辞", mean: "外へ" },
-      { p: "haust", type: "語根", mean: "くみ出す" },
-      { p: "-ed", type: "接尾辞", mean: "〜された（形容詞を作る）" }
-    ],
-    note: "<b>ex</b>（外へ）<b>haust</b>（くみ出す）＝力を全部くみ出されてしまった→<b>疲れ果てている</b>。exhaust は「使い果たす」「排気ガス」の意味でも使う。h は発音しない。"
-  },
-  family: [
-    { w: "exhaust", pos: "動", ja: "使い果たす、疲れ果てさせる" },
-    { w: "exhaustion", pos: "名", ja: "極度の疲労" },
-    { w: "exhausting", pos: "形", ja: "ひどく疲れさせる" }
-  ],
-  mates: [
-    { w: "tired", ja: "疲れた（ふつうの言い方）" },
-    { w: "drained", ja: "（気力を）吸い取られた" },
-    { w: "worn-out", ja: "くたくたの" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "Bizmate資料/1-D-13_ノート_01.heic",
-  savedAt: "2026-10-31T10:14:58.923Z"
-},
-{
   id: 1793441698924,
   word: "frustrated",
   ipa: "/ˈfrʌstreɪtɪd/",
@@ -49885,7 +49535,7 @@ const WORDS = [
   id: 1794356342501,
   word: "journal",
   ipa: "/ˈdʒɜːrnl/",
-  tags: ["TOEFL", "アカデミック"],
+  tags: ["TOEFL", "アカデミック", "Red Kiwi"],
   senses: [
     {
       pos: "名詞",
@@ -49904,6 +49554,15 @@ const WORDS = [
       target: "journal",
       exJa: "ダーウィンは航海中に日誌をつけていた。",
       colloc: ["keep a journal"]
+    },
+    {
+      pos: "名詞（journaling の形）",
+      ja: "日記を書くこと（ジャーナリング）",
+      def: "writing your thoughts in a diary regularly",
+      ex: "Journaling helps me organize my thoughts.",
+      target: "journaling",
+      exJa: "日記を書くと考えが整理される。",
+      colloc: ["daily journaling"]
     }
   ],
   origin: {
@@ -49915,7 +49574,8 @@ const WORDS = [
   },
   family: [
     { w: "journalist", pos: "名", ja: "記者" },
-    { w: "journalism", pos: "名", ja: "報道" }
+    { w: "journalism", pos: "名", ja: "報道" },
+    { w: "journaling", pos: "名", ja: "日記を書くこと（ジャーナリング）" }
   ],
   mates: [
     { w: "journey", ja: "旅（1日の道のり）" },
@@ -52135,7 +51795,7 @@ const WORDS = [
   id: 1794359068199,
   word: "aesthetic",
   ipa: "/esˈθetɪk/",
-  tags: ["TOEFL", "アカデミック"],
+  tags: ["TOEFL", "アカデミック", "芸術"],
   senses: [
     {
       pos: "形容詞",
@@ -52154,6 +51814,15 @@ const WORDS = [
       target: "aesthetic",
       exJa: "その映画の暗い美的スタイルは多くの後の監督に影響を与えた。",
       colloc: ["a minimalist aesthetic"]
+    },
+    {
+      pos: "名詞（aesthetics の形）",
+      ja: "美学・美しさ",
+      def: "the study of beauty, or the way something looks",
+      ex: "The architect cares about both function and aesthetics.",
+      target: "aesthetics",
+      exJa: "その建築家は機能と美しさの両方を大切にする。",
+      colloc: ["the aesthetics of A"]
     }
   ],
   origin: {
@@ -53218,7 +52887,7 @@ const WORDS = [
   id: 1794359668359,
   word: "mural",
   ipa: "/ˈmjʊrəl/",
-  tags: ["TOEFL", "アカデミック"],
+  tags: ["TOEFL", "アカデミック", "芸術"],
   senses: [
     {
       pos: "名詞",
@@ -53228,6 +52897,15 @@ const WORDS = [
       target: "murals",
       exJa: "メキシコの芸術家たちは自国の歴史を描いた壁画を描いた。",
       colloc: ["paint a mural", "a wall mural"]
+    },
+    {
+      pos: "名詞（murals の形）",
+      ja: "壁画",
+      def: "large paintings on walls",
+      ex: "The city has many colorful murals.",
+      target: "murals",
+      exJa: "その町にはカラフルな壁画がたくさんある。",
+      colloc: ["street murals", "paint murals"]
     }
   ],
   origin: {
@@ -53240,9 +52918,7 @@ const WORDS = [
   family: [
     { w: "muralist", pos: "名", ja: "壁画家" }
   ],
-  mates: [
-
-  ],
+  mates: [],
   confuse: [
     { w: "fresco", ja: "フレスコ画。しっくいが乾く前に描く壁画の技法。" }
   ],
@@ -56715,7 +56391,7 @@ const WORDS = [
   id: 1794378728593,
   word: "vein",
   ipa: "/veɪn/",
-  tags: ["TOEFL", "アカデミック"],
+  tags: ["TOEFL", "アカデミック", "生物"],
   senses: [
     {
       pos: "名詞",
@@ -56743,6 +56419,15 @@ const WORDS = [
       target: "vein",
       exJa: "第2章も同じ調子で続いている。",
       colloc: ["in the same vein", "in a similar vein"]
+    },
+    {
+      pos: "名詞（veins の形）",
+      ja: "静脈",
+      def: "tubes that carry blood back to the heart",
+      ex: "Veins carry blood to the heart.",
+      target: "Veins",
+      exJa: "静脈は血液を心臓へ運ぶ。",
+      colloc: ["blood veins"]
     }
   ],
   origin: {
@@ -57510,7 +57195,7 @@ const WORDS = [
   id: 1794378989177,
   word: "startle",
   ipa: "/ˈstɑːrtl/",
-  tags: ["TOEFL", "アカデミック"],
+  tags: ["TOEFL", "アカデミック", "描写"],
   senses: [
     {
       pos: "動詞",
@@ -57520,6 +57205,15 @@ const WORDS = [
       target: "startled",
       exJa: "大きな音に驚いて鳥たちは飛び去った。",
       colloc: ["be startled by ~", "startle response"]
+    },
+    {
+      pos: "形容詞（startling の形）",
+      ja: "驚くべき、びっくりさせる",
+      def: "very surprising",
+      ex: "The study revealed startling facts about ocean pollution.",
+      target: "startling",
+      exJa: "その研究は海洋汚染について驚くべき事実を明らかにした。",
+      colloc: ["a startling discovery", "startling results"]
     }
   ],
   origin: {
@@ -60790,47 +60484,6 @@ const WORDS = [
   savedAt: "2026-11-12T01:34:27.250Z"
 },
 {
-  id: 1794447267251,
-  word: "tactics",
-  ipa: "/ˈtæktɪks/",
-  tags: ["TOEFL", "ビジネス"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "戦術、作戦",
-      def: "the methods you use to achieve something",
-      ex: "The company changed its marketing tactics to attract younger customers.",
-      target: "tactics",
-      exJa: "その会社は若い客を引きつけるために販売戦術を変えた。",
-      colloc: ["change tactics", "delaying tactics"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "tact", type: "語根", mean: "並べる・配置する（ギリシャ語 taktikos）" },
-      { p: "-ics", type: "接尾辞", mean: "〜の術" }
-    ],
-    note: "兵を<b>うまく配置する術</b>。ノートの「コマを盤上におく感じ」。"
-  },
-  family: [
-    { w: "tactical", pos: "形", ja: "戦術的な" },
-    { w: "tactic", pos: "名", ja: "（個々の）作戦" },
-    { w: "tactician", pos: "名", ja: "策略家" }
-  ],
-  mates: [
-    { w: "strategy", ja: "戦略（全体の計画）" },
-    { w: "syntax", ja: "文法（並べ方）" },
-    { w: "maneuver", ja: "作戦行動" }
-  ],
-  confuse: [
-    { w: "strategy", ja: "strategy は長期的・全体的な「戦略」、tactics は目の前の目的のための具体的な「戦術」。" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "駿台単語/IMG_0186.HEIC",
-  savedAt: "2026-11-12T01:34:27.251Z"
-},
-{
   id: 1794447267252,
   word: "integrity",
   ipa: "/ɪnˈteɡrəti/",
@@ -61983,47 +61636,6 @@ const WORDS = [
   savedAt: "2026-11-12T01:34:27.280Z"
 },
 {
-  id: 1794447267281,
-  word: "persecuted",
-  ipa: "/ˈpɜːrsɪkjuːtɪd/",
-  tags: ["TOEFL", "歴史"],
-  senses: [
-    {
-      pos: "動詞",
-      ja: "迫害する、しつこく苦しめる",
-      def: "to treat someone cruelly and unfairly, especially because of their beliefs",
-      ex: "Many people were persecuted for their religious beliefs.",
-      target: "persecuted",
-      exJa: "多くの人が宗教的信念のために迫害された。",
-      colloc: ["be persecuted for A", "persecute minorities"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "per-", type: "接頭辞", mean: "ずっと・徹底的に" },
-      { p: "secut", type: "語根", mean: "追う（ラテン語 sequi）" },
-      { p: "-ed", type: "接尾辞", mean: "過去形・過去分詞" }
-    ],
-    note: "<b>どこまでも追いかけ回す</b>、で「迫害する」。"
-  },
-  family: [
-    { w: "persecute", pos: "動", ja: "迫害する" },
-    { w: "persecution", pos: "名", ja: "迫害" }
-  ],
-  mates: [
-    { w: "sequence", ja: "連続（続く）" },
-    { w: "consecutive", ja: "連続した" },
-    { w: "pursue", ja: "追求する" }
-  ],
-  confuse: [
-    { w: "prosecute", ja: "「起訴する」。per-（ずっと追う＝迫害）と pro-（前へ追う＝訴える）の違い。" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "駿台単語/IMG_0187.HEIC",
-  savedAt: "2026-11-12T01:34:27.281Z"
-},
-{
   id: 1794447267282,
   word: "appall",
   ipa: "/əˈpɔːl/",
@@ -62059,43 +61671,6 @@ const WORDS = [
   src: "note",
   srcRef: "駿台単語/IMG_0187.HEIC",
   savedAt: "2026-11-12T01:34:27.282Z"
-},
-{
-  id: 1794447267283,
-  word: "intriguing",
-  ipa: "/ɪnˈtriːɡɪŋ/",
-  tags: ["TOEFL", "描写"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "興味をそそる、面白い",
-      def: "very interesting because it is unusual or mysterious",
-      ex: "The scientists made an intriguing discovery about the ancient city.",
-      target: "intriguing",
-      exJa: "科学者たちはその古代都市について興味をそそる発見をした。",
-      colloc: ["an intriguing question", "an intriguing possibility"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "intrig", type: "語根", mean: "もつれさせる（ラテン語 intricare）" },
-      { p: "-uing", type: "接尾辞", mean: "形容詞を作る" }
-    ],
-    note: "<b>なぞが絡み合って</b>引き込まれる感じ。ノートのとおり interesting より少し高級な語。"
-  },
-  family: [
-    { w: "intrigue", pos: "動", ja: "興味をそそる、名:陰謀" },
-    { w: "intrigued", pos: "形", ja: "興味をそそられた" }
-  ],
-  mates: [
-    { w: "fascinating", ja: "魅力的な" },
-    { w: "intricate", ja: "入り組んだ" },
-    { w: "curious", ja: "好奇心の強い" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "駿台単語/IMG_0187.HEIC",
-  savedAt: "2026-11-12T01:34:27.283Z"
 },
 {
   id: 1794447267284,
@@ -62349,52 +61924,6 @@ const WORDS = [
   src: "note",
   srcRef: "駿台単語/IMG_0187.HEIC",
   savedAt: "2026-11-12T01:34:27.289Z"
-},
-{
-  id: 1794447267290,
-  word: "reservations",
-  ipa: "/ˌrezərˈveɪʃənz/",
-  tags: ["日常会話", "旅行"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "予約",
-      def: "an arrangement to have a seat, room, etc. kept for you",
-      ex: "We made reservations at three hotels for our trip.",
-      target: "reservations",
-      exJa: "私たちは旅行のために3つのホテルを予約した。",
-      colloc: ["make a reservation", "cancel a reservation"]
-    },
-    {
-      pos: "名詞",
-      ja: "（計画などへの）疑念、ためらい",
-      def: "doubts about whether something is good or right",
-      ex: "Some teachers have reservations about the new testing system.",
-      target: "reservations",
-      exJa: "新しい試験制度に疑念を持っている教師もいる。",
-      colloc: ["have reservations about A", "without reservation"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "reserve", type: "語根", mean: "取っておく（re- 後ろに＋serve 保つ）" },
-      { p: "-ation", type: "接尾辞", mean: "名詞を作る" }
-    ],
-    note: "<b>取っておくこと</b>＝予約。賛成を「取っておく」＝ためらい、の意味もある。"
-  },
-  family: [
-    { w: "reserve", pos: "動", ja: "予約する" },
-    { w: "reserved", pos: "形", ja: "予約済みの" }
-  ],
-  mates: [
-    { w: "conserve", ja: "節約する" },
-    { w: "preserve", ja: "保存する" },
-    { w: "observation", ja: "観察" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "駿台単語/IMG_0187.HEIC",
-  savedAt: "2026-11-12T01:34:27.290Z"
 },
 {
   id: 1794447267291,
@@ -62849,43 +62378,6 @@ const WORDS = [
   src: "note",
   srcRef: "駿台単語/IMG_0188.HEIC",
   savedAt: "2026-11-12T01:34:27.301Z"
-},
-{
-  id: 1794447267302,
-  word: "condominiums",
-  ipa: "/ˌkɑːndəˈmɪniəmz/",
-  tags: ["生活", "住まい"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "分譲マンション",
-      def: "apartment buildings in which each apartment is owned by the person living in it",
-      ex: "Several new condominiums were built near the station.",
-      target: "condominiums",
-      exJa: "駅の近くに新しい分譲マンションがいくつか建った。",
-      colloc: ["a condominium complex"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "con-", type: "接頭辞", mean: "共に" },
-      { p: "domin", type: "語根", mean: "家・主人（ラテン語 domus）" },
-      { p: "-ium", type: "接尾辞", mean: "名詞を作る" }
-    ],
-    note: "<b>みんなで共有する家</b>、で「分譲マンション」。"
-  },
-  family: [
-    { w: "condo", pos: "名", ja: "マンション（略語）" }
-  ],
-  mates: [
-    { w: "domestic", ja: "家庭の" },
-    { w: "dominate", ja: "支配する" },
-    { w: "domain", ja: "領域" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "駿台単語/IMG_0188.HEIC",
-  savedAt: "2026-11-12T01:34:27.302Z"
 },
 {
   id: 1794447267303,
@@ -68450,42 +67942,6 @@ const WORDS = [
   savedAt: "2026-11-12T01:34:27.441Z"
 },
 {
-  id: 1794447267442,
-  word: "pedestrians",
-  ipa: "/pəˈdestriənz/",
-  tags: ["生活", "TOEFL"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "歩行者",
-      def: "people who are walking, especially in a city",
-      ex: "This street is closed to cars and open only to pedestrians.",
-      target: "pedestrians",
-      exJa: "この通りは車は通行止めで、歩行者専用だ。",
-      colloc: ["a pedestrian crossing"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "ped", type: "語根", mean: "足（ラテン語 pes）" },
-      { p: "-estrian", type: "接尾辞", mean: "〜する人" }
-    ],
-    note: "<b>足で移動する人</b>、で「歩行者」。"
-  },
-  family: [
-    { w: "pedestrian", pos: "形", ja: "歩行者の、平凡な" }
-  ],
-  mates: [
-    { w: "pedal", ja: "ペダル" },
-    { w: "expedition", ja: "遠征" },
-    { w: "impede", ja: "妨げる" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "駿台単語/IMG_0193.HEIC",
-  savedAt: "2026-11-12T01:34:27.442Z"
-},
-{
   id: 1794447267443,
   word: "expedition",
   ipa: "/ˌekspəˈdɪʃən/",
@@ -69103,7 +68559,7 @@ const WORDS = [
   id: 1794447267458,
   word: "press",
   ipa: "/pres/",
-  tags: ["TOEFL", "ニュース"],
+  tags: ["TOEFL", "ニュース", "歌詞", "社会"],
   senses: [
     {
       pos: "名詞",
@@ -69122,6 +68578,15 @@ const WORDS = [
       target: "pressed",
       exJa: "労働者たちは会社に賃上げを迫った。",
       colloc: ["press A for B", "press a button"]
+    },
+    {
+      pos: "名詞（the press の形）",
+      ja: "報道機関、マスコミ、記者たち",
+      def: "newspapers, magazines, and the journalists who work for them",
+      ex: "The minister refused to answer questions from the press.",
+      target: "the press",
+      exJa: "大臣は報道陣の質問に答えることを拒んだ。",
+      colloc: ["freedom of the press", "press conference", "the press reported"]
     }
   ],
   origin: {
@@ -71991,7 +71456,7 @@ const WORDS = [
   id: 1794447267529,
   word: "candidate",
   ipa: "/ˈkændɪdət/",
-  tags: ["政治", "仕事"],
+  tags: ["政治", "仕事", "TOEFL", "社会"],
   senses: [
     {
       pos: "名詞",
@@ -72001,6 +71466,15 @@ const WORDS = [
       target: "candidates",
       exJa: "3人の候補者が市長選に立候補している。",
       colloc: ["a candidate for A", "a strong candidate"]
+    },
+    {
+      pos: "名詞（candidates の形）",
+      ja: "立候補者・候補者",
+      def: "people who want to be chosen for a position",
+      ex: "Three candidates are running for president.",
+      target: "candidates",
+      exJa: "3人の候補者が会長選に出ている。",
+      colloc: ["job candidates", "presidential candidates"]
     }
   ],
   origin: {
@@ -72596,7 +72070,7 @@ const WORDS = [
   id: 1794447267544,
   word: "astonish",
   ipa: "/əˈstɑːnɪʃ/",
-  tags: ["気持ち", "TOEFL"],
+  tags: ["気持ち", "TOEFL", "Red Kiwi"],
   senses: [
     {
       pos: "動詞",
@@ -72606,6 +72080,15 @@ const WORDS = [
       target: "astonished",
       exJa: "彼女の速い回復は医師たちを驚かせた。",
       colloc: ["be astonished at A", "be astonished to do"]
+    },
+    {
+      pos: "形容詞（astonishing の形）",
+      ja: "驚くべき・信じがたい",
+      def: "very surprising",
+      ex: "the results were astonishing.",
+      target: "astonishing",
+      exJa: "結果は驚くべきものでした。",
+      colloc: ["astonishing results", "an astonishing number of"]
     }
   ],
   origin: {
@@ -72618,7 +72101,8 @@ const WORDS = [
   },
   family: [
     { w: "astonishment", pos: "名", ja: "驚き" },
-    { w: "astonishing", pos: "形", ja: "驚くべき" }
+    { w: "astonishing", pos: "形", ja: "驚くべき" },
+    { w: "astonished", pos: "形", ja: "驚いた" }
   ],
   mates: [
     { w: "stun", ja: "唖然とさせる" },
@@ -74492,42 +73976,6 @@ const WORDS = [
   savedAt: "2026-11-12T01:34:27.592Z"
 },
 {
-  id: 1794447267593,
-  word: "contents",
-  ipa: "/ˈkɑːntents/",
-  tags: ["生活", "TOEFL"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "中身、内容物",
-      def: "the things that are inside a container",
-      ex: "She emptied the contents of her bag onto the table.",
-      target: "contents",
-      exJa: "彼女はバッグの中身をテーブルの上に出した。",
-      colloc: ["the contents of A", "table of contents"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "con-", type: "接頭辞", mean: "共に" },
-      { p: "tent", type: "語根", mean: "保つ（ラテン語 tenere）" }
-    ],
-    note: "<b>中に保たれているもの</b>、で「中身」。本の table of contents＝「目次」。"
-  },
-  family: [
-    { w: "content", pos: "名", ja: "内容、形:満足した" }
-  ],
-  mates: [
-    { w: "container", ja: "容器" },
-    { w: "contain", ja: "含む" },
-    { w: "detain", ja: "拘留する" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "駿台単語/IMG_0199.HEIC",
-  savedAt: "2026-11-12T01:34:27.593Z"
-},
-{
   id: 1794447267594,
   word: "detente",
   ipa: "/deɪˈtɑːnt/",
@@ -74998,44 +74446,6 @@ const WORDS = [
   src: "note",
   srcRef: "駿台単語/IMG_0199.HEIC",
   savedAt: "2026-11-12T01:34:27.604Z"
-},
-{
-  id: 1794447267605,
-  word: "complicated",
-  ipa: "/ˈkɑːmplɪkeɪtɪd/",
-  tags: ["TOEFL", "日常会話"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "複雑な、ややこしい",
-      def: "difficult to understand because it has many parts",
-      ex: "The instructions were too complicated to follow.",
-      target: "complicated",
-      exJa: "その説明は複雑すぎて従えなかった。",
-      colloc: ["a complicated process"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "com-", type: "接頭辞", mean: "共に" },
-      { p: "plic", type: "語根", mean: "折る（ラテン語 plicare）" },
-      { p: "-ated", type: "接尾辞", mean: "〜された" }
-    ],
-    note: "<b>何重にも折り重ねられた</b>、で「複雑な」。"
-  },
-  family: [
-    { w: "complicate", pos: "動", ja: "複雑にする" },
-    { w: "complication", pos: "名", ja: "合併症、面倒" }
-  ],
-  mates: [
-    { w: "implicit", ja: "暗黙の" },
-    { w: "duplication", ja: "複製" },
-    { w: "simple", ja: "簡単な" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "駿台単語/IMG_0199.HEIC",
-  savedAt: "2026-11-12T01:34:27.605Z"
 },
 {
   id: 1794447267606,
@@ -76166,7 +75576,7 @@ const WORDS = [
   id: 1794447267634,
   word: "exist",
   ipa: "/ɪɡˈzɪst/",
-  tags: ["TOEFL", "アカデミック"],
+  tags: ["TOEFL", "アカデミック", "ビジネス"],
   senses: [
     {
       pos: "動詞",
@@ -76176,6 +75586,15 @@ const WORDS = [
       target: "existed",
       exJa: "かつて存在した多くの種が今では絶滅している。",
       colloc: ["exist in A", "continue to exist"]
+    },
+    {
+      pos: "形容詞（existing の形）",
+      ja: "既存の、現存の",
+      def: "already present or in use",
+      ex: "The new system will replace the existing one.",
+      target: "existing",
+      exJa: "新しいシステムは既存のものに取って代わる。",
+      colloc: ["existing customers", "the existing system"]
     }
   ],
   origin: {
@@ -76290,43 +75709,6 @@ const WORDS = [
   src: "note",
   srcRef: "駿台単語/IMG_0200.HEIC",
   savedAt: "2026-11-12T01:34:27.636Z"
-},
-{
-  id: 1794447267637,
-  word: "existing",
-  ipa: "/ɪɡˈzɪstɪŋ/",
-  tags: ["TOEFL", "ビジネス"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "既存の、現存の",
-      def: "already present or in use",
-      ex: "The new system will replace the existing one.",
-      target: "existing",
-      exJa: "新しいシステムは既存のものに取って代わる。",
-      colloc: ["existing customers", "the existing system"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "exist", type: "語根", mean: "存在する" },
-      { p: "-ing", type: "接尾辞", mean: "形容詞を作る" }
-    ],
-    note: "今<b>存在している</b>、で「既存の」。"
-  },
-  family: [
-    { w: "exist", pos: "動", ja: "存在する" },
-    { w: "existence", pos: "名", ja: "存在" }
-  ],
-  mates: [
-    { w: "resist", ja: "抵抗する" },
-    { w: "persist", ja: "固執する" },
-    { w: "consist", ja: "成る" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "駿台単語/IMG_0200.HEIC",
-  savedAt: "2026-11-12T01:34:27.637Z"
 },
 {
   id: 1794447267638,
@@ -76747,7 +76129,7 @@ const WORDS = [
   id: 1794447267648,
   word: "noble",
   ipa: "/ˈnoʊbəl/",
-  tags: ["歴史", "描写"],
+  tags: ["歴史", "描写", "Red Kiwi"],
   senses: [
     {
       pos: "形容詞",
@@ -76766,6 +76148,15 @@ const WORDS = [
       target: "noble",
       exJa: "彼女は貴族の家に生まれた。",
       colloc: ["a noble family"]
+    },
+    {
+      pos: "名詞（nobles の形）",
+      ja: "貴族",
+      def: "people of high social rank",
+      ex: "The nobles controlled most of the land.",
+      target: "nobles",
+      exJa: "貴族が土地の大半を支配していた。",
+      colloc: ["the nobility"]
     }
   ],
   origin: {
@@ -77717,42 +77108,6 @@ const WORDS = [
   src: "note",
   srcRef: "駿台単語/IMG_0202.HEIC",
   savedAt: "2026-11-12T01:34:27.672Z"
-},
-{
-  id: 1794447267673,
-  word: "startling",
-  ipa: "/ˈstɑːrtlɪŋ/",
-  tags: ["TOEFL", "描写"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "驚くべき、びっくりさせる",
-      def: "very surprising",
-      ex: "The study revealed startling facts about ocean pollution.",
-      target: "startling",
-      exJa: "その研究は海洋汚染について驚くべき事実を明らかにした。",
-      colloc: ["a startling discovery", "startling results"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "start", type: "語根", mean: "びくっとする" },
-      { p: "-ling", type: "接尾辞", mean: "形容詞を作る" }
-    ],
-    note: "<b>びくっとさせる</b>、で「驚くべき」。"
-  },
-  family: [
-    { w: "startle", pos: "動", ja: "びっくりさせる" }
-  ],
-  mates: [
-    { w: "surprising", ja: "驚くべき" },
-    { w: "astonishing", ja: "驚くべき" },
-    { w: "stun", ja: "唖然とさせる" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "駿台単語/IMG_0202.HEIC",
-  savedAt: "2026-11-12T01:34:27.673Z"
 },
 {
   id: 1794447267674,
@@ -79130,7 +78485,7 @@ const WORDS = [
   id: 1794447267709,
   word: "pesticide",
   ipa: "/ˈpestɪsaɪd/",
-  tags: ["環境", "農業"],
+  tags: ["環境", "農業", "TOEFL"],
   senses: [
     {
       pos: "名詞",
@@ -79140,6 +78495,15 @@ const WORDS = [
       target: "pesticides",
       exJa: "有機農家は化学農薬を使わない。",
       colloc: ["chemical pesticides", "pesticide use"]
+    },
+    {
+      pos: "名詞（pesticides の形）",
+      ja: "農薬・殺虫剤",
+      def: "chemicals used to kill insects that harm crops",
+      ex: "Many farmers use pesticides.",
+      target: "pesticides",
+      exJa: "多くの農家が農薬を使っている。",
+      colloc: ["use pesticides", "pesticide residue"]
     }
   ],
   origin: {
@@ -87894,43 +87258,6 @@ const WORDS = [
   savedAt: "2026-11-13T06:48:17.950Z"
 },
 {
-  id: 1794552497951,
-  word: "prevailing",
-  ipa: "/prɪˈveɪlɪŋ/",
-  tags: ["TOEFL", "アカデミック"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "支配的な・一般的な",
-      def: "most common or strongest at a particular time",
-      ex: "The prevailing wind here is from the west.",
-      target: "prevailing",
-      exJa: "ここの卓越風は西から吹く。",
-      colloc: ["prevailing winds", "the prevailing view"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "pre-", type: "接頭辞", mean: "前に" },
-      { p: "vail", type: "語根", mean: "強い" },
-      { p: "-ing", type: "接尾辞", mean: "形容詞" }
-    ],
-    note: "<b>前に出て勝っている</b>。"
-  },
-  family: [
-    { w: "prevail", pos: "動", ja: "広まる・勝つ" },
-    { w: "prevalent", pos: "形", ja: "広まっている" }
-  ],
-  mates: [
-    { w: "dominant", ja: "支配的な" },
-    { w: "current", ja: "現在の" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "Santa/IMG_0621.png",
-  savedAt: "2026-11-13T06:48:17.951Z"
-},
-{
   id: 1794552497952,
   word: "oligopolistic",
   ipa: "/ˌɑːlɪɡɑːpəˈlɪstɪk/",
@@ -88042,7 +87369,7 @@ const WORDS = [
   id: 1794552497955,
   word: "engage",
   ipa: "/ɪnˈɡeɪdʒ/",
-  tags: ["TOEFL", "アカデミック"],
+  tags: ["TOEFL", "アカデミック", "人物描写"],
   senses: [
     {
       pos: "動詞",
@@ -88070,6 +87397,15 @@ const WORDS = [
       target: "engaged",
       exJa: "二人は去年婚約した。",
       colloc: ["be engaged to A"]
+    },
+    {
+      pos: "形容詞（engaging の形）",
+      ja: "（人を）引きつける、魅力的な",
+      def: "interesting or pleasant in a way that holds your attention",
+      ex: "The professor's lectures were so engaging that nobody looked at their phones.",
+      target: "engaging",
+      exJa: "その教授の講義はとても引きつけられるもので、誰もスマホを見なかった。",
+      colloc: ["an engaging speaker", "engaging content", "highly engaging"]
     }
   ],
   origin: {
@@ -88081,7 +87417,8 @@ const WORDS = [
   },
   family: [
     { w: "engagement", pos: "名", ja: "婚約・関与" },
-    { w: "engaging", pos: "形", ja: "魅力的な" }
+    { w: "engaging", pos: "形", ja: "魅力的な" },
+    { w: "engaged", pos: "形", ja: "従事した、婚約した" }
   ],
   mates: [
     { w: "participate", ja: "参加する" },
@@ -88170,41 +87507,6 @@ const WORDS = [
   src: "note",
   srcRef: "Santa/IMG_0621.png",
   savedAt: "2026-11-13T06:48:17.957Z"
-},
-{
-  id: 1794552497958,
-  word: "aesthetics",
-  ipa: "/esˈθetɪks/",
-  tags: ["TOEFL", "芸術"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "美学・美しさ",
-      def: "the study of beauty, or the way something looks",
-      ex: "The architect cares about both function and aesthetics.",
-      target: "aesthetics",
-      exJa: "その建築家は機能と美しさの両方を大切にする。",
-      colloc: ["the aesthetics of A"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "aesthe", type: "語根", mean: "感じる" },
-      { p: "-ics", type: "接尾辞", mean: "学問" }
-    ],
-    note: "ギリシャ語 aisthesis（感覚）。<b>感じることの学問</b>。"
-  },
-  family: [
-    { w: "aesthetic", pos: "形", ja: "美的な" }
-  ],
-  mates: [
-    { w: "beauty", ja: "美" },
-    { w: "design", ja: "デザイン" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "Santa/IMG_0621.png",
-  savedAt: "2026-11-13T06:48:17.958Z"
 },
 {
   id: 1794552497959,
@@ -89502,36 +88804,6 @@ const WORDS = [
   savedAt: "2026-11-13T06:48:17.995Z"
 },
 {
-  id: 1794552497996,
-  word: "errands",
-  ipa: "/ˈerəndz/",
-  tags: ["日常"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "用事／お使い",
-      def: "short trips to do tasks such as shopping",
-      ex: "I have some errands to run this afternoon.",
-      target: "errands",
-      exJa: "午後にいくつか用事がある。",
-      colloc: ["run errands"]
-    }
-  ],
-  origin: {
-    parts: [],
-    note: "古英語 ærende（伝言・使い）から。"
-  },
-  family: [],
-  mates: [
-    { w: "chore", ja: "雑用" },
-    { w: "task", ja: "仕事" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "Santa/IMG_0623.png",
-  savedAt: "2026-11-13T06:48:17.996Z"
-},
-{
   id: 1794552497997,
   word: "soundproof",
   ipa: "/ˈsaʊndpruːf/",
@@ -90655,39 +89927,6 @@ const WORDS = [
   savedAt: "2026-11-13T06:48:18.027Z"
 },
 {
-  id: 1794552498028,
-  word: "pesticides",
-  ipa: "/ˈpestɪsaɪdz/",
-  tags: ["TOEFL", "環境"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "農薬・殺虫剤",
-      def: "chemicals used to kill insects that harm crops",
-      ex: "Many farmers use pesticides.",
-      target: "pesticides",
-      exJa: "多くの農家が農薬を使っている。",
-      colloc: ["use pesticides", "pesticide residue"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "pest", type: "語根", mean: "害虫" },
-      { p: "-cide", type: "接尾辞", mean: "殺すもの" }
-    ],
-    note: "<b>害虫を殺すもの</b>。insecticide と同じ -cide。"
-  },
-  family: [],
-  mates: [
-    { w: "herbicide", ja: "除草剤" },
-    { w: "fertilizer", ja: "肥料" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "Santa/IMG_0834.png",
-  savedAt: "2026-11-13T06:48:18.028Z"
-},
-{
   id: 1794552498029,
   word: "secretion",
   ipa: "/sɪˈkriːʃən/",
@@ -91109,6 +90348,15 @@ const WORDS = [
       target: "endure",
       exJa: "彼女の音楽は何世代にもわたって残るだろう。",
       colloc: ["endure over time"]
+    },
+    {
+      pos: "形容詞（enduring の形）",
+      ja: "長く続く／永続的な",
+      def: "lasting for a long time",
+      ex: "The two countries have an enduring friendship.",
+      target: "enduring",
+      exJa: "両国には長く続く友好関係がある。",
+      colloc: ["enduring popularity", "an enduring legacy"]
     }
   ],
   origin: {
@@ -91130,41 +90378,6 @@ const WORDS = [
   src: "note",
   srcRef: "Santa/IMG_0835.png",
   savedAt: "2026-11-13T06:48:18.040Z"
-},
-{
-  id: 1794552498041,
-  word: "enduring",
-  ipa: "/ɪnˈdʊrɪŋ/",
-  tags: ["TOEFL", "アカデミック"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "長く続く／永続的な",
-      def: "lasting for a long time",
-      ex: "The two countries have an enduring friendship.",
-      target: "enduring",
-      exJa: "両国には長く続く友好関係がある。",
-      colloc: ["enduring popularity", "an enduring legacy"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "endure", type: "語根", mean: "続く" },
-      { p: "-ing", type: "接尾辞", mean: "形容詞" }
-    ],
-    note: "<b>続いている</b>。"
-  },
-  family: [
-    { w: "endure", pos: "動", ja: "耐える・続く" }
-  ],
-  mates: [
-    { w: "lasting", ja: "永続的な" },
-    { w: "permanent", ja: "永久の" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "Santa/IMG_0835.png",
-  savedAt: "2026-11-13T06:48:18.041Z"
 },
 {
   id: 1794552498042,
@@ -91240,7 +90453,7 @@ const WORDS = [
   id: 1794552498044,
   word: "complicate",
   ipa: "/ˈkɑːmplɪkeɪt/",
-  tags: ["TOEFL", "アカデミック"],
+  tags: ["TOEFL", "アカデミック", "日常会話"],
   senses: [
     {
       pos: "動詞",
@@ -91250,6 +90463,15 @@ const WORDS = [
       target: "complicated",
       exJa: "悪天候で救助が難しくなった。",
       colloc: ["complicate matters"]
+    },
+    {
+      pos: "形容詞（complicated の形）",
+      ja: "複雑な、ややこしい",
+      def: "difficult to understand because it has many parts",
+      ex: "The instructions were too complicated to follow.",
+      target: "complicated",
+      exJa: "その説明は複雑すぎて従えなかった。",
+      colloc: ["a complicated process"]
     }
   ],
   origin: {
@@ -91287,6 +90509,15 @@ const WORDS = [
       target: "pigments",
       exJa: "昔の画家は植物や鉱物から顔料を作った。",
       colloc: ["natural pigment", "skin pigment"]
+    },
+    {
+      pos: "名詞（pigments の形）",
+      ja: "色素（の複数形）",
+      def: "substances that give color",
+      ex: "Leaves contain green pigments.",
+      target: "pigments",
+      exJa: "葉には緑の色素が含まれている。",
+      colloc: ["natural pigments"]
     }
   ],
   origin: {
@@ -92007,6 +91238,15 @@ const WORDS = [
       target: "clarify",
       exJa: "どういう意味か説明してもらえますか。",
       colloc: ["clarify the issue"]
+    },
+    {
+      pos: "形容詞（clarifying の形）",
+      ja: "明確にするための",
+      def: "making something clearer",
+      ex: "Can I ask a clarifying question?",
+      target: "clarifying",
+      exJa: "確認の質問をしてもいいですか。",
+      colloc: ["a clarifying question"]
     }
   ],
   origin: {
@@ -92018,7 +91258,8 @@ const WORDS = [
   },
   family: [
     { w: "clarification", pos: "名", ja: "説明" },
-    { w: "clarity", pos: "名", ja: "明快さ" }
+    { w: "clarity", pos: "名", ja: "明快さ" },
+    { w: "clarifying", pos: "形", ja: "明確にするための" }
   ],
   mates: [
     { w: "explain", ja: "説明する" },
@@ -92224,7 +91465,7 @@ const WORDS = [
   id: 1794552498072,
   word: "milestone",
   ipa: "/ˈmaɪlstoʊn/",
-  tags: ["TOEFL", "日常"],
+  tags: ["TOEFL", "日常", "ビジネス"],
   senses: [
     {
       pos: "名詞",
@@ -92234,6 +91475,15 @@ const WORDS = [
       target: "milestone",
       exJa: "大学の卒業は大きな節目だ。",
       colloc: ["reach a milestone", "a major milestone"]
+    },
+    {
+      pos: "名詞（milestones の形）",
+      ja: "進捗（の目標・節目）",
+      def: "important points in the progress of a project",
+      ex: "The project has three milestones.",
+      target: "milestones",
+      exJa: "そのプロジェクトには3つの節目がある。",
+      colloc: ["project milestones", "reach milestones"]
     }
   ],
   origin: {
@@ -92537,41 +91787,6 @@ const WORDS = [
   savedAt: "2026-11-13T06:48:18.080Z"
 },
 {
-  id: 1794552498081,
-  word: "candidates",
-  ipa: "/ˈkændɪdeɪts/",
-  tags: ["TOEFL", "社会"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "立候補者・候補者",
-      def: "people who want to be chosen for a position",
-      ex: "Three candidates are running for president.",
-      target: "candidates",
-      exJa: "3人の候補者が会長選に出ている。",
-      colloc: ["job candidates", "presidential candidates"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "candid", type: "語根", mean: "白い" },
-      { p: "-ate", type: "接尾辞", mean: "人" }
-    ],
-    note: "ローマの立候補者は<b>白い服</b>を着たことから。"
-  },
-  family: [
-    { w: "candidacy", pos: "名", ja: "立候補" }
-  ],
-  mates: [
-    { w: "applicant", ja: "応募者" },
-    { w: "nominee", ja: "指名された人" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "Santa/IMG_4012.HEIC",
-  savedAt: "2026-11-13T06:48:18.081Z"
-},
-{
   id: 1794552498082,
   word: "boutique",
   ipa: "/buːˈtiːk/",
@@ -92666,40 +91881,6 @@ const WORDS = [
   src: "note",
   srcRef: "Santa/IMG_4012.HEIC",
   savedAt: "2026-11-13T06:48:18.084Z"
-},
-{
-  id: 1794552498085,
-  word: "commodities",
-  ipa: "/kəˈmɑːdətiz/",
-  tags: ["TOEFL", "経済"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "一次生産物・商品",
-      def: "raw materials or products that are bought and sold",
-      ex: "Oil and wheat are important commodities.",
-      target: "commodities",
-      exJa: "石油と小麦は重要な商品だ。",
-      colloc: ["commodity prices", "basic commodities"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "com-", type: "接頭辞", mean: "共に" },
-      { p: "mod", type: "語根", mean: "尺度・適切な" },
-      { p: "-ity", type: "接尾辞", mean: "名詞" }
-    ],
-    note: "<b>役に立つ（適切な）もの</b>。"
-  },
-  family: [],
-  mates: [
-    { w: "goods", ja: "商品" },
-    { w: "raw materials", ja: "原材料" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "Santa/IMG_4012.HEIC",
-  savedAt: "2026-11-13T06:48:18.085Z"
 },
 {
   id: 1794552498086,
@@ -93317,7 +92498,7 @@ const WORDS = [
   id: 1794552498103,
   word: "fatigue",
   ipa: "/fəˈtiːɡ/",
-  tags: ["健康"],
+  tags: ["健康", "フォーマル", "ライティング", "TOEFL", "アカデミック"],
   senses: [
     {
       pos: "名詞",
@@ -93327,13 +92508,34 @@ const WORDS = [
       target: "fatigue",
       exJa: "睡眠不足は疲労の原因になる。",
       colloc: ["chronic fatigue", "mental fatigue"]
+    },
+    {
+      pos: "形容詞（fatigued の形）",
+      ja: "（改まった言い方で）疲労した、疲れきった",
+      def: "very tired, especially after long effort or illness",
+      ex: "Patients often feel fatigued for several weeks after the treatment.",
+      target: "fatigued",
+      exJa: "患者は治療のあと数週間、疲労感が続くことが多い。",
+      colloc: ["feel fatigued", "become fatigued", "mentally fatigued"]
+    },
+    {
+      pos: "形容詞（fatigued の形）",
+      ja: "（金属などが）繰り返しの力で弱くなった",
+      def: "weakened by repeated stress, especially of metal",
+      ex: "Engineers inspect the bridge regularly for fatigued metal in the support beams.",
+      target: "fatigued",
+      exJa: "技術者は、支柱に金属疲労が起きていないか定期的に橋を点検している。",
+      colloc: ["fatigued metal", "metal fatigue"]
     }
   ],
   origin: {
     parts: [],
     note: "フランス語 fatiguer（疲れさせる）から。"
   },
-  family: [],
+  family: [
+    { w: "fatiguing", pos: "形", ja: "疲れさせる、骨の折れる" },
+    { w: "fatigued", pos: "形", ja: "（改まった言い方で）疲労した、疲れきった" }
+  ],
   mates: [
     { w: "exhaustion", ja: "疲労困憊" },
     { w: "tiredness", ja: "疲れ" }
@@ -93341,7 +92543,10 @@ const WORDS = [
   memo: "",
   src: "note",
   srcRef: "Santa/IMG_4013.HEIC",
-  savedAt: "2026-11-13T06:48:18.103Z"
+  savedAt: "2026-11-13T06:48:18.103Z",
+  confuse: [
+    { w: "tired", ja: "<b>tired</b> は軽い疲れから使える日常語。<b>fatigued</b> は改まった語で、長く続いた疲労・病気・金属疲労のように<b>原因があって力が削られた</b>場面に使う。" }
+  ]
 },
 {
   id: 1794552498104,
@@ -93569,42 +92774,6 @@ const WORDS = [
   savedAt: "2026-11-13T06:48:18.110Z"
 },
 {
-  id: 1794552498111,
-  word: "clarifying",
-  ipa: "/ˈklerəfaɪɪŋ/",
-  tags: ["TOEFL", "アカデミック"],
-  senses: [
-    {
-      pos: "形容詞",
-      ja: "明確にするための",
-      def: "making something clearer",
-      ex: "Can I ask a clarifying question?",
-      target: "clarifying",
-      exJa: "確認の質問をしてもいいですか。",
-      colloc: ["a clarifying question"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "clar", type: "語根", mean: "明らかな" },
-      { p: "-ify", type: "接尾辞", mean: "〜にする" },
-      { p: "-ing", type: "接尾辞", mean: "形容詞" }
-    ],
-    note: "<b>明らかにする</b>。"
-  },
-  family: [
-    { w: "clarify", pos: "動", ja: "明確にする" }
-  ],
-  mates: [
-    { w: "explanatory", ja: "説明的な" },
-    { w: "confirming", ja: "確かめる" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "Santa/IMG_4014.HEIC",
-  savedAt: "2026-11-13T06:48:18.111Z"
-},
-{
   id: 1794552498112,
   word: "self-awareness",
   ipa: "/ˌself əˈwernəs/",
@@ -93638,39 +92807,6 @@ const WORDS = [
   src: "note",
   srcRef: "Santa/IMG_4014.HEIC",
   savedAt: "2026-11-13T06:48:18.112Z"
-},
-{
-  id: 1794552498113,
-  word: "milestones",
-  ipa: "/ˈmaɪlstoʊnz/",
-  tags: ["TOEFL", "ビジネス"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "進捗（の目標・節目）",
-      def: "important points in the progress of a project",
-      ex: "The project has three milestones.",
-      target: "milestones",
-      exJa: "そのプロジェクトには3つの節目がある。",
-      colloc: ["project milestones", "reach milestones"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "mile", type: "語根", mean: "マイル" },
-      { p: "stone", type: "語根", mean: "石" }
-    ],
-    note: "milestone の複数形。プロジェクトでは「中間目標」として進み具合を測る。"
-  },
-  family: [],
-  mates: [
-    { w: "deadline", ja: "締め切り" },
-    { w: "goal", ja: "目標" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "Santa/IMG_4014.HEIC",
-  savedAt: "2026-11-13T06:48:18.113Z"
 },
 {
   id: 1794552498114,
@@ -93740,36 +92876,6 @@ const WORDS = [
   src: "note",
   srcRef: "Santa/IMG_4014.HEIC",
   savedAt: "2026-11-13T06:48:18.115Z"
-},
-{
-  id: 1794552498116,
-  word: "veins",
-  ipa: "/veɪnz/",
-  tags: ["TOEFL", "生物"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "静脈",
-      def: "tubes that carry blood back to the heart",
-      ex: "Veins carry blood to the heart.",
-      target: "Veins",
-      exJa: "静脈は血液を心臓へ運ぶ。",
-      colloc: ["blood veins"]
-    }
-  ],
-  origin: {
-    parts: [],
-    note: "ラテン語 vena（血管）から。葉脈・鉱脈にも使う。"
-  },
-  family: [],
-  mates: [
-    { w: "arteries", ja: "動脈" },
-    { w: "blood vessels", ja: "血管" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "Santa/IMG_4014.HEIC",
-  savedAt: "2026-11-13T06:48:18.116Z"
 },
 {
   id: 1794552498117,
@@ -94301,39 +93407,6 @@ const WORDS = [
   savedAt: "2026-11-13T06:48:18.130Z"
 },
 {
-  id: 1794552498131,
-  word: "pigments",
-  ipa: "/ˈpɪɡmənts/",
-  tags: ["TOEFL", "芸術"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "色素（の複数形）",
-      def: "substances that give color",
-      ex: "Leaves contain green pigments.",
-      target: "pigments",
-      exJa: "葉には緑の色素が含まれている。",
-      colloc: ["natural pigments"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "pig", type: "語根", mean: "塗る" },
-      { p: "-ment", type: "接尾辞", mean: "名詞" }
-    ],
-    note: "ラテン語 pingere（色を塗る）から。"
-  },
-  family: [],
-  mates: [
-    { w: "dye", ja: "染料" },
-    { w: "hues", ja: "色合い" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "Santa/IMG_4015.HEIC",
-  savedAt: "2026-11-13T06:48:18.131Z"
-},
-{
   id: 1794552498132,
   word: "varnish",
   ipa: "/ˈvɑːrnɪʃ/",
@@ -94583,39 +93656,6 @@ const WORDS = [
   savedAt: "2026-11-13T06:48:18.138Z"
 },
 {
-  id: 1794552498139,
-  word: "murals",
-  ipa: "/ˈmjʊrəlz/",
-  tags: ["TOEFL", "芸術"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "壁画",
-      def: "large paintings on walls",
-      ex: "The city has many colorful murals.",
-      target: "murals",
-      exJa: "その町にはカラフルな壁画がたくさんある。",
-      colloc: ["street murals", "paint murals"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "mur", type: "語根", mean: "壁" },
-      { p: "-al", type: "接尾辞", mean: "もの" }
-    ],
-    note: "ラテン語 murus（壁）から。"
-  },
-  family: [],
-  mates: [
-    { w: "fresco", ja: "フレスコ画" },
-    { w: "graffiti", ja: "落書き" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "Santa/IMG_4015.HEIC",
-  savedAt: "2026-11-13T06:48:18.139Z"
-},
-{
   id: 1794552498140,
   word: "inspection",
   ipa: "/ɪnˈspekʃən/",
@@ -94651,43 +93691,6 @@ const WORDS = [
   src: "note",
   srcRef: "Santa/IMG_4016.HEIC",
   savedAt: "2026-11-13T06:48:18.140Z"
-},
-{
-  id: 1794552498141,
-  word: "replenishes",
-  ipa: "/rɪˈplenɪʃɪz/",
-  tags: ["TOEFL", "日常"],
-  senses: [
-    {
-      pos: "動詞",
-      ja: "補充する／再び満たす",
-      def: "fills something again",
-      ex: "Rain replenishes the lake.",
-      target: "replenishes",
-      exJa: "雨が湖を再び満たす。",
-      colloc: ["replenish supplies", "replenish water"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "re-", type: "接頭辞", mean: "再び" },
-      { p: "plen", type: "語根", mean: "満ちた" },
-      { p: "-ish", type: "接尾辞", mean: "動詞" }
-    ],
-    note: "<b>再び満たす</b>。plenty と同じ。"
-  },
-  family: [
-    { w: "replenish", pos: "動", ja: "補充する" },
-    { w: "replenishment", pos: "名", ja: "補充" }
-  ],
-  mates: [
-    { w: "refill", ja: "補充する" },
-    { w: "restock", ja: "再入荷する" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "Santa/IMG_4016.HEIC",
-  savedAt: "2026-11-13T06:48:18.141Z"
 },
 {
   id: 1794552498142,
@@ -94731,7 +93734,7 @@ const WORDS = [
   id: 1794552498143,
   word: "reservation",
   ipa: "/ˌrezərˈveɪʃən/",
-  tags: ["日常"],
+  tags: ["日常", "日常会話", "旅行"],
   senses: [
     {
       pos: "名詞",
@@ -94750,6 +93753,24 @@ const WORDS = [
       target: "reservations",
       exJa: "その計画には少し疑問がある。",
       colloc: ["without reservation"]
+    },
+    {
+      pos: "名詞（reservations の形）",
+      ja: "予約",
+      def: "an arrangement to have a seat, room, etc. kept for you",
+      ex: "We made reservations at three hotels for our trip.",
+      target: "reservations",
+      exJa: "私たちは旅行のために3つのホテルを予約した。",
+      colloc: ["make a reservation", "cancel a reservation"]
+    },
+    {
+      pos: "名詞（reservations の形）",
+      ja: "（計画などへの）疑念、ためらい",
+      def: "doubts about whether something is good or right",
+      ex: "Some teachers have reservations about the new testing system.",
+      target: "reservations",
+      exJa: "新しい試験制度に疑念を持っている教師もいる。",
+      colloc: ["have reservations about A", "without reservation"]
     }
   ],
   origin: {
@@ -94761,7 +93782,8 @@ const WORDS = [
     note: "<b>後ろに取っておくこと</b>。"
   },
   family: [
-    { w: "reserve", pos: "動", ja: "予約する" }
+    { w: "reserve", pos: "動", ja: "予約する" },
+    { w: "reserved", pos: "形", ja: "予約済みの" }
   ],
   mates: [
     { w: "booking", ja: "予約" },
@@ -95448,35 +94470,6 @@ const WORDS = [
   savedAt: "2026-11-13T06:48:18.164Z"
 },
 {
-  id: 1794552498165,
-  word: "be endowed",
-  tags: ["駿台単語", "熟語"],
-  senses: [
-    {
-      pos: "熟語",
-      ja: "恵まれている",
-      def: "to naturally have a good quality or ability",
-      ex: "She is endowed with a beautiful voice.",
-      target: "is endowed with",
-      exJa: "彼女は生まれつき美しい声に恵まれている。",
-      colloc: ["be endowed with A", "be richly endowed"]
-    }
-  ],
-  origin: {
-    parts: [],
-    note: "endow は「（財産・才能を）授ける」。en-（中に）＋dow（与える）＝ donate と同じ「与える」の仲間。"
-  },
-  family: [],
-  mates: [
-    { w: "be blessed with", ja: "〜に恵まれている" },
-    { w: "gifted", ja: "才能のある" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "駿台単語/IMG_0186.HEIC",
-  savedAt: "2026-11-13T06:48:18.165Z"
-},
-{
   id: 1794552498166,
   word: "hesitate to do",
   tags: ["駿台単語", "熟語"],
@@ -95766,35 +94759,6 @@ const WORDS = [
   src: "note",
   srcRef: "駿台単語/IMG_0194.HEIC",
   savedAt: "2026-11-13T06:48:18.175Z"
-},
-{
-  id: 1794552498176,
-  word: "in terms of A",
-  tags: ["駿台単語", "熟語"],
-  senses: [
-    {
-      pos: "熟語",
-      ja: "Aの観点から",
-      def: "when considering a particular aspect of something",
-      ex: "In terms of cost, the train is much cheaper than a taxi.",
-      target: "In terms of",
-      exJa: "費用の点では、電車の方がタクシーよりずっと安い。",
-      colloc: ["in terms of cost", "in terms of quality"]
-    }
-  ],
-  origin: {
-    parts: [],
-    note: "term は「区切り・限界」→「言葉・条件」。in terms of は「〜という言葉で言えば」＝その観点から。"
-  },
-  family: [],
-  mates: [
-    { w: "regarding", ja: "〜に関して" },
-    { w: "from the viewpoint of", ja: "〜の観点から" }
-  ],
-  memo: "",
-  src: "note",
-  srcRef: "駿台単語/IMG_0194.HEIC",
-  savedAt: "2026-11-13T06:48:18.176Z"
 },
 {
   id: 1794552498177,
@@ -96908,55 +95872,6 @@ const WORDS = [
   src: "lyrics",
   srcRef: "HUMBLE. / Kendrick Lamar",
   savedAt: "2026-11-13T03:06:40.014Z"
-},
-{
-  id: 1794539204343,
-  word: "counterfeits",
-  ipa: "/ˈkaʊntərfɪts/",
-  tags: ["歌詞", "TOEFL"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "偽物、偽札（counterfeit の複数形）",
-      def: "copies made to look like real money or products in order to deceive people",
-      ex: "Customs officers seized thousands of counterfeits of luxury handbags.",
-      target: "counterfeits",
-      exJa: "税関職員は高級バッグの偽物を数千点押収した。",
-      colloc: ["sell counterfeits", "spot counterfeits"]
-    },
-    {
-      pos: "形容詞",
-      ja: "偽造の",
-      def: "made to look exactly like something real in order to deceive",
-      ex: "The bank installed machines that can detect counterfeit bills.",
-      target: "counterfeit",
-      exJa: "その銀行は偽札を見分けられる機械を設置した。",
-      colloc: ["counterfeit money", "counterfeit goods", "counterfeit bills"]
-    }
-  ],
-  origin: {
-    parts: [
-      { p: "counter-", type: "接頭辞", mean: "反対に・対になって" },
-      { p: "feit", type: "語根", mean: "作る（ラテン語 facere）" }
-    ],
-    note: "「<b>本物に対して作ったもの</b>」＝模造品。facere（作る）は fact・factory と同じ語根。"
-  },
-  family: [
-    { w: "counterfeit", pos: "動", ja: "偽造する" },
-    { w: "counterfeiter", pos: "名", ja: "偽造者" }
-  ],
-  mates: [
-    { w: "factory", ja: "工場（作る場所）" },
-    { w: "artifact", ja: "人工物" },
-    { w: "forfeit", ja: "（権利を）失う、没収" }
-  ],
-  confuse: [
-    { w: "fake", ja: "fake は一般的な「偽物」。counterfeit は特に<b>お金・ブランド品を違法に偽造したもの</b>に使う。" }
-  ],
-  memo: "",
-  src: "lyrics",
-  srcRef: "HUMBLE. / Kendrick Lamar",
-  savedAt: "2026-11-13T03:06:44.343Z"
 },
 {
   id: 1794539205830,
@@ -99002,39 +97917,6 @@ const WORDS = [
   src: "lyrics",
   srcRef: "you should see me in a crown / Billie Eilish",
   savedAt: "2026-11-19T05:54:38.107Z"
-},
-{
-  id: 1795067694771,
-  word: "the press",
-  ipa: "/ðə pres/",
-  tags: ["歌詞", "社会"],
-  senses: [
-    {
-      pos: "名詞",
-      ja: "報道機関、マスコミ、記者たち",
-      def: "newspapers, magazines, and the journalists who work for them",
-      ex: "The minister refused to answer questions from the press.",
-      target: "the press",
-      exJa: "大臣は報道陣の質問に答えることを拒んだ。",
-      colloc: ["freedom of the press", "press conference", "the press reported"]
-    }
-  ],
-  origin: {
-    parts: [],
-    note: "press は「<b>押す</b>」。印刷機（紙を押しつけて刷る）を指すようになり、そこから印刷物を出す新聞・記者全体を the press と呼ぶ。"
-  },
-  family: [
-    { w: "press", pos: "動", ja: "押す；強く迫る" },
-    { w: "pressure", pos: "名", ja: "圧力" }
-  ],
-  mates: [
-    { w: "the media", ja: "メディア" },
-    { w: "journalist", ja: "記者" }
-  ],
-  memo: "",
-  src: "lyrics",
-  srcRef: "Therefore I Am / Billie Eilish",
-  savedAt: "2026-11-19T05:54:54.771Z"
 },
 {
   id: 1795067731197,
@@ -102770,7 +101652,7 @@ const WORDS = [
   id: 1795076241626,
   word: "pedestrian",
   ipa: "/pəˈdestriən/",
-  tags: ["TOEFL", "語彙"],
+  tags: ["TOEFL", "語彙", "生活"],
   senses: [
     {
       pos: "名詞",
@@ -102789,6 +101671,15 @@ const WORDS = [
       target: "pedestrian",
       exJa: "批評家はその小説の文体を平凡だと評した。",
       colloc: ["a pedestrian performance"]
+    },
+    {
+      pos: "名詞（pedestrians の形）",
+      ja: "歩行者",
+      def: "people who are walking, especially in a city",
+      ex: "This street is closed to cars and open only to pedestrians.",
+      target: "pedestrians",
+      exJa: "この通りは車は通行止めで、歩行者専用だ。",
+      colloc: ["a pedestrian crossing"]
     }
   ],
   origin: {
@@ -109283,7 +108174,7 @@ const WORDS = [
   id: 1795324236411,
   word: "counterfeit",
   ipa: "/ˈkaʊntərfɪt/",
-  tags: ["語彙"],
+  tags: ["語彙", "歌詞", "TOEFL"],
   senses: [
     {
       pos: "形容詞",
@@ -109302,6 +108193,24 @@ const WORDS = [
       target: "counterfeit",
       exJa: "通貨の偽造は重大な犯罪だ。",
       colloc: []
+    },
+    {
+      pos: "名詞（counterfeits の形）",
+      ja: "偽物、偽札（counterfeit の複数形）",
+      def: "copies made to look like real money or products in order to deceive people",
+      ex: "Customs officers seized thousands of counterfeits of luxury handbags.",
+      target: "counterfeits",
+      exJa: "税関職員は高級バッグの偽物を数千点押収した。",
+      colloc: ["sell counterfeits", "spot counterfeits"]
+    },
+    {
+      pos: "形容詞（counterfeits の形）",
+      ja: "偽造の",
+      def: "made to look exactly like something real in order to deceive",
+      ex: "The bank installed machines that can detect counterfeit bills.",
+      target: "counterfeit",
+      exJa: "その銀行は偽札を見分けられる機械を設置した。",
+      colloc: ["counterfeit money", "counterfeit goods", "counterfeit bills"]
     }
   ],
   origin: {
@@ -109319,7 +108228,10 @@ const WORDS = [
     { w: "forge", ja: "偽造する" }
   ],
   memo: "",
-  savedAt: "2026-11-22T05:10:36.411Z"
+  savedAt: "2026-11-22T05:10:36.411Z",
+  confuse: [
+    { w: "fake", ja: "fake は一般的な「偽物」。counterfeit は特に<b>お金・ブランド品を違法に偽造したもの</b>に使う。" }
+  ]
 },
 {
   id: 1795324262141,
@@ -110173,12 +109085,21 @@ const WORDS = [
   id: 1795324875159,
   word: "hone",
   ipa: "/hoʊn/",
-  tags: ["TOEFL", "語彙"],
+  tags: ["TOEFL", "語彙", "Red Kiwi"],
   senses: [
     {
       pos: "動詞",
       ja: "（技術を）磨く",
       def: "to improve a skill over time",
+      ex: "She spent years honing her writing skills.",
+      target: "honing",
+      exJa: "彼女は何年もかけて文章力を磨いた。",
+      colloc: ["hone one's skills"]
+    },
+    {
+      pos: "動詞（honing の形）",
+      ja: "（技などを）磨くこと",
+      def: "improving a skill through practice",
       ex: "She spent years honing her writing skills.",
       target: "honing",
       exJa: "彼女は何年もかけて文章力を磨いた。",
@@ -113013,12 +111934,62 @@ function loadUser() {
       if (!Array.isArray(U.qhist)) U.qhist = [];   /* 1問ごとの学習の履歴 */
     }
   } catch (e) { U = blankUser(); }
+  if (foldMergedU()) { try { localStorage.setItem(U_KEY, JSON.stringify(U)); } catch (e) {} }
 }
 function saveUser(push) {
   U.updatedAt = Date.now();
   try { localStorage.setItem(U_KEY, JSON.stringify(U)); } catch (e) {}
   if (push !== false) schedulePush();
 }
+
+/* ================= 活用ちがいの語を1つにまとめた（2026-11-26） =================
+   soared→soar・murals→mural・exhausted→exhaust のように、活用形だけちがう語を残す語のカードへまとめた
+   （消した語の意味・例文・音声は残す語の senses の後ろへ。一覧: 削除履歴/英単語ノート_活用ちがい統合_削除予定_20261126.md）。
+   MERGED_INTO は「消した語の id → 残した語の id」。消した語の記録（お気に入り・メモ・復習の段・成績）を残した語へ寄せる。
+   ・この端末で初めて寄せるとき（U.folded に無い）… メモはつなぎ（同じ文が入っていれば足さない）、お気に入りは残す語もONに
+   ・成績は正解数・不正解数それぞれ多い方、復習の段は残す語に無ければ移す（何度寄せても同じ結果＝古いページの端末と同期しても二重にならない）
+   ・2回目以降（古いページの端末から消した id が同期で戻ってきた）… 残す語に無いものだけ移して、あとは捨てる
+   今日の復習（review-core の RV）も id ごとなので、rvClean を包んで読み込み・合流のたびに寄せる */
+const MERGED_INTO = { '1791188469464': '1789037591510', '1794552498141': '1789035618644', '1794552498085': '1789034161690', '1794552497996': '1788778348930', '1794447267593': '1789999735921', '1794447267302': '1791193781721', '1794447267251': '1791266031422', '1794552497958': '1794359068199', '1794552498139': '1794359668359', '1794552498116': '1794378728593', '1794447267290': '1794552498143', '1794447267442': '1795076241626', '1794552498081': '1794447267529', '1794552498028': '1794447267709', '1794552498131': '1794552498045', '1794552498113': '1794552498072', '1794539204343': '1795324236411', '1794447267281': '1789658439858', '1793347431880': '1793090250673', '1791188469415': '1795324875159', '1791188469566': '1791188469405', '1791188469557': '1788359450396', '1791188469429': '1794447267648', '1794552498176': '1791188469398', '1795067694771': '1794447267458', '1794552498165': '1792028578490', '1791181941166': '1788359450396', '1788704554537': '1792023772333', '1789999735916': '1789035659414', '1793441698923': '1789035142423', '1794447267283': '1789035001763', '1794552497951': '1789034879587', '1789998803195': '1794552498103', '1789999735919': '1791188469506', '1791188469046': '1794447267544', '1791188469371': '1792028611520', '1791188469486': '1792024093329', '1791188469545': '1794356342501', '1791193781723': '1794552497955', '1794447267673': '1794378989177', '1794447267605': '1794552498044', '1794447267637': '1794447267634', '1794552498041': '1794552498040', '1794552498111': '1794552498066' };
+function foldMergedU() {
+  let ch = false;
+  if (!U.folded || typeof U.folded !== 'object' || Array.isArray(U.folded)) U.folded = {};
+  Object.keys(MERGED_INTO).forEach(o => {
+    const k = MERGED_INTO[o], first = !U.folded[o];
+    const any = ['memos', 'favs', 'dels', 'srs', 'stats'].some(f => U[f] && U[f][o] != null);
+    if (!first && !any) return;
+    if (any) {
+      const fo = U.favs[o], fk = U.favs[k];
+      if (first && fo && fo.on && !(fk && fk.on)) U.favs[k] = { t: Math.max(fo.t || 0, (fk && fk.t) || 0), on: true };
+      const mo = U.memos[o], mk = U.memos[k];
+      if (first && mo && String(mo.text || '').trim() && !(mk && String(mk.text || '').includes(String(mo.text).trim()))) {
+        const kt = mk && String(mk.text || '').trim();
+        U.memos[k] = { t: Math.max(mo.t || 0, (mk && mk.t) || 0), text: kt ? kt + '\n' + mo.text : mo.text };
+      }
+      if (U.srs[o] && !U.srs[k]) U.srs[k] = U.srs[o];
+      const so = U.stats[o], sk = U.stats[k];
+      if (so && !sk) U.stats[k] = so;
+      else if (so && sk) U.stats[k] = { ok: Math.max(sk.ok || 0, so.ok || 0), ng: Math.max(sk.ng || 0, so.ng || 0), last: Math.max(sk.last || 0, so.last || 0) };
+      ['memos', 'favs', 'dels', 'srs', 'stats'].forEach(f => { if (U[f]) delete U[f][o]; });
+    }
+    U.folded[o] = 1; ch = true;
+  });
+  return ch;
+}
+function foldMergedRv(rv) {
+  if (!rv || typeof rv !== 'object') return rv;
+  Object.keys(MERGED_INTO).forEach(o => {
+    const k = MERGED_INTO[o];
+    ['base', 'ev', 'wait', 'seen', 'pause'].forEach(f => {
+      const m = rv[f]; if (!m || m[o] == null) return;
+      if (m[k] == null) m[k] = m[o];
+      delete m[o];
+    });
+  });
+  return rv;
+}
+const rvCleanBeforeFold = rvClean;
+rvClean = function (o) { return foldMergedRv(rvCleanBeforeFold(o)); };
 
 let PREFS = { view: 'week', openWeeks: null, hide: false, player: {}, rootKind: '語根', favSort: 'fav' };
 function loadPrefs() {
@@ -113127,6 +112098,7 @@ function mergeRemote(r) {
     U.hist.sort((a, b) => b.at - a.at);
     if (U.hist.length > 60) U.hist = U.hist.slice(0, 60);
   }
+  if (foldMergedU()) changed = true;   /* 古いページの端末から、まとめて消した語の記録が戻ってきたとき */
   return changed;
 }
 function pullSync() {
@@ -116087,9 +115059,9 @@ function makeQuestion(w, kind, pool) {
     const re = new RegExp('\\b' + tgt.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
     const m = s.ex.match(re);
     if (!m) return null;
-    /* DETの Fill in the Blanks と同じ形：単語ごとに前半 floor(n/2) 文字を見せ、後半を打つ（熟語は1語ずつ） */
+    /* DETの Fill in the Blanks と同じ形：前半 floor(n/2) 文字を見せ、後半を打つ。熟語・表現は1語だけ空欄（clozeTokens） */
     const actual = m[0];
-    const tok = actual.split(/(\s+)/).filter(x => x !== '').map(x => /^\s+$/.test(x) ? { sp: x } : { keep: x.slice(0, Math.floor(x.length / 2)), rest: x.slice(Math.floor(x.length / 2)) });
+    const tok = clozeTokens(actual);
     let bi = 0;
     const mid = tok.map(t => t.sp != null ? escapeHtml(t.sp)
       : '<span class="cw">' + escapeHtml(t.keep) + '<input class="ci" data-bi="' + (bi++) + '" maxlength="' + t.rest.length + '" style="width:calc(' + t.rest.length + 'ch + ' + (t.rest.length + 6) + 'px)" placeholder="' + '_'.repeat(t.rest.length) + '" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"></span>').join('');
@@ -116113,6 +115085,30 @@ function makeQuestion(w, kind, pool) {
     return { kind: 'recall', w: w, si: 0, prompt: w.word, sub: 'まず意味を思い出してから、答えを表示', answer: s.ja || '' };
   }
   return null;
+}
+/* 例文穴埋めの空欄の作り方（2026-11-26）
+   1語 … 今までどおり前半 floor(n/2) 文字を見せ、後半を打つ（sustain → sus____）
+   2語以上の熟語・表現 … 1語だけ空欄。残りの語はそのまま見せる。空欄の語は1文字目だけ見せる
+     （belt out these songs → b___ out these songs）
+   空欄にする語＝機能語（out・the・of・to・it's など）と軽い動詞（get・take・make など）を除いた最初の語。
+   なければ機能語以外の最初の語、それもなければいちばん長い語 */
+const CLOZE_FUNC = new Set(("a an the of to in on at for with by from up out off over into onto about around down away back through as and or but so than that this these those it its i you he she we they me him her us them my your his our their one one's oneself someone somebody something sb sth be is am are was were been being do does did have has had not no any some all every everything anything nothing what which who how when where why if will would can could should may might must shall just very too much many more most such there here now then upon within without across along against among between behind beyond under toward towards until while during after before since via per wanna gonna gotta shoulda coulda woulda well really pretty quite rather even still also only ever again already yet almost").split(' '));
+const CLOZE_LIGHT = /^(get|gets|got|gotten|getting|take|takes|took|taken|taking|make|makes|made|making|give|gives|gave|given|giving|go|goes|went|gone|going|come|comes|came|coming|put|puts|putting|keep|keeps|kept|keeping|set|sets|setting|let|lets|letting)$/;
+function clozeTokens(actual) {
+  const parts = String(actual).split(/(\s+)/).filter(x => x !== '');
+  const half = x => ({ keep: x.slice(0, Math.floor(x.length / 2)), rest: x.slice(Math.floor(x.length / 2)) });
+  const words = parts.map((x, i) => /^\s+$/.test(x) ? -1 : i).filter(i => i >= 0);
+  if (words.length <= 1) return parts.map(x => /^\s+$/.test(x) ? { sp: x } : half(x));
+  const bare = i => parts[i].toLowerCase().replace(/[’]/g, "'").replace(/[^a-z']/g, '');
+  const fn = i => { const b = bare(i); return CLOZE_FUNC.has(b) || /n't$/.test(b) || (b.includes("'") && CLOZE_FUNC.has(b.split("'")[0])); };   // it's・I'm・can't なども機能語あつかい
+  const content = words.filter(i => !fn(i) && bare(i).replace(/'/g, '').length >= 2);
+  let pick = content.find(i => !CLOZE_LIGHT.test(bare(i)));
+  if (pick === undefined) pick = content.length ? content[0] : words.reduce((a, b) => bare(b).length > bare(a).length ? b : a);
+  return parts.map((x, i) => {
+    if (i !== pick) return { sp: x };
+    const lead = x.length > 1 ? (x.match(/^[^A-Za-z0-9]*[A-Za-z0-9]/) || [x.charAt(0)])[0] : '';
+    return lead.length < x.length ? { keep: lead, rest: x.slice(lead.length) } : half(x);
+  });
 }
 const KIND_LABEL = { recall: '意味を思い出す', e2j: '意味を選ぶ', j2e: '英単語を書く', cloze: '例文穴埋め', family: '語族', oral: '言う' };
 /* 形式は複数えらべる（2026-11-18）。T.kind は 'mix' か 'recall,cloze' のようなカンマ区切り */
